@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  
+  <defs>
+    <linearGradient id="hexfade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5a0a14" stop-opacity="0"></stop>
+      <stop offset=".25" stop-color="#7a1020" stop-opacity=".35"></stop>
+      <stop offset=".55" stop-color="#c8203a" stop-opacity=".75"></stop>
+      <stop offset="1" stop-color="#ff5a3a" stop-opacity="1"></stop>
+    </linearGradient>
+  </defs>
+  
+  <g fill="none" stroke="url(#hexfade)" stroke-width="1.2">
+    <ellipse cx="800" cy="900" rx="60" ry="20"></ellipse>
+    <ellipse cx="800" cy="900" rx="140" ry="42"></ellipse>
+    <ellipse cx="800" cy="900" rx="240" ry="70"></ellipse>
+    <ellipse cx="800" cy="900" rx="360" ry="100"></ellipse>
+    <ellipse cx="800" cy="900" rx="500" ry="135"></ellipse>
+    <ellipse cx="800" cy="900" rx="660" ry="172"></ellipse>
+    <ellipse cx="800" cy="900" rx="840" ry="212"></ellipse>
+    <ellipse cx="800" cy="900" rx="1040" ry="252"></ellipse>
+    <ellipse cx="800" cy="900" rx="1260" ry="292"></ellipse>
+  </g>
+  
+  <g stroke="url(#hexfade)" stroke-width="1" opacity=".6">
+    <line x1="800" y1="900" x2="-200" y2="608"></line>
+    <line x1="800" y1="900" x2="120" y2="608"></line>
+    <line x1="800" y1="900" x2="380" y2="608"></line>
+    <line x1="800" y1="900" x2="600" y2="608"></line>
+    <line x1="800" y1="900" x2="800" y2="608"></line>
+    <line x1="800" y1="900" x2="1000" y2="608"></line>
+    <line x1="800" y1="900" x2="1220" y2="608"></line>
+    <line x1="800" y1="900" x2="1480" y2="608"></line>
+    <line x1="800" y1="900" x2="1800" y2="608"></line>
+  </g>
+  
+  <radialGradient id="hotspot" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="#ff8a4a" stop-opacity=".9"></stop>
+    <stop offset=".4" stop-color="#ff3018" stop-opacity=".4"></stop>
+    <stop offset="1" stop-color="#ff3018" stop-opacity="0"></stop>
+  </radialGradient>
+  <ellipse cx="800" cy="900" rx="220" ry="44" fill="url(#hotspot)"></ellipse>
+</svg>

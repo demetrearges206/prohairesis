@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+  <defs>
+    <linearGradient id="pn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1d3857"></stop>
+      <stop offset="1" stop-color="#0d1b30"></stop>
+    </linearGradient>
+    <radialGradient id="pnlight" cx=".5" cy=".5" r=".6">
+      <stop offset="0" stop-color="#aad6ff" stop-opacity=".9"></stop>
+      <stop offset=".6" stop-color="#4a8fd6" stop-opacity=".35"></stop>
+      <stop offset="1" stop-color="#4a8fd6" stop-opacity="0"></stop>
+    </radialGradient>
+    <symbol id="bigpod" viewBox="0 0 180 300" width="180" height="300">
+      <rect x="0" y="0" width="180" height="300" rx="14" fill="url(#pn)" stroke="#2a4a6d" stroke-width="2"></rect>
+      <rect x="16" y="16" width="148" height="268" rx="8" fill="none" stroke="#3a6a96" stroke-width="1" opacity=".5"></rect>
+      <circle cx="90" cy="150" r="52" fill="url(#pnlight)"></circle>
+      <rect x="80" y="140" width="20" height="20" rx="3" fill="#d4eaff" opacity=".85"></rect>
+    </symbol>
+  </defs>
+  <g>
+    <use href="#bigpod" x="60" y="120"></use>
+    <use href="#bigpod" x="340" y="120"></use>
+    <use href="#bigpod" x="620" y="120"></use>
+    <use href="#bigpod" x="900" y="120"></use>
+    <use href="#bigpod" x="1180" y="120"></use>
+    <use href="#bigpod" x="1460" y="120"></use>
+
+    <use href="#bigpod" x="60" y="520"></use>
+    <use href="#bigpod" x="340" y="520"></use>
+    <use href="#bigpod" x="620" y="520"></use>
+    <use href="#bigpod" x="900" y="520"></use>
+    <use href="#bigpod" x="1180" y="520"></use>
+    <use href="#bigpod" x="1460" y="520"></use>
+  </g>
+  <rect x="0" y="880" width="1600" height="20" fill="#050812"></rect>
+</svg>

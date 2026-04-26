@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+  <defs>
+    <linearGradient id="pod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#14263f"></stop>
+      <stop offset="1" stop-color="#0a1628"></stop>
+    </linearGradient>
+    <radialGradient id="podlight" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#7ec3ff" stop-opacity=".7"></stop>
+      <stop offset="1" stop-color="#7ec3ff" stop-opacity="0"></stop>
+    </radialGradient>
+    <symbol id="col" viewBox="0 0 70 120" width="70" height="120">
+      <rect x="0" y="0" width="70" height="120" rx="6" fill="url(#pod)"></rect>
+      <circle cx="35" cy="60" r="18" fill="url(#podlight)"></circle>
+      <rect x="28" y="54" width="14" height="14" rx="2" fill="#bfe1ff" opacity=".55"></rect>
+    </symbol>
+  </defs>
+  <g opacity=".62">
+    <use href="#col" x="80" y="80"></use>
+    <use href="#col" x="280" y="80"></use>
+    <use href="#col" x="480" y="80"></use>
+    <use href="#col" x="680" y="80"></use>
+    <use href="#col" x="880" y="80"></use>
+    <use href="#col" x="1080" y="80"></use>
+    <use href="#col" x="1280" y="80"></use>
+    <use href="#col" x="1480" y="80"></use>
+
+    <use href="#col" x="80" y="240"></use>
+    <use href="#col" x="280" y="240"></use>
+    <use href="#col" x="480" y="240"></use>
+    <use href="#col" x="680" y="240"></use>
+    <use href="#col" x="880" y="240"></use>
+    <use href="#col" x="1080" y="240"></use>
+    <use href="#col" x="1280" y="240"></use>
+    <use href="#col" x="1480" y="240"></use>
+
+    <use href="#col" x="80" y="400"></use>
+    <use href="#col" x="280" y="400"></use>
+    <use href="#col" x="480" y="400"></use>
+    <use href="#col" x="680" y="400"></use>
+    <use href="#col" x="880" y="400"></use>
+    <use href="#col" x="1080" y="400"></use>
+    <use href="#col" x="1280" y="400"></use>
+    <use href="#col" x="1480" y="400"></use>
+
+    <use href="#col" x="80" y="560"></use>
+    <use href="#col" x="280" y="560"></use>
+    <use href="#col" x="480" y="560"></use>
+    <use href="#col" x="680" y="560"></use>
+    <use href="#col" x="880" y="560"></use>
+    <use href="#col" x="1080" y="560"></use>
+    <use href="#col" x="1280" y="560"></use>
+    <use href="#col" x="1480" y="560"></use>
+
+    <use href="#col" x="80" y="720"></use>
+    <use href="#col" x="280" y="720"></use>
+    <use href="#col" x="480" y="720"></use>
+    <use href="#col" x="680" y="720"></use>
+    <use href="#col" x="880" y="720"></use>
+    <use href="#col" x="1080" y="720"></use>
+    <use href="#col" x="1280" y="720"></use>
+    <use href="#col" x="1480" y="720"></use>
+  </g>
+</svg>

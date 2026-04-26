@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+  
+  <g fill="#220800" stroke="#3a1408" stroke-width="1.5">
+    <rect x="760" y="40" width="80" height="36" rx="4"></rect>
+    <polygon points="785,76 815,76 810,96 790,96"></polygon>
+  </g>
+  <circle cx="800" cy="58" r="4" fill="#ff2a18">
+    
+  </circle>
+</svg>

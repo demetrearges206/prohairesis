@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+  
+  <g fill="#0a1224">
+    <polygon points="0,900 80,740 180,900"></polygon>
+    <polygon points="160,900 260,780 360,900"></polygon>
+    <polygon points="340,900 440,760 520,900"></polygon>
+    <polygon points="500,900 580,800 660,900"></polygon>
+  </g>
+  <g fill="#18091a">
+    <polygon points="640,900 740,790 820,900"></polygon>
+    <polygon points="800,900 880,770 960,900"></polygon>
+    <polygon points="940,900 1040,800 1120,900"></polygon>
+  </g>
+  <g fill="#200612">
+    <polygon points="1100,900 1180,760 1280,900"></polygon>
+    <polygon points="1260,900 1360,790 1460,900"></polygon>
+    <polygon points="1440,900 1520,770 1600,900"></polygon>
+  </g>
+  
+  <g stroke="#4a7ac0" stroke-width="0.8" opacity=".35" fill="none">
+    <line x1="80" y1="740" x2="100" y2="800"></line>
+    <line x1="260" y1="780" x2="280" y2="830"></line>
+    <line x1="440" y1="760" x2="458" y2="820"></line>
+  </g>
+  <g stroke="#e24a4a" stroke-width="0.8" opacity=".35" fill="none">
+    <line x1="1180" y1="760" x2="1198" y2="820"></line>
+    <line x1="1360" y1="790" x2="1378" y2="840"></line>
+    <line x1="1520" y1="770" x2="1538" y2="830"></line>
+  </g>
+</svg>

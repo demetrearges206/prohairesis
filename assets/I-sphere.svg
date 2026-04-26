@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  
+  <defs>
+    <radialGradient id="halo" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffb86a" stop-opacity=".55"></stop>
+      <stop offset=".25" stop-color="#ff5a1a" stop-opacity=".35"></stop>
+      <stop offset=".55" stop-color="#aa180a" stop-opacity=".18"></stop>
+      <stop offset="1" stop-color="#aa180a" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="core" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffe4b0" stop-opacity="1"></stop>
+      <stop offset=".15" stop-color="#ffb060" stop-opacity=".95"></stop>
+      <stop offset=".4" stop-color="#ff5418" stop-opacity=".7"></stop>
+      <stop offset="1" stop-color="#ff5418" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  
+  <circle cx="800" cy="450" r="520" fill="url(#halo)"></circle>
+  
+  <circle cx="800" cy="450" r="320" fill="url(#halo)" opacity=".7"></circle>
+  
+  <circle cx="800" cy="450" r="180" fill="url(#core)"></circle>
+  
+  <circle cx="800" cy="450" r="40" fill="#fff5d8" opacity=".95"></circle>
+</svg>

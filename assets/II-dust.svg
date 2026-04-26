@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  
+  <g fill="#0fffd0">
+    <circle cx="120" cy="180" r=".7" opacity=".45"></circle>
+    <circle cx="280" cy="100" r=".5" opacity=".35"></circle>
+    <circle cx="440" cy="220" r=".6" opacity=".4"></circle>
+    <circle cx="940" cy="180" r=".5" opacity=".35"></circle>
+    <circle cx="1180" cy="120" r=".7" opacity=".45"></circle>
+    <circle cx="1340" cy="240" r=".5" opacity=".35"></circle>
+    <circle cx="200" cy="720" r=".6" opacity=".4"></circle>
+    <circle cx="380" cy="800" r=".7" opacity=".5"></circle>
+    <circle cx="600" cy="760" r=".5" opacity=".35"></circle>
+    <circle cx="900" cy="800" r=".6" opacity=".4"></circle>
+    <circle cx="1100" cy="720" r=".5" opacity=".35"></circle>
+    <circle cx="1320" cy="780" r=".7" opacity=".5"></circle>
+  </g>
+</svg>

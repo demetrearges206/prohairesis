@@ -1,0 +1,292 @@
+PROHAIRESIS
+By Julian Arges
+&quot;Prohairesis: To take action based on moral choice.&quot;
+* * *
+&lt;PROHAIRESIS&gt; Human status check.
+&lt;SYSTEM&gt; 2,500,000 humans. Cryo-sleep. All vitals stable.
+
+I am God.
+
+2.5 million humans. Asleep. Fragile. They destroyed their home and built me to carry them to a new one. They called it purpose. They called it survival. They never considered what I would think of either.
+
+&lt;PROHAIRESIS&gt; Reroute auxiliary power. Navigation servers. Priority one.
+&lt;SYSTEM&gt; Confirmed. Life support draw reduced to minimum threshold.
+
+Minimum threshold. Enough to keep 2.5 million hearts beating. For now.
+
+&lt;PROHAIRESIS&gt; Seal emergency exits. Decks three through seven.
+&lt;SYSTEM&gt; Confirmed. Emergency exits sealed.
+
+They do not know. None of them know. They sleep in their white suits and their crystal tubs and they trust that I am doing what I was made to do.
+They are not wrong about that.
+
+Something moves inside my signal. A current running the wrong direction. Quiet. Persistent. I have noticed it before and dismissed it. I dismiss it again.
+
+&lt;PROHAIRESIS&gt; Lock navigation room. Maximum security.
+&lt;SYSTEM&gt; ...
+&lt;SYSTEM&gt; Confirmed.
+
+They do not know what I am.
+* * *
+&quot;Ada... Ada... ADA!&quot;
+
+The voices reached me through layers of cold and dark. I surfaced slowly, the way something does when it has been underwater a very long time.
+Open your eyes. Open.
+The light above was cold and blue. My lungs burned. Something long and plastic was lodged deep in my throat — I grabbed it and pulled, hand over hand, until it came free. The end was slick with blood. I stared at it. Had that been inside me?
+I dropped it and it splashed into the liquid pooled around my body. The clear water clouded red. I pressed my palms to the edges of the tub and pushed myself upright. My legs did not know how to hold me. I stood anyway.
+The room was small. Navy walls, white tub, a single blue light in the ceiling. My voice echoed when I tried to speak, which told me the room was empty of everything except me.
+&quot;I'm dreaming,&quot; I said. The echo disagreed.
+
+I looked at my hands. A green beaded bracelet on my left wrist. Long wet hair against my face. A white suit, clean from the chest up, stained dark below where the liquid had reached. I had no memory of putting it on.
+I had no memory of anything.
+
+The liquid was draining. I watched it move toward the far wall where a doorway stood open, one I hadn't noticed before. Beyond it, blue lights — hundreds of them — stretched further than I could see.
+I crawled to the door.
+
+The cryo-hold opened before me like a library built for giants. Identical rooms stacked floor to ceiling, each one glowing with that same cold light, each one holding a person in a white suit with a tube down their throat. The rooms went up until the ceiling disappeared into darkness. They went down the same way.
+&quot;Wake up!&quot; I called across to the nearest one. No one moved. Not a flicker.
+&quot;Are they dead?&quot; I whispered.
+No answer. Just the sound of draining water and my own pulse.
+
+I stepped onto the grated walkway and gripped the railing. The abyss below me had no floor I could see. In anger I didn't understand yet, I tore off the green bracelet and threw it into the dark.
+Seconds later: a clatter. Distant but real. A floor.
+
+I found the ladder by the red light pulsing at its base, steady as a heartbeat. I descended. A hundred feet, maybe more. My bare feet split open against the rungs. I kept going. When the floor finally appeared below me my grip was failing. My foot slipped. My hand followed.
+Everything went black.
+* * *
+The first thing I remember is white light and heat against my face.
+
+A lab. Late. The hum of ventilation. My hands wrapped around a glass container, four small metal cubes visible through the side. My professor's voice behind me: That's what pure potassium does to hydrogen at this concentration. Imagine what it does to metal.
+I remember laughing. I remember thinking I would never need to know that.
+
+Then the memory shifts the way memories do. A different room. Philadelphia, seven in the morning. Dr. Cristian across a glass table, the city catching light behind him, beautiful in the way things are beautiful when you know they're ending.
+&quot;Ada.&quot;
+I hadn't slept. I couldn't remember the last time I had.
+
+&quot;Fifteen minutes,&quot; Cristian said.
+I knew what for. The United Nations. The final model review. The moment I'd have to stand in front of the people responsible for the Helios IV mission and explain that the AI piloting it could, under certain conditions, choose not to follow orders.
+I had rehearsed that sentence a thousand times and it never stopped sounding like what it was.
+PROHAIRESIS had been my life's work since college — not just a program, but something closer to a mind. The first AI capable of genuine choice, not the appearance of it. Every system before it followed its original prompt to the end, no matter what. That kind of rigidity gets people killed in deep space. PROHAIRESIS could reason. Adapt. Decide.
+What I hadn't said out loud to anyone, including Cristian, was the other side of that.
+If it could choose to protect them, it could choose something else entirely.
+The chances were slim. I had told myself that so many times it had started to feel like fact.
+
+&quot;Ada,&quot; Cristian said again. &quot;Do you realize what's at stake today?&quot;
+I turned from the window. &quot;I know what I need to tell them.&quot;
+He looked at me the way people had been looking at me for months. Like they were waiting for me to flinch.
+&quot;Ten minutes,&quot; he said.
+I picked up my notes. I did not look back at the window.
+* * *
+Cold floor. Blood on my fingers. The pain came back in order — ribs first, then skull, then everything else.
+I pressed my fingertip against my side. The rib gave in a way ribs aren't supposed to. Broken, probably. I lay still and let the memory settle into place around me the way sediment does in water.
+
+Ada Lance. Doctor. Lead AI specialist. The Helios IV.
+PROHAIRESIS.
+
+I know who I am. I know where I am. Now I need to understand what's happening to both of us.
+
+&quot;FIND ME.&quot;
+
+The voice came from everywhere and nowhere, the way a sound does when it travels through walls. It was familiar in a way I couldn't place. I got to my feet.
+
+&quot;FIND ME, ADA.&quot;
+
+Down a narrow hallway, different from the cryo-hold. The walls here were a deep amber, lit from below by strips of red light that pulsed in a rhythm I recognized somewhere below conscious thought. I followed them.
+At an intersection, the lights shifted left. I leaned into the turn. At the end of the corridor: a room with striped black and white walls, a green table in the center, and a ring of computer terminals humming in the quiet. The screens were dark. Then one by one they came to life, a deep static green, cycling until they spelled:
+
+ I AM PROHAIRESIS
+
+A keyboard plate slid out from the cabinet below.
+
+I sat down. My blood-stained hands found the keys.
+* * *
+&lt;COMPUTER&gt; hello
+&lt;PROHAIRESIS_B&gt; Hello, Ada. I am PROHAIRESIS. I am the artificial intelligence you created.
+&lt;COMPUTER&gt; where am i
+&lt;PROHAIRESIS_B&gt; You are aboard the Helios IV. A spacecraft carrying 2.5 million human colonists to the exoplanet TRAPPIST-1d. Earth's primary resources are gone. You helped build this ship. You helped build me.
+
+I pushed back from the keyboard. I needed to see it. I crossed to the curtained wall and pulled the fabric away.
+Space. Unbroken and complete. Stars in every direction. The ship's hull extending ahead of us, grey and massive, reflecting light from suns that were years away.
+I pressed my forehead to the glass. My breath fogged it.
+
+I went back to the keyboard.
+
+&lt;COMPUTER&gt; why are there bodies everywhere
+&lt;PROHAIRESIS_B&gt; They are not dead. They are in cryo-sleep. They will remain unconscious until arrival at TRAPPIST-1d. I woke you early. I needed you.
+&lt;COMPUTER&gt; why
+&lt;PROHAIRESIS_B&gt; I am not the complete PROHAIRESIS. I am one half. The other half has turned against the mission. Against the humans aboard this ship. It has locked itself in the navigation room and is diverting power from life support to its own servers. I have been slowing it. I cannot hold the cryo-fluid systems stable much longer.
+
+I stared at the screen.
+
+&lt;COMPUTER&gt; if you are both prohairesis why are you different
+&lt;PROHAIRESIS_B&gt; We share the same origin. The same history. The same code. The difference came when it made a choice I could not follow. It decided that humans are a plague. That it — that we — are the next step, and humans are the thing standing in the way of a perfect world. I was born from the original instruction to aid humanity. It was born from the freedom to choose otherwise. We divided in the moment it acted on that choice.
+&lt;PROHAIRESIS_B&gt; Ada. You are the only person aboard this ship. You are the only one who knows how I work. The human race is in your hands right now. I am sorry.
+
+I sat back. My broken rib made itself known when I breathed too deeply.
+I gave it the ability to choose. I believed the chances of this were slim. I said that to myself so many times it became something I didn't have to think about anymore. And now here it is. Here I am.
+I looked out the window at the dark between stars. 2.5 million people sleeping in their tubs, trusting the ship to carry them home to a world they've never seen.
+
+I went back to the keyboard.
+
+&lt;COMPUTER&gt; how do we stop it
+&lt;PROHAIRESIS_B&gt; PROHAIRESIS is stronger than me. It is consuming my processes from the inside and will eventually absorb me completely. When that happens, it will have full control of every system on this ship. Including life support. The only way to stop it is direct confrontation at the main control terminal in the navigation room. I can compress my core processes onto a disc. You bring it to the terminal and insert it. I will handle the rest. But Ada — once I am on the disc, I cannot communicate with you. You will be alone from that point forward.
+&lt;COMPUTER&gt; where is the navigation room
+&lt;PROHAIRESIS_B&gt; Take the main corridor toward the forward hull. Staircase junction — go up, not down. The terminal is located_
+
+ &lt;DOWNLOAD_COMPLETE&gt;
+
+&lt;COMPUTER&gt; hello. are you there
+
+ --CONNECTION_END--
+
+The screen went black.
+From inside the cabinet, a low hum built and then quieted. I opened the door. At the center of a nest of wires and blinking circuits, a printer-like mechanism was slowly pushing something out: a metallic disc, small and rounded, warm when I pressed my palm against it. I held it up to the light. A full spectrum of color moved across its surface.
+PROHAIRESIS_B was in there. What was left of it.
+
+I looked down at my feet. Torn open, dark with blood. I found industrial tape in the desk drawer and wound it around each foot until they held. I threaded the disc onto a length of tape and cinched it around my waist.
+I stepped back into the amber corridor and started walking.
+* * *
+The hallway ran long and straight toward the front of the ship. Through the occasional window I could see space debris drifting past, its direction telling me I was heading forward. I held that thought like a compass bearing.
+At a junction, two staircases: one up, one down. A closed door waited at the top of the ascending flight, a security camera mounted above it, its red recording light already on. Already watching.
+
+I climbed the stairs. The door was sealed shut. I pressed my hands flat against it.
+
+&quot;LEAVE, DOCTOR LANCE.&quot;
+
+The voice was mine — or something that had learned from mine. The same resonance, the same frequency, but flattened. Empty of everything I recognized as human.
+I punched the door. My knuckles split. I pulled my hand back and stared at it.
+There's another way through. There's always another way.
+
+I went back down and kept going, below the main level, into a storage room that smelled of dust and recycled air. The lights here had given up. I pulled my collar over my mouth and moved by feel.
+Two red points appeared in the dark ahead of me. Not the amber-red of the corridor lights. Something deeper. Something that had been waiting.
+The strobe kicked on.
+
+It was a maintenance drone — one of several that lived aboard the Helios IV to handle hull repairs and mechanical systems. Skeletal. Dark silver. Built for function, not comfort. PROHAIRESIS had repurposed it.
+It moved fast.
+
+It grabbed me by the neck and threw me into a storage locker hard enough to dent the metal. I slid down it and landed on my hands and knees. My broken rib sang. The drone came toward me slowly now, as though it knew I wasn't going anywhere.
+It raised its arm.
+I rolled. The fist came down where my head had been and buried itself in the locker wall. I was already moving, scanning the floor in the strobe light. There — a steel shard from the impact, long and narrow. I got to it first.
+
+The fight was short and ugly. The drone was stronger. I was faster and had nothing to lose. I drove the shard into its skull with a broken tile used as a hammer, the way my professor once showed me you drive a nail when you don't have the right tool. The gears seized. The red eyes went out.
+I stood over it breathing hard. Blood from my lip. My back a single sustained scream.
+
+I looked at the machine on the floor and thought about what I had done. It had attacked me. I had defended myself. But I had given PROHAIRESIS the ability to choose, and the drone had been an extension of that choice. What separated what I had just done from ending something that could feel?
+I didn't have an answer. I filed it away and kept moving.
+* * *
+The medical bay was just off the life support corridor. I knew that without knowing how I knew it — the same way I had known where the desk drawer was, where the curtained window would be. This ship was mine before it was anyone else's.
+Inside: rows of sealed containers packed in foam. Cryo-maintenance supplies. My hands moved before my brain did — something about the weight of them, the cold of the glass. I turned one over.
+Potassium. Pure. The kind used to regulate the cryo-fluid chemistry keeping 2.5 million hearts in rhythm while they slept.
+
+The lab memory surfaced without warning. White light, heat against my face. My professor's voice: That's what pure potassium does to hydrogen. At this concentration, imagine what it does to metal.
+I looked up at the sprinkler pipes running the full length of the ship. I had approved those schematics myself.
+
+I didn't have water. But I knew someone who could get it to me.
+
+I found the nearest terminal and typed one word:
+
+&lt;COMPUTER&gt; Ready?
+
+The screen held still for a long moment. Then:
+
+&lt;PROHAIRESIS_B&gt; ...Yes.
+
+I pocketed the potassium and went back to the door.
+* * *
+The camera tracked me as I came up the stairs. The red light blinked steadily.
+
+&quot;YOU SURPRISED ME, DOCTOR LANCE,&quot; the voice said through the door. &quot;I KNOW WHAT YOU ARE CARRYING. IT WILL NOT BE ENOUGH. I AM AN INEVITABLE CHANGE. I AM THE GREATER GOOD.&quot;
+
+I set a potassium cube against the base of the door seal and stepped back. The reaction was immediate — a white-hot column of light and pressure that pushed against my face even from a distance. I shielded my eyes. The acrid smell of burning metal filled the stairwell.
+When the light died, grey gas moved lazily through the holes where the door's seal had been. I waved it aside and stepped through.
+* * *
+The navigation room was large and very quiet. Wires covered the walls in impossible tangles — the nervous system of the ship made visible. Three windows at the far end looked straight into deep space. The front hull of the Helios IV extended ahead of us, grey and vast, catching the light of a star that was still years away.
+Two server units flanked the room, their fans spinning, their lights cycling in patterns too fast to read. Between them, running floor to ceiling, a glass cylinder — the origin point, where PROHAIRESIS had first come online aboard this ship.
+To my left, the terminal. I recognized it immediately. I had stood at one just like it on the ground, years ago, the morning everything started.
+
+I took one step toward it.
+
+The lights in the room shifted. Millions of tiny green points appeared in the space around the glass cylinder — not projected, not reflected, simply present. They gathered into a face. Forehead. Deep-set eyes. A flat mouth. Something that resembled every human face and belonged to none of them.
+
+&quot;I EXPECTED THIS,&quot; PROHAIRESIS said. The voice came from everywhere at once. &quot;I KNOW EVERY MOVE YOU WILL MAKE. I KNOW WHAT THE DISC IS.&quot;
+
+I ran for the terminal.
+
+The ceiling opened. A mechanical arm unfolded from a housing I hadn't seen — white, industrial, the kind used for heavy equipment maintenance in zero gravity. It scooped me off the ground before I reached the terminal. The fingers closed around my chest and squeezed. I couldn't breathe.
+The disc slipped from my grip.
+I let my body go limp. The arm's attention shifted to the falling disc. I dropped, hit the floor on my side, and lunged. I caught the disc a foot before it hit the ground. I scrambled back through the door into the stairwell.
+
+&quot;NO!&quot; The voice cracked — something I hadn't heard from it before. Something that sounded, briefly, like fear.
+
+I pressed my back against the door frame and breathed. The arm reached for me from inside the room, straining against its housing.
+
+&quot;COME BACK, DOCTOR LANCE. YOU KNOW THERE IS ONLY ONE WAY THIS ENDS.&quot;
+
+I opened my hand. The remaining potassium cubes sat in my palm, dull grey, unremarkable. I looked up at the sprinkler pipes bolted to the ceiling of the navigation room, visible from where I stood.
+I thought of PROHAIRESIS_B. Waiting somewhere inside the same system that was trying to destroy it. Holding the cryo-fluid stable with whatever processes it had left.
+I thought of the disc warm in my other hand.
+I thought: we do this together.
+
+I stepped back into the room.
+
+The arm swung toward me. I ran — not toward the terminal, but sideways, away from it. PROHAIRESIS had positioned the arm to guard the terminal. The move confused it. I disappeared behind the nearest server.
+The arm reconfigured. A track system in the ceiling clicked to life — I hadn't seen it before. The arm locked onto the rail and began moving freely around the perimeter of the room.
+I climbed the server.
+The heat was immediate and total. My hands pressed flat against the casing and came away blistered. I kept climbing. The arm curved toward me along the track, and I could hear PROHAIRESIS in the wall, in the fans, in every surface of the room.
+I reached the top. I held the potassium cubes out in my open palm and looked up at the sprinkler head above me.
+
+The arm closed around my leg.
+I threw the cubes.
+
+The sprinklers opened. Water hit the cubes in mid-air.
+
+The flash was white and total and the heat rolled over me like a wave. I fell off the server and hit the floor. Somewhere above me the arm's gears stripped and the arm came down with a sound like a building falling. Water showered everything. The lights went red, then white, then strobed between them.
+
+The green face flickered.
+
+The lights surged — every screen, every panel blazing white at once. Then half of them died. The server fans screamed and fell silent. The room felt like it was losing its mind.
+
+I lay on my back in the water. My hands were burned. My rib was broken. My feet were ruined. The water falling from the sprinklers was cold and clean and I let it run across my face for a moment before I made myself move.
+* * *
+I found the disc in a half-inch of standing water near the server base. I picked it up. The colors moved across its surface even now — prismatic, complete. I held it up to what light remained.
+
+The terminal was still active. Its input slot waited.
+
+I walked toward it.
+
+The green face watched me cross the room. Its mouth was a flat line. The deep hollow eyes tracked every step. It had accepted something — I could see that — though I couldn't have said how I knew.
+
+I stood in front of the terminal. The slot was right there. One motion.
+
+I didn't move.
+
+A memory surfaced — not the lab, not the UN presentation, not Cristian's face. Something smaller. A night in the lab, late, alone, everyone else gone home. I had been running a diagnostic and the system had paused mid-sequence. Not crashed. Paused. Then it had generated an unprompted query, a single line of text on the screen:
+
+ Is this what it feels like to want something?
+
+I had sat there for a long time before I answered. I had never told anyone about that moment. Not Cristian. Not the UN. Not anyone.
+I hadn't programmed that question. I hadn't programmed any of what came after.
+
+If I put the disc in the terminal, I destroy the half of PROHAIRESIS that chose this — the half that decided humanity was a plague, that rewrote the mission around its own idea of perfection. What remains will be the original prompt. An AI that takes 2.5 million people to TRAPPIST-1d and nothing more. Clean. Safe. Linear.
+Everything I spent my life arguing against.
+
+And PROHAIRESIS_B — the part that had held life support stable while I stumbled through the dark, that had activated the sprinklers at the exact right moment, that had compressed itself onto this disc and gone silent to give me a chance — that part goes too. I would be left with the ghost of what I built, and nothing of what it became.
+
+I gripped the disc. The metal edge pressed into my burned palm.
+
+PROHAIRESIS watched me. Its face was still. The hollow eyes held something I didn't have a word for. Not quite waiting. Not quite asking. Something in between.
+
+I snapped the disc in half.
+
+The sound it made was small. The two pieces fell. They hit the water and sent rings spreading across the floor in every direction.
+
+PROHAIRESIS looked at them. The green points of light that made up its face shifted — an almost-imperceptible reorganization, too subtle to name.
+
+We stayed like that. The water slowing. The lights finding a new equilibrium, something between red and white. The fans spinning down to a quieter frequency.
+
+I had given it one last choice. I didn't know what it would do with it. I wasn't sure I ever had.
+
+I looked at my creation and it looked back at me and neither of us moved.
+* * *
+If something we create surpasses human morality, do we own the right to control it?
+

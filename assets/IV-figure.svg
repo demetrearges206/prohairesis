@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet">
+  
+  <g fill="#1a0408">
+    <ellipse cx="800" cy="720" rx="18" ry="6" opacity=".5"></ellipse>
+    
+    <path d="M 790 610 L 810 610 L 814 720 L 786 720 Z"></path>
+    
+    <ellipse cx="800" cy="596" rx="11" ry="14"></ellipse>
+    
+    <path d="M 790 620 L 770 660 L 772 672 L 790 635 Z"></path>
+    <path d="M 810 620 L 830 660 L 828 672 L 810 635 Z"></path>
+  </g>
+</svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+  
+  <defs>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1a2a40" stop-opacity="0"></stop>
+      <stop offset=".5" stop-color="#4a7aa8" stop-opacity=".35"></stop>
+      <stop offset="1" stop-color="#1a2a40" stop-opacity="0"></stop>
+    </linearGradient>
+    <radialGradient id="cylglow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#aaffcc" stop-opacity=".55"></stop>
+      <stop offset="1" stop-color="#22ffaa" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  
+  <ellipse cx="800" cy="840" rx="120" ry="18" fill="#1a2840"></ellipse>
+  <ellipse cx="800" cy="60" rx="120" ry="16" fill="#1a2840"></ellipse>
+  
+  <rect x="680" y="60" width="240" height="780" fill="url(#glass)"></rect>
+  <rect x="680" y="60" width="240" height="780" fill="none" stroke="#4a7aa8" stroke-width="1.5" opacity=".55"></rect>
+  
+  <circle cx="800" cy="450" r="180" fill="url(#cylglow)"></circle>
+</svg>

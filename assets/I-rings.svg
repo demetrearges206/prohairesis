@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  
+  <g fill="none" stroke="#ff5418" stroke-width="1" opacity=".55">
+    
+    <ellipse cx="800" cy="450" rx="420" ry="78"></ellipse>
+    
+    <ellipse cx="800" cy="450" rx="420" ry="78" transform="rotate(35 800 450)"></ellipse>
+    
+    <ellipse cx="800" cy="450" rx="420" ry="78" transform="rotate(-35 800 450)"></ellipse>
+    
+    <ellipse cx="800" cy="450" rx="560" ry="105" opacity=".5"></ellipse>
+  </g>
+  
+  <g fill="#ffd690">
+    <circle cx="380" cy="450" r="2.2"></circle>
+    <circle cx="1220" cy="450" r="2.2"></circle>
+    <circle cx="540" cy="378" r="1.8" opacity=".8"></circle>
+    <circle cx="1060" cy="522" r="1.8" opacity=".8"></circle>
+    <circle cx="630" cy="312" r="1.6" opacity=".75"></circle>
+    <circle cx="970" cy="588" r="1.6" opacity=".75"></circle>
+    <circle cx="240" cy="450" r="2.5" opacity=".9"></circle>
+    <circle cx="1360" cy="450" r="2.5" opacity=".9"></circle>
+  </g>
+</svg>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" preserveAspectRatio="xMidYMid meet">
+  
+  <defs>
+    <radialGradient id="orbBody" cx=".42" cy=".4" r=".55">
+      <stop offset="0" stop-color="#aaeaff" stop-opacity=".95"></stop>
+      <stop offset=".15" stop-color="#5ab8ff" stop-opacity=".9"></stop>
+      <stop offset=".4" stop-color="#3a4ad0" stop-opacity=".85"></stop>
+      <stop offset=".65" stop-color="#a82c80" stop-opacity=".9"></stop>
+      <stop offset="1" stop-color="#3a0820" stop-opacity="1"></stop>
+    </radialGradient>
+    <radialGradient id="orbRim" cx=".5" cy=".5" r=".5">
+      <stop offset=".82" stop-color="#ff80c8" stop-opacity="0"></stop>
+      <stop offset=".95" stop-color="#ff80c8" stop-opacity=".4"></stop>
+      <stop offset="1" stop-color="#ff80c8" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="orbHaze" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ff4a90" stop-opacity=".25"></stop>
+      <stop offset="1" stop-color="#ff4a90" stop-opacity="0"></stop>
+    </radialGradient>
+    
+    <radialGradient id="cloudA" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#cce8ff" stop-opacity=".75"></stop>
+      <stop offset="1" stop-color="#cce8ff" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="cloudB" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ff5a90" stop-opacity=".7"></stop>
+      <stop offset="1" stop-color="#ff5a90" stop-opacity="0"></stop>
+    </radialGradient>
+    <clipPath id="orbClip">
+      <circle cx="450" cy="450" r="320"></circle>
+    </clipPath>
+  </defs>
+
+  
+  <circle cx="450" cy="450" r="430" fill="url(#orbHaze)"></circle>
+
+  
+  <circle cx="450" cy="450" r="320" fill="url(#orbBody)"></circle>
+
+  
+  <g clip-path="url(#orbClip)" opacity=".85">
+    <ellipse cx="320" cy="360" rx="180" ry="120" fill="url(#cloudA)"></ellipse>
+    <ellipse cx="540" cy="320" rx="200" ry="120" fill="url(#cloudA)" opacity=".7"></ellipse>
+    <ellipse cx="380" cy="540" rx="220" ry="140" fill="url(#cloudB)"></ellipse>
+    <ellipse cx="600" cy="560" rx="180" ry="120" fill="url(#cloudB)" opacity=".75"></ellipse>
+    <ellipse cx="440" cy="640" rx="240" ry="80" fill="url(#cloudA)" opacity=".55"></ellipse>
+    <ellipse cx="280" cy="460" rx="120" ry="160" fill="url(#cloudB)" opacity=".55"></ellipse>
+  </g>
+
+  
+  <ellipse cx="350" cy="320" rx="90" ry="50" fill="#ffffff" opacity=".18"></ellipse>
+
+  
+  <circle cx="450" cy="450" r="320" fill="url(#orbRim)"></circle>
+
+  
+  <circle cx="450" cy="450" r="320" fill="none" stroke="#ff80c8" stroke-width="1.5" opacity=".55"></circle>
+</svg>

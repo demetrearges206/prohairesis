@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
+  
+  <defs>
+    <radialGradient id="discbase" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#e8f0ff"></stop>
+      <stop offset=".5" stop-color="#a0c0e8"></stop>
+      <stop offset="1" stop-color="#3a5078"></stop>
+    </radialGradient>
+    <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff5a8a" stop-opacity=".8"></stop>
+      <stop offset=".3" stop-color="#5aaaff" stop-opacity=".8"></stop>
+      <stop offset=".6" stop-color="#5affaa" stop-opacity=".8"></stop>
+      <stop offset="1" stop-color="#ffd05a" stop-opacity=".8"></stop>
+    </linearGradient>
+  </defs>
+  <circle cx="200" cy="200" r="140" fill="url(#discbase)"></circle>
+  <circle cx="200" cy="200" r="140" fill="url(#prism)" opacity=".6"></circle>
+  <circle cx="200" cy="200" r="140" fill="none" stroke="#c0d8f0" stroke-width="2"></circle>
+  <circle cx="200" cy="200" r="32" fill="#0a1220"></circle>
+  <circle cx="200" cy="200" r="30" fill="none" stroke="#c0d8f0" stroke-width="1"></circle>
+  
+  <path d="M 120 150 A 100 100 0 0 1 280 150" fill="none" stroke="#ffffff" stroke-width="3" opacity=".55"></path>
+</svg>

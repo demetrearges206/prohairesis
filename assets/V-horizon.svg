@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+  
+  <defs>
+    <linearGradient id="hz" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f9e8d0" stop-opacity="0"></stop>
+      <stop offset="40%" stop-color="#f4d8a8" stop-opacity=".7"></stop>
+      <stop offset="100%" stop-color="#e8b05c"></stop>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="600" width="1600" height="300" fill="url(#hz)"></rect>
+  <polygon points="0,900 0,780 220,800 520,760 860,790 1200,760 1600,800 1600,900" fill="#d49a4c" opacity=".5"></polygon>
+  <polygon points="0,900 0,840 300,850 700,830 1100,850 1600,840 1600,900" fill="#b97a30" opacity=".4"></polygon>
+</svg>

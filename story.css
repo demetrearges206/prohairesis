@@ -1,0 +1,920 @@
+/* ============================================================
+   Prohairesis — Julian Arges — parallax story CSS
+   ============================================================ */
+
+:root {
+  --bg: #050608;
+  --ink: #e8ecf4;
+  --ink-soft: rgba(232,236,244,.62);
+  --rule: rgba(232,236,244,.18);
+  --serif: "Fraunces", Georgia, serif;
+  --sans: "Inter Tight", "Inter", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  --text-shadow-strength: 0.7;
+  --card-opacity: 0.0;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--serif);
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ---------- Fixed UI chrome ---------- */
+.chrome {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 28px;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.88);
+  mix-blend-mode: difference;
+}
+.chrome .brand { font-weight: 600; }
+.chrome .brand em { font-style: normal; opacity: .55; margin-left: 10px; font-weight: 400; }
+.chrome .counter { text-align: right; font-variant-numeric: tabular-nums; }
+.chrome .counter span.dim { opacity: .5; }
+
+.frame-top {
+  position: fixed;
+  top: 54px; left: 28px; right: 28px;
+  height: 1px;
+  background: rgba(255,255,255,.18);
+  z-index: 999;
+  mix-blend-mode: difference;
+}
+
+.progress-bar {
+  position: fixed;
+  top: 54px; left: 28px;
+  height: 1px;
+  width: 0%;
+  background: #fff;
+  z-index: 1001;
+  transition: width .12s linear;
+  mix-blend-mode: difference;
+}
+
+/* ---------- Opening ---------- */
+.opening {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  background: #050608;
+  overflow: hidden;
+}
+.opening::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 50%, rgba(58,122,226,.12), transparent 70%),
+    radial-gradient(ellipse 30% 20% at 50% 50%, rgba(226,74,74,.08), transparent 70%);
+}
+.opening .opening-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 820px;
+  padding: 0 24px;
+}
+.opening .eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 32px;
+}
+.opening h1 {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(52px, 10vw, 148px);
+  line-height: .98;
+  letter-spacing: -.025em;
+  margin: 0;
+  font-style: italic;
+  color: #f4f6fb;
+}
+.opening h1 .slash {
+  color: #f4f6fb;
+  font-style: italic;
+  font-weight: 200;
+}
+.opening .byline {
+  margin-top: 40px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.opening .meta-rule {
+  position: absolute;
+  left: 32px; right: 32px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.opening .meta-rule.top { top: 78px; }
+.opening .meta-rule.bot { bottom: 78px; }
+
+.opening .scroll-hint {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: bob 2.6s ease-in-out infinite;
+}
+.opening .scroll-hint::after {
+  content: "";
+  width: 1px; height: 28px;
+  background: currentColor;
+  opacity: .4;
+}
+@keyframes bob { 0%, 100% { transform: translate(-50%,0); } 50% { transform: translate(-50%, 6px); } }
+
+/* ---------- Chapter scenes ---------- */
+.chapter { position: relative; width: 100%; }
+.scene {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Feather the scene into its end-color at top and bottom */
+.scene::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 22vh;
+  pointer-events: none;
+  z-index: 30;
+}
+/* A solid color "floor" that extends BELOW the scene to prevent silhouettes
+   from "creeping up" when the sticky scene unsticks at the chapter break.
+   Each palette overrides this with its actual end-color. */
+.scene::after {
+  /* keep feather */
+}
+.chapter::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 0;
+  height: 60vh;
+  z-index: 1;
+  pointer-events: none;
+}
+.scene::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 14vh;
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* --- Palettes (matched at chapter boundaries) ---
+   Updated for the new art direction:
+   I  Genesis     — pure black void with crimson ember at center
+   II Cryo        — pure black + teal grid; pierced by cyan beam
+   III Philadelphia — crimson/vermilion sky → hot-pink fog → black ridge
+   IV Find Me     — near-black with phosphor-green HUD wash
+   V  Choice      — black void w/ subtle plum & cobalt rim glow (orb space) */
+
+/* I — Genesis: pure black with subtle crimson rim from the central sphere */
+.scene[data-palette="genesis"] {
+  background: radial-gradient(ellipse at 50% 50%,
+    #1a0408 0%, #0a0204 40%, #050102 70%, #000 100%);
+}
+.scene[data-palette="genesis"]::before {
+  background: linear-gradient(to top, rgba(0,0,0,0) 0%, #000 90%);
+}
+.scene[data-palette="genesis"]::after {
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 90%);
+}
+.chapter:has(.scene[data-palette="genesis"])::after { background: #000; }
+
+/* II — Cryo: pure black with subtle teal rim from grid VP */
+.scene[data-palette="cryo"] {
+  background: radial-gradient(ellipse at 35% 50%,
+    #021214 0%, #010608 50%, #000 80%);
+}
+.scene[data-palette="cryo"]::before {
+  background: linear-gradient(to top, rgba(0,0,0,0) 0%, #000 90%);
+}
+.scene[data-palette="cryo"]::after {
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 90%);
+}
+.chapter:has(.scene[data-palette="cryo"])::after { background: #000; }
+
+/* III — Philadelphia: blood-red vermilion sky → hot pink → near-black bottom ridge.
+   Crimson is bright enough that .prose.light (#1a0a05) reads well; the halo on
+   .prose.light .chapter-head guarantees it. */
+.scene[data-palette="philadelphia"] {
+  background: linear-gradient(to bottom,
+    #e8081a 0%,
+    #ff2820 18%,
+    #ff3868 42%,
+    #ff5a8a 62%,
+    #b8285a 80%,
+    #1a0608 100%);
+}
+.scene[data-palette="philadelphia"]::before {
+  background: linear-gradient(to top, rgba(232,8,26,0) 0%, #000 95%);
+  height: 6vh;
+}
+.scene[data-palette="philadelphia"]::after {
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 85%);
+}
+.chapter:has(.scene[data-palette="philadelphia"])::after { background: #000; }
+
+/* IV — Find Me: near-black with the faintest phosphor-green wash */
+.scene[data-palette="findme"] {
+  background: linear-gradient(to bottom,
+    #1a0608 0%,
+    #060802 25%,
+    #050a04 55%,
+    #04080a 100%);
+}
+.scene[data-palette="findme"]::before {
+  background: linear-gradient(to top, rgba(26,6,8,0) 0%, #1a0608 85%);
+}
+.scene[data-palette="findme"]::after {
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 90%);
+}
+.chapter:has(.scene[data-palette="findme"])::after { background: #000; }
+
+/* V — Choice: deep void with subtle plum + cobalt rims (the orb's room) */
+.scene[data-palette="choice"] {
+  background: radial-gradient(ellipse at 50% 45%,
+    #1a0a20 0%, #08081a 35%, #02040a 70%, #000 100%);
+}
+.scene[data-palette="choice"]::before {
+  background: linear-gradient(to top, rgba(0,0,0,0) 0%, #000 90%);
+}
+.scene[data-palette="choice"]::after {
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 90%);
+}
+.chapter:has(.scene[data-palette="choice"])::after { background: #000; }
+
+.scene .layer {
+  position: absolute;
+  left: 0; right: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.scene .layer img { width: 100%; display: block; }
+
+/* ---------- Prose ---------- */
+.prose {
+  position: relative;
+  z-index: 40;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 32px;
+  font-family: var(--serif);
+}
+.prose.dark   { color: #f4f6fb; }
+.prose.light  { color: #1a0a05; }
+
+.prose .chapter-head {
+  padding-top: 32vh;
+  padding-bottom: 18vh;
+}
+/* Soft warm halo behind chapter heads in light-prose chapters so the
+   title stays readable even if a dark foreground layer happens to
+   scroll into the same vertical band. Invisible on amber, softly
+   lifts the heading off anything darker. */
+.prose.light .chapter-head {
+  position: relative;
+}
+.prose.light .chapter-head::before {
+  content: "";
+  position: absolute;
+  inset: 20vh -8% 12vh -8%;
+  background: radial-gradient(ellipse at center,
+    rgba(255, 228, 190, 0.72) 0%,
+    rgba(255, 228, 190, 0.45) 30%,
+    rgba(255, 228, 190, 0.15) 60%,
+    rgba(255, 228, 190, 0) 85%);
+  filter: blur(30px);
+  z-index: -1;
+  pointer-events: none;
+}
+.prose .chapter-head .roman {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  opacity: .7;
+  margin-bottom: 18px;
+}
+.prose .chapter-head .roman::before {
+  content: "— ";
+  opacity: .5;
+}
+.prose .chapter-head h2 {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(52px, 8vw, 108px);
+  line-height: 1;
+  letter-spacing: -.02em;
+  margin: 0 0 20px;
+}
+.prose .chapter-head .lede {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.5;
+  opacity: .88;
+  max-width: 480px;
+  font-style: italic;
+}
+
+.prose p {
+  font-size: 19px;
+  line-height: 1.62;
+  margin: 0 0 1.3em;
+  text-wrap: pretty;
+  max-width: 580px;
+}
+.prose p.drop::first-letter {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 4em;
+  line-height: .85;
+  float: left;
+  padding: 6px 10px 0 0;
+  margin: 4px 0 0;
+}
+.prose p.pause {
+  text-align: center;
+  font-style: italic;
+  opacity: .7;
+  font-size: 16px;
+  max-width: none;
+  margin-block: 2.5em;
+  font-family: var(--mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.prose p.pause::before, .prose p.pause::after {
+  content: " · ";
+  opacity: .5;
+  margin: 0 10px;
+}
+.prose blockquote {
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.4;
+  border-left: 2px solid currentColor;
+  padding-left: 20px;
+  margin: 2em 0;
+  opacity: .92;
+  max-width: 580px;
+  font-weight: 300;
+}
+.prose blockquote.query {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 18px;
+  opacity: 1;
+  border-left-color: #3affaa;
+  color: #d4ffee;
+  letter-spacing: .01em;
+  padding: 8px 20px;
+}
+
+/* Terminal-style blocks */
+.prose p.term {
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.9;
+  letter-spacing: .01em;
+  background: rgba(0,0,0,.35);
+  border-left: 1px solid rgba(122,218,166,.4);
+  padding: 14px 16px 14px 18px;
+  margin: 1.6em 0;
+  max-width: 580px;
+  color: #d4ffee;
+  text-shadow: none !important;
+}
+.prose p.term .tag {
+  color: #7adaa6;
+  font-weight: 500;
+  margin-right: 6px;
+}
+.prose p.term .tag.dim {
+  color: #6a8aa8;
+}
+.prose p.term.center-term {
+  text-align: center;
+  font-size: 16px;
+  letter-spacing: .3em;
+  background: transparent;
+  border: none;
+  color: #3affaa;
+  padding: 2em 0;
+  text-shadow: 0 0 20px rgba(58,255,170,.6) !important;
+}
+
+.prose p.shout {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: .05em;
+  font-size: 24px;
+  color: #ff8a6a;
+  text-align: center;
+  margin: 2em 0;
+  max-width: none;
+}
+.prose p.shout.gentle {
+  color: inherit;
+  font-style: italic;
+  font-size: 22px;
+  opacity: .95;
+  letter-spacing: 0;
+  text-align: left;
+}
+
+.prose p.flash {
+  font-family: var(--mono);
+  text-align: center;
+  font-size: 64px;
+  letter-spacing: .3em;
+  color: #fff;
+  margin: 1.5em 0;
+  text-shadow:
+    0 0 40px rgba(255,255,255,.8),
+    0 0 80px rgba(255,200,120,.6) !important;
+  animation: flash 2.4s ease-out;
+}
+@keyframes flash {
+  0% { opacity: 0; transform: scale(1.1); }
+  10% { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.prose .spacer     { height: 25vh; }
+.prose .spacer-sm  { height: 12vh; }
+.prose .spacer-lg  { height: 45vh; }
+
+/* Text sits as elevated layer with soft shadow onto the scene */
+.prose.shadowed,
+.prose.shadowed *:not(.term):not(.term *):not(.flash) {
+  text-shadow:
+    0 1px 2px rgba(0,0,0,calc(var(--text-shadow-strength) * 0.7)),
+    0 5px 16px rgba(0,0,0,calc(var(--text-shadow-strength) * 1.0)),
+    0 12px 36px rgba(0,0,0,calc(var(--text-shadow-strength) * 0.6));
+}
+.prose.light.shadowed,
+.prose.light.shadowed *:not(.term):not(.term *):not(.flash) {
+  text-shadow:
+    0 1px 2px rgba(0,0,0,calc(var(--text-shadow-strength) * 0.35)),    0 4px 12px rgba(0,0,0,calc(var(--text-shadow-strength) * 0.5));
+}
+
+.prose.carded > *:not(.term) {
+  background: rgba(0,0,0,var(--card-opacity));
+  padding: 2px 14px;
+  border-radius: 2px;
+  backdrop-filter: blur(calc(var(--card-opacity) * 10px));
+}
+.prose.light.carded > *:not(.term) {
+  background: rgba(255,240,210,calc(var(--card-opacity) * 1.4));
+}
+
+/* ---------- Chapter break — seamless matched color ---------- */
+.chapter-break {
+  position: relative;
+  z-index: 5;
+  height: 40vh;
+  width: 100%;
+  pointer-events: none;
+}
+.chapter-break[data-from="genesis"][data-to="cryo"] { background: #000; }
+.chapter-break[data-from="cryo"][data-to="philadelphia"] { background: linear-gradient(to bottom, #000 0%, #e8081a 100%); }
+.chapter-break[data-from="philadelphia"][data-to="findme"] { background: linear-gradient(to bottom, #1a0608 0%, #06060a 100%); }
+.chapter-break[data-from="findme"][data-to="choice"] { background: #000; }
+
+/* ---------- Closing ---------- */
+.closing {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  background: #0a2018;
+  color: #d4ffee;
+  padding: 120px 24px;
+}
+.closing .fin {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 72px;
+  letter-spacing: -.01em;
+  margin: 0 0 40px;
+  color: #f4f6fb;
+}
+.closing .question {
+  max-width: 680px;
+  margin: 0 auto 56px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.35;
+  font-weight: 300;
+  color: #f4f6fb;
+  text-wrap: pretty;
+}
+.closing .colophon {
+  max-width: 480px;
+  margin: 0 auto;
+  font-size: 15px;
+  line-height: 1.7;
+  opacity: .65;
+  font-family: var(--mono);
+  letter-spacing: .04em;
+}
+.closing .meta {
+  margin-top: 40px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  opacity: .45;
+}
+
+/* ---------- Section nav ---------- */
+.toc {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  mix-blend-mode: difference;
+  color: #e8e3d9;
+}
+.toc button {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  opacity: .45;
+  transition: opacity .2s;
+}
+.toc button:hover, .toc button[data-active="true"] { opacity: 1; }
+.toc button .dot {
+  width: 18px; height: 1px;
+  background: currentColor;
+  transition: width .2s;
+}
+.toc button[data-active="true"] .dot { width: 36px; }
+.toc button .label { opacity: 0; transition: opacity .2s; }
+.toc button:hover .label,
+.toc button[data-active="true"] .label { opacity: 1; }
+
+@media (max-width: 720px) {
+  .toc { display: none; }
+  .chrome { padding: 14px 18px; font-size: 10px; }
+  .chrome .brand em { display: none; }
+  .frame-top, .progress-bar { left: 18px; right: 18px; top: 44px; }
+  .prose { padding: 0 22px; }
+  .prose p { font-size: 17px; }
+  .prose p.term { font-size: 12px; }
+  .opening .meta-rule { left: 18px; right: 18px; }
+  .prose .chapter-head h2 { font-size: clamp(40px, 11vw, 72px); letter-spacing: -.01em; }
+  .prose .chapter-head .lede { font-size: 16px; }
+  .opening h1 { font-size: clamp(48px, 14vw, 96px); }
+  /* HUD overlay: shrink + reposition for narrow screens */
+  .hud-overlay .radar { width: 130px; height: 130px; left: 16px; bottom: 30vh; }
+  .hud-overlay .feeds { right: 14px; top: 80px; width: 130px; gap: 4px; }
+  .hud-overlay .alert { left: 16px; top: 60px; font-size: 9px; }
+  .hud-overlay .telemetry { left: 16px; top: 96px; font-size: 8px; }
+  .hud-overlay .telemetry div { min-width: 150px; }
+  .eyes-intro .eyes-cap { font-size: 9px; padding-bottom: 12vh; }
+  .closing .question { font-size: 22px; }
+  .closing .fin { font-size: 80px; }
+}
+
+.grain {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 2000;
+  opacity: .05;
+  mix-blend-mode: overlay;
+  /* noise overlay removed to avoid bundler url-fragment issue; decorative only */
+}
+
+
+/* ============================================================
+   Chapter-specific overlays / animations (added in revision)
+   ============================================================ */
+
+/* ---------- Ch I — sphere pulse ---------- */
+@keyframes spherePulse {
+  0%, 100% { opacity: .92; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.04); }
+}
+.layer.pulse-sphere img {
+  animation: spherePulse 7s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes ringSpin1 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes ringSpin2 { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+.layer.spin-rings img { animation: ringSpin1 90s linear infinite; transform-origin: center; }
+
+/* ---------- Ch II — beam pulse + ada_eyes intro ---------- */
+@keyframes beamPulse {
+  0%, 100% { opacity: .55; }
+  50%      { opacity: 1; }
+}
+.layer.beam-pulse img { animation: beamPulse 4.5s ease-in-out infinite; }
+
+/* The ada_eyes overlay sits as its own full-bleed sticky layer
+   at the top of Ch II, fading out as the reader scrolls. */
+.eyes-intro {
+  position: relative;
+  height: 110vh;          /* sticky window inside chapter */
+  width: 100%;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+}
+.eyes-intro .eyes-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  background: #000;
+}
+.eyes-intro .eyes-stage img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: contrast(1.05);
+}
+.eyes-intro .eyes-cap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: end center;
+  padding: 0 0 18vh;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: #aaffe8;
+  text-shadow: 0 0 14px rgba(15,255,208,.6);
+  opacity: .9;
+}
+/* horizontal scan-line sweep */
+.eyes-intro .eyes-stage::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(to right,
+    transparent, rgba(15,255,208,0) 20%, rgba(15,255,208,.85) 50%, rgba(15,255,208,0) 80%, transparent);
+  animation: scanSweep 5.5s linear infinite;
+  mix-blend-mode: screen;
+}
+@keyframes scanSweep {
+  0%   { top: 0%;   opacity: 0; }
+  10%  { opacity: .85; }
+  90%  { opacity: .85; }
+  100% { top: 100%; opacity: 0; }
+}
+/* glitch flicker on the eyes layer */
+.eyes-intro .eyes-stage img {
+  animation: eyesFlicker 7s steps(1) infinite;
+}
+@keyframes eyesFlicker {
+  0%, 92%, 100% { opacity: 1; transform: translateX(0); }
+  93%           { opacity: .85; transform: translateX(-2px); filter: hue-rotate(-12deg) contrast(1.15); }
+  94%           { opacity: 1; transform: translateX(2px); }
+  95%           { opacity: .9; transform: translateX(-1px); }
+  96%           { opacity: 1; transform: translateX(0); }
+}
+
+/* ---------- Ch III — drifting fog (just the fog band slides slowly) ---------- */
+@keyframes fogDrift {
+  0%   { transform: translate3d(-2%, 0, 0); }
+  50%  { transform: translate3d(2%, 0, 0); }
+  100% { transform: translate3d(-2%, 0, 0); }
+}
+.layer.fog-drift img { animation: fogDrift 28s ease-in-out infinite; }
+
+/* ---------- Ch IV — full HUD overlay with animated elements ---------- */
+.hud-overlay {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  margin-top: -100vh;       /* sit on top of the scene, not below it */
+  pointer-events: none;
+  font-family: var(--mono);
+  color: #a8d088;
+  z-index: 3;
+  overflow: hidden;
+}
+.hud-overlay .radar {
+  position: absolute;
+  left: 60px; bottom: 180px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  border: 1px solid #3a6a30;
+  background:
+    radial-gradient(circle at center, rgba(15,40,8,.4), rgba(0,0,0,.85) 70%),
+    repeating-conic-gradient(from 0deg, rgba(168,208,136,.12) 0deg 1deg, transparent 1deg 30deg);
+  box-shadow: inset 0 0 40px rgba(15,40,8,.6);
+  overflow: hidden;
+}
+.hud-overlay .radar::before,
+.hud-overlay .radar::after {
+  content: "";
+  position: absolute;
+  background: #3a6a30;
+  opacity: .65;
+}
+.hud-overlay .radar::before { left: 0; right: 0; top: 50%; height: 1px; }
+.hud-overlay .radar::after  { top: 0; bottom: 0; left: 50%; width: 1px; }
+.hud-overlay .radar-sweep {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from 0deg,
+    rgba(168,208,136,.55) 0deg,
+    rgba(168,208,136,.18) 14deg,
+    rgba(168,208,136,0) 30deg,
+    rgba(168,208,136,0) 360deg);
+  border-radius: 50%;
+  animation: radarSpin 4s linear infinite;
+  transform-origin: center;
+}
+@keyframes radarSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.hud-overlay .radar-blip {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #ff4030;
+  box-shadow: 0 0 10px rgba(255,64,48,.9);
+  animation: blip 4s linear infinite;
+}
+.hud-overlay .radar-blip.b1 { top: 38%; left: 65%; animation-delay: -.4s; }
+.hud-overlay .radar-blip.b2 { top: 62%; left: 30%; animation-delay: -2.6s; }
+@keyframes blip {
+  0%, 100% { opacity: .15; }
+  10%      { opacity: 1; }
+  60%      { opacity: .35; }
+}
+.hud-overlay .radar-label {
+  position: absolute;
+  top: -22px; left: 0;
+  font-size: 9px;
+  letter-spacing: .25em;
+  color: #a8d088;
+}
+
+.hud-overlay .feeds {
+  position: absolute;
+  right: 30px; top: 100px;
+  width: 220px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.hud-overlay .feed {
+  aspect-ratio: 16 / 9;
+  background: #050a04;
+  border: 1px solid #3a6a30;
+  position: relative;
+  overflow: hidden;
+}
+.hud-overlay .feed::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(168,208,136,.05) 0 2px, transparent 2px 4px);
+}
+.hud-overlay .feed::after {
+  content: attr(data-id);
+  position: absolute;
+  top: 3px; left: 5px;
+  font-size: 7px;
+  color: #7aa068;
+  letter-spacing: .2em;
+}
+.hud-overlay .feed.live::before {
+  background:
+    repeating-linear-gradient(0deg, rgba(168,208,136,.06) 0 2px, transparent 2px 4px),
+    radial-gradient(circle at 60% 50%, rgba(168,208,136,.35), transparent 60%);
+  animation: feedFlicker 1.4s steps(2) infinite;
+}
+@keyframes feedFlicker {
+  0%, 100% { opacity: .85; }
+  50%      { opacity: 1; }
+}
+.hud-overlay .alert {
+  position: absolute;
+  left: 60px; top: 100px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; letter-spacing: .25em;
+  color: #ff4a3a;
+  text-shadow: 0 0 8px rgba(255,40,30,.6);
+  animation: alertBlink 1.6s steps(2) infinite;
+}
+.hud-overlay .alert::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: #ff4a3a; box-shadow: 0 0 10px rgba(255,40,30,.85);
+}
+@keyframes alertBlink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: .35; }
+}
+
+.hud-overlay .telemetry {
+  position: absolute;
+  left: 60px; top: 145px;
+  font-size: 9px; letter-spacing: .15em;
+  color: #a8d088;
+  line-height: 1.6;
+  opacity: .8;
+}
+.hud-overlay .telemetry div { display: flex; justify-content: space-between; min-width: 220px; }
+.hud-overlay .telemetry b { color: #dceabc; font-weight: 500; }
+
+/* ---------- Ch V — orb pulse & halftone glitch overlay ---------- */
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50%      { transform: scale(1.03); filter: brightness(1.12); }
+}
+.layer.orb-pulse img {
+  animation: orbPulse 9s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.halftone-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  pointer-events: none;
+  opacity: 0;
+  background: #000;
+  transition: opacity .25s ease;
+  mix-blend-mode: screen;
+}
+.halftone-overlay.active { opacity: var(--halftone-opacity, 1); }
+.halftone-overlay img { width: 100%; height: 100%; object-fit: cover; }
+.halftone-overlay.glitch img {
+  animation: halftoneShake 0.18s steps(1) infinite;
+}
+@keyframes halftoneShake {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-3px, 2px); }
+  50%  { transform: translate(2px, -3px); }
+  75%  { transform: translate(-2px, -1px); }
+  100% { transform: translate(1px, 2px); }
+}
