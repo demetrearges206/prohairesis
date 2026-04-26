@@ -638,6 +638,91 @@ body {
   .eyes-intro .eyes-cap { font-size: 9px; padding-bottom: 12vh; }
   .closing .question { font-size: 22px; }
   .closing .fin { font-size: 80px; }
+
+  /* ----------------------------------------------------------
+     Mobile scene scaling.
+     SVG layers were composed for cinematic 1600x900 widescreen.
+     On portrait phones the focal subjects (sphere, firs, orb,
+     etc.) shrink to thumbnails. We scale up each layer so the
+     scene reads at the same "presence" it has on desktop.
+     The master multiplier --mobile-scale can be tweaked live
+     via the Tweaks panel.
+     ---------------------------------------------------------- */
+  :root { --mobile-scale: 1; }
+  /* Apply the scale to the .layer WRAPPER, not the inner <img>.
+     Several inner imgs already have keyframe animations on transform
+     (pulse-sphere, spin-rings, fog-drift, orb-pulse, beam-pulse)
+     which would otherwise clobber the static scale. Wrappers don't
+     animate, so this composes cleanly with the parallax JS that
+     applies translateY transforms via .style on the wrapper too —
+     wait, parallax.js DOES set .style.transform on the wrapper.
+     So we must scale the IMG, but compose with animations.
+     Implementation: scale the img, and rewrite each animation
+     keyframe so it includes the var()-driven scale. */
+  .scene .layer img {
+    transform: scale(calc(var(--layer-scale, 1.4) * var(--mobile-scale)));
+    transform-origin: center center;
+  }
+  /* Ch I — sphere is the hero; rings & embers want a similar push;
+     hex floor stays modest so it doesn't crawl up the frame. */
+  .scene[data-palette="genesis"] .layer.pulse-sphere img { --layer-scale: 1.7; }
+  .scene[data-palette="genesis"] .layer.spin-rings img   { --layer-scale: 1.55; }
+  .scene[data-palette="genesis"] .layer img              { --layer-scale: 1.3; }
+
+  /* Ch II — grid + beam want to feel architectural; dust subtle. */
+  .scene[data-palette="cryo"] .layer.beam-pulse img { --layer-scale: 1.6; }
+  .scene[data-palette="cryo"] .layer img            { --layer-scale: 1.35; }
+
+  /* Ch III — Philadelphia: firs & ridge are the silhouette story;
+     fog band drifts and benefits from extra width; sun stays. */
+  .scene[data-palette="philadelphia"] .layer.fog-drift img { --layer-scale: 1.7; }
+  .scene[data-palette="philadelphia"] .layer img           { --layer-scale: 1.55; }
+
+  /* Ch IV — HUD frame is ornament around the live overlay; modest. */
+  .scene[data-palette="findme"] .layer img { --layer-scale: 1.25; }
+
+  /* Ch V — orb is the focal hero; rays & stars want a push. */
+  .scene[data-palette="choice"] .layer.orb-pulse img { --layer-scale: 1.5; }
+  .scene[data-palette="choice"] .layer img           { --layer-scale: 1.4; }
+
+  /* ----- Animation overrides for mobile -----
+     These rewrite the existing keyframes so they compose with
+     the per-layer scale. Animations on transform fully replace
+     the static transform value, so we have to bake the scale in. */
+  @keyframes spherePulseMobile {
+    0%, 100% { opacity: .92; transform: scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1) * 1.0)); }
+    50%      { opacity: 1;   transform: scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1) * 1.04)); }
+  }
+  .layer.pulse-sphere img { animation-name: spherePulseMobile; }
+
+  @keyframes ringSpin1Mobile {
+    from { transform: rotate(0deg)   scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1))); }
+    to   { transform: rotate(360deg) scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1))); }
+  }
+  .layer.spin-rings img { animation-name: ringSpin1Mobile; }
+
+  @keyframes beamPulseMobile {
+    0%, 100% { opacity: .55; transform: scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1))); }
+    50%      { opacity: 1;   transform: scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1))); }
+  }
+  .layer.beam-pulse img { animation-name: beamPulseMobile; }
+
+  @keyframes fogDriftMobile {
+    0%   { transform: translate3d(-2%, 0, 0) scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1))); }
+    50%  { transform: translate3d( 2%, 0, 0) scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1))); }
+    100% { transform: translate3d(-2%, 0, 0) scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1))); }
+  }
+  .layer.fog-drift img { animation-name: fogDriftMobile; }
+
+  @keyframes orbPulseMobile {
+    0%, 100% { transform: scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1) * 1.0));  filter: brightness(1); }
+    50%      { transform: scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1) * 1.03)); filter: brightness(1.12); }
+  }
+  .layer.orb-pulse img { animation-name: orbPulseMobile; }
+
+  /* Eyes-intro photograph in Ch II — already object-fit: cover,
+     but a slight zoom tightens the framing on phones. */
+  .eyes-intro .eyes-stage img { transform: scale(calc(1.15 * var(--mobile-scale))); }
 }
 
 .grain {

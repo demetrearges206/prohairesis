@@ -9,7 +9,8 @@ const PROHAIRESIS_TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "parallaxStrength": 1.0,
   "grain": true,
   "fontPair": "Fraunces + Inter Tight",
-  "showProgress": true
+  "showProgress": true,
+  "mobileScale": 1.0
 }/*EDITMODE-END*/;
 
 const FONT_PAIRS = {
@@ -57,6 +58,7 @@ function ProhairesisTweaks() {
     const root = document.documentElement;
     root.style.setProperty("--text-shadow-strength", String(t.textShadow));
     root.style.setProperty("--card-opacity", String(t.cardOpacity));
+    root.style.setProperty("--mobile-scale", String(t.mobileScale ?? 1));
 
     // parallax strength: multiply data-speed by a factor via CSS custom prop
     // simpler: mutate live layers
@@ -127,6 +129,14 @@ function ProhairesisTweaks() {
         value={t.fontPair}
         options={Object.keys(FONT_PAIRS)}
         onChange={(v) => setTweak("fontPair", v)}
+      />
+
+      <TweakSection label="Mobile" />
+      <TweakSlider
+        label="Scene zoom (phones)"
+        value={Math.round((t.mobileScale ?? 1) * 100)}
+        min={50} max={180} step={5} unit="%"
+        onChange={(v) => setTweak("mobileScale", v / 100)}
       />
 
       <TweakSection label="Atmosphere" />
