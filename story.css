@@ -222,7 +222,8 @@ body {
   background: linear-gradient(to top, rgba(0,0,0,0) 0%, #000 90%);
 }
 .scene[data-palette="genesis"]::after {
-  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 90%);
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.6) 40%, #000 100%);
+  height: 38vh;
 }
 .chapter:has(.scene[data-palette="genesis"])::after { background: #000; }
 
@@ -232,10 +233,12 @@ body {
     #021214 0%, #010608 50%, #000 80%);
 }
 .scene[data-palette="cryo"]::before {
-  background: linear-gradient(to top, rgba(0,0,0,0) 0%, #000 90%);
+  background: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 50%, #000 100%);
+  height: 28vh;
 }
 .scene[data-palette="cryo"]::after {
-  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 90%);
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.6) 45%, #000 100%);
+  height: 38vh;
 }
 .chapter:has(.scene[data-palette="cryo"])::after { background: #000; }
 
@@ -258,7 +261,9 @@ body {
 .scene[data-palette="philadelphia"]::after {
   background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 85%);
 }
-.chapter:has(.scene[data-palette="philadelphia"])::after { background: #000; }
+.chapter:has(.scene[data-palette="philadelphia"])::after {
+  background: linear-gradient(to bottom, rgba(26,6,8,0) 0%, #1a0608 35%, #000 100%);
+}
 
 /* IV — Find Me: near-black with the faintest phosphor-green wash */
 .scene[data-palette="findme"] {
@@ -300,7 +305,7 @@ body {
 /* ---------- Prose ---------- */
 .prose {
   position: relative;
-  z-index: 40;
+  z-index: 50;
   max-width: 680px;
   margin: 0 auto;
   padding: 0 32px;
@@ -723,6 +728,38 @@ body {
   /* Eyes-intro photograph in Ch II — already object-fit: cover,
      but a slight zoom tightens the framing on phones. */
   .eyes-intro .eyes-stage img { transform: scale(calc(1.15 * var(--mobile-scale))); }
+
+  /* ----- Per-issue fixes -----
+     Pinned/scaled tweaks for specific problem layers on mobile. */
+
+  /* Ch II beam: SVG content is slightly off-center; nudge right. */
+  .scene[data-palette="cryo"] .layer.beam-pulse img {
+    margin-left: 4%;
+  }
+
+  /* Ch II eyes-intro: soften the hard cut into the cryo scene below by
+     fading the bottom of the eyes stage to black. */
+  .eyes-intro .eyes-stage::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 30%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 95%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Ch III firs + ridge: pin them harder to the bottom so they don't
+     reveal page background underneath when scaled up. */
+  .scene[data-palette="philadelphia"] .layer:nth-child(3),  /* firs  */
+  .scene[data-palette="philadelphia"] .layer:nth-child(4) { /* ridge */
+    bottom: -2vh !important;
+  }
+
+  /* Make sure prose ALWAYS sits above the chapter-end floor — this was
+     making Ch III "Ada, Cristian said again" unreadable when the dark
+     floor rose under the dark light-prose. */
+  .prose { z-index: 50; }
 }
 
 .grain {
