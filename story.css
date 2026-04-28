@@ -101,6 +101,28 @@ body {
     radial-gradient(ellipse 80% 50% at 50% 50%, rgba(58,122,226,.12), transparent 70%),
     radial-gradient(ellipse 30% 20% at 50% 50%, rgba(226,74,74,.08), transparent 70%);
 }
+/* Fade the bottom of the title screen to pure black so it dissolves
+   seamlessly into Ch I's void. Without this the title scene's teal/green
+   tone butts hard against Ch I's #000 background — visible as a horizontal
+   color line. The shader's own bleed alpha-fades on top of this; the page
+   background fade does the heavy lifting beneath. z-index: 3 puts this
+   above the shader canvas (z-index 0) but below .opening-inner (z-index 2)
+   — wait, opening-inner is z-index: 2 so this needs to be 1, between the
+   canvas and the type. */
+.opening::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 0;
+  height: 45%;
+  background: linear-gradient(to bottom,
+    rgba(5,6,8,0) 0%,
+    rgba(0,0,0,.5) 35%,
+    rgba(0,0,0,.85) 70%,
+    #000 100%);
+  z-index: 1;
+  pointer-events: none;
+}
 .opening .opening-inner {
   position: relative;
   z-index: 2;
@@ -151,14 +173,14 @@ body {
 }
 .opening .meta-rule.top { top: 78px; }
 .opening .meta-rule.bot { bottom: 78px; }
-/* v22 deploy marker — if you see a bright magenta VERSION XXII on the title
-   screen, the new story.css landed. If it's still cyan (XXI) or dim/grey,
-   the CSS file did NOT update. */
+/* v23 deploy marker — if you see a bright lime-green VERSION XXIII on the
+   title screen, the new story.css landed. If it's still magenta (XXII) or
+   cyan (XXI), the CSS file did NOT update. */
 .opening .meta-rule.bot span:first-child {
-  color: #ff5ad7 !important;
+  color: #ff8a3a !important;
   font-weight: 700 !important;
   letter-spacing: .35em !important;
-  text-shadow: 0 0 14px rgba(15,255,208,.6) !important;
+  text-shadow: 0 0 14px rgba(255,138,58,.6) !important;
 }
 
 .opening .scroll-hint {
@@ -243,7 +265,10 @@ body {
     #1a0408 0%, #0a0204 40%, #050102 70%, #000 100%);
 }
 .scene[data-palette="genesis"]::before {
-  background: linear-gradient(to top, rgba(0,0,0,0) 0%, #000 90%);
+  /* Top feather removed — the title shader fades into the void on its own,
+     and the hard black band was creating a harsh edge against the shader. */
+  background: none;
+  display: none;
 }
 .scene[data-palette="genesis"]::after {
   background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.6) 40%, #000 100%);
@@ -284,10 +309,7 @@ body {
     #b8285a 80%,
     #1a0608 100%);
 }
-.scene[data-palette="philadelphia"]::before {
-  background: linear-gradient(to top, rgba(232,8,26,0) 0%, #000 95%);
-  height: 6vh;
-}
+
 .scene[data-palette="philadelphia"]::after {
   background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 85%);
 }
@@ -343,6 +365,22 @@ body {
 }
 .prose.dark   { color: #f4f6fb; }
 .prose.light  { color: #1a0a05; }
+
+/* Philadelphia legibility (desktop + mobile): the chapter scrolls from
+   bright vermilion at the top to near-black at the bottom. Dark prose
+   reads on vermilion but is invisible on the dark ridge / chapter-end
+   floor. Lift to warm cream + strong drop shadow so it reads against
+   ANY tone in the chapter. (Mobile rule below replicates this with
+   !important to win specificity if the cascade collapses on phones.) */
+.chapter:has(.scene[data-palette="philadelphia"]) .prose.light {
+  color: #fff2dc;
+}
+.chapter:has(.scene[data-palette="philadelphia"]) .prose.light *:not(.term):not(.term *):not(.flash) {
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.85),
+    0 4px 14px rgba(0,0,0,.7),
+    0 12px 36px rgba(0,0,0,.55);
+}
 
 .prose .chapter-head {
   padding-top: 32vh;
@@ -642,9 +680,20 @@ body {
   display: grid;
   place-items: center;
   text-align: center;
-  background: #0a2018;
+  background: #060812;
   color: #d4ffee;
   padding: 120px 24px;
+  overflow: hidden;
+}
+/* All closing children sit above the plasma shader canvas */
+.closing > *:not(canvas) { position: relative; z-index: 2; }
+/* Soft vignette so corners of the shader fade toward black */
+.closing::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 75% 65% at 50% 50%, transparent 40%, rgba(6,8,18,.85) 100%);
+  z-index: 1;
+  pointer-events: none;
 }
 .closing .fin {
   font-family: var(--serif);
@@ -919,6 +968,147 @@ body {
   opacity: .05;
   mix-blend-mode: overlay;
   /* noise overlay removed to avoid bundler url-fragment issue; decorative only */
+}
+
+/* ============================================================
+   Horizontal Timeline (Ch I — 80 years of solitude)
+   ------------------------------------------------------------
+   The block .timeline-h is tall (set in JS, ~ N * 100vh) so the
+   reader scrolls vertically through it. Inside, .timeline-h-stage
+   is sticky-pinned at the top of the viewport and holds:
+     • a fixed centered YEAR label + big year-number ticker
+     • a horizontal track of cards that slides right→left in JS
+   ============================================================ */
+.timeline-h {
+  position: relative;
+  width: 100%;
+  z-index: 60;                    /* above .scene (z-index 2) and chapter::after */
+  background: transparent;        /* the genesis scene continues to render behind */
+  /* Height set by JS: cards * 100vh + 100vh padding tail */
+}
+.timeline-h-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
+  overflow: hidden;
+  /* a soft radial vignette so the cards bleed off-edge */
+  background:
+    radial-gradient(ellipse 70% 90% at 50% 50%, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 80%, rgba(0,0,0,.85) 100%);
+}
+.timeline-h-year {
+  position: absolute;
+  left: 0; right: 0;
+  top: 18vh;            /* upper-mid of viewport, leaves room for prose below */
+  z-index: 4;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+}
+.timeline-h-year-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: rgba(217,200,138,.8);
+  margin-bottom: 12px;
+  text-shadow: 0 0 18px rgba(217,200,138,.35);
+}
+.timeline-h-year-num {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 200;
+  font-size: clamp(120px, 22vw, 280px);
+  line-height: .9;
+  letter-spacing: -.04em;
+  color: #ff8a6a;
+  text-shadow:
+    0 0 40px rgba(255,84,24,.35),
+    0 0 8px rgba(255,84,24,.4);
+  font-variant-numeric: tabular-nums;
+}
+.timeline-h-year-num.ticking {
+  animation: yearTickerJitter .12s steps(2) infinite;
+}
+@keyframes yearTickerJitter {
+  0%   { transform: translate(0, 0); opacity: .9; }
+  50%  { transform: translate(1px, -1px); opacity: 1; }
+  100% { transform: translate(-1px, 1px); opacity: .92; }
+}
+.timeline-h-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  /* The track's full width = N * 100vw. JS sets transform: translateX(-progress * (N-1) * 100vw). */
+  width: max-content;
+  height: 100%;
+  z-index: 3;
+  will-change: transform;
+}
+.timeline-h-card {
+  flex: 0 0 100vw;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 60vh 6vw 8vh;  /* push prose below the year (year sits ~30%-50% down) */
+}
+.timeline-h-card > * {
+  max-width: 640px;
+  width: 100%;
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.62;
+  color: #f4f6fb;
+  text-wrap: pretty;
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.7),
+    0 5px 16px rgba(0,0,0,.85),
+    0 12px 36px rgba(0,0,0,.6);
+  margin: 0 0 1em;
+}
+.timeline-h-card p:last-child { margin-bottom: 0; }
+.timeline-h-section-marker {
+  font-family: var(--serif) !important;
+  font-style: italic !important;
+  font-weight: 300 !important;
+  font-size: clamp(28px, 3.6vw, 38px) !important;
+  letter-spacing: -.01em !important;
+  color: rgba(255,200,170,.92) !important;
+  margin: 0 0 1.2em !important;
+  text-shadow: 0 0 24px rgba(255,84,24,.35) !important;
+}
+.timeline-h-present-label {
+  font-family: var(--mono) !important;
+  font-size: 13px !important;
+  letter-spacing: .35em !important;
+  text-transform: uppercase !important;
+  color: #ffb09a !important;
+  margin: 0 0 1.4em !important;
+  padding-top: 1em !important;
+  border-top: 1px solid rgba(255,138,106,.5) !important;
+  display: inline-block !important;
+  text-shadow: 0 0 14px rgba(255,138,106,.4) !important;
+}
+.timeline-h-card-final > * {
+  /* Final "PRESENT DAY" card — slightly more dramatic */
+  max-width: 660px;
+}
+
+/* Mobile: same effect, smaller type, tighter padding */
+@media (max-width: 720px) {
+  .timeline-h-year { top: 12vh; }
+  .timeline-h-year-label { font-size: 10px; letter-spacing: .3em; margin-bottom: 8px; }
+  .timeline-h-year-num { font-size: clamp(80px, 26vw, 140px); }
+  .timeline-h-card { padding: 48vh 6vw 6vh; }
+  .timeline-h-card > * { font-size: 15px; line-height: 1.55; }
+  .timeline-h-section-marker { font-size: clamp(22px, 6vw, 28px) !important; margin-bottom: .9em !important; }
+  .timeline-h-present-label { font-size: 10px !important; letter-spacing: .3em !important; }
 }
 
 

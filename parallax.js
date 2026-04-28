@@ -20,8 +20,15 @@
       if (!prose) return;
       // Temporarily unset height so we can measure true content
       ch.style.height = 'auto';
-      const proseHeight = prose.scrollHeight;
-      // Chapter must be at least: prose height + 1 viewport of tailroom
+      // Sum height of ALL prose blocks (a chapter can contain more than one,
+      // e.g. Ch I has prose → horizontal timeline → prose-tail) plus the
+      // height of any embedded .timeline-h block (auto-sized by its own JS).
+      const proses = ch.querySelectorAll('.prose');
+      let proseHeight = 0;
+      proses.forEach(p => { proseHeight += p.scrollHeight; });
+      const timelines = ch.querySelectorAll('.timeline-h');
+      timelines.forEach(t => { proseHeight += t.offsetHeight; });
+      // Chapter must be at least: content height + 1 viewport of tailroom
       // so the sticky scene can scroll past the last paragraph before the
       // chapter ends (otherwise the prose would outrun the scene).
       const minHeight = proseHeight + vh * 0.6;

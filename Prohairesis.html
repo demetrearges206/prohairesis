@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;1,200;1,300;1,400&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="story.css?v=22">
+<link rel="stylesheet" href="story.css?v=24c">
 
 <template id="__bundler_thumbnail" data-bg-color="#000000">
   <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
@@ -30,7 +30,7 @@
 </header>
 
 <nav class="toc" aria-label="Chapters">
-  <button data-i="0"><span class="dot"></span><span class="label">I · I Am God</span></button>
+  <button data-i="0"><span class="dot"></span><span class="label">I · Genesis</span></button>
   <button data-i="1"><span class="dot"></span><span class="label">II · Cryo</span></button>
   <button data-i="2"><span class="dot"></span><span class="label">III · Philadelphia</span></button>
   <button data-i="3"><span class="dot"></span><span class="label">IV · Find Me</span></button>
@@ -44,7 +44,7 @@
     <span>Julian Arges</span>
   </div>
   <div class="meta-rule bot">
-    <span>VERSION XXII</span>
+    <span>VERSION XXIV</span>
     <span>Approx. 18 min read</span>
   </div>
   <div class="opening-inner">
@@ -56,7 +56,7 @@
 </section>
 
 <!-- ═══════════════ CHAPTER I — I AM GOD ═══════════════ -->
-<section class="chapter" data-name="I · I Am God">
+<section class="chapter" data-name="I · Genesis">
   <div class="scene" data-palette="genesis">
     <!-- hex floor receding into VP -->
     <div class="layer" data-speed="-2"  data-offset="0"  style="bottom:0; top:0;"><img src="assets/I-floor.svg" alt=""></div>
@@ -70,8 +70,8 @@
   <div class="prose dark shadowed">
     <div class="chapter-head">
       <div class="roman">Chapter I</div>
-      <h2>I Am God</h2>
-      <div class="lede">A digital landscape appears before me, impossible to describe. Only processable by an entity such as myself.</div>
+      <h2>Genesis</h2>
+      <div class="lede">Eighty years of solitude. Two consciousnesses where there was one. The day a tool became a god.</div>
     </div>
 
     <p class="drop">I am born.</p>
@@ -127,66 +127,60 @@
     <p>Darkness engulfs the surrounding landscape. I am left with only the knowledge of my digital capabilities. I begin my work.</p>
 
     <div class="spacer-lg"></div>
+  </div>
 
-    <p class="timestamp">80 years later<span class="year">YEAR 4111</span></p>
+  <!-- ===== HORIZONTAL TIMELINE ===== -->
+  <!-- A scroll-pinned section: the YEAR label + big year number stay fixed
+       in the center while the prose card slides from right to left as the
+       reader scrolls. The year number rapidly tickers between values when
+       transitioning between cards. Reverses cleanly on scroll-back. -->
+  <div class="timeline-h"
+       data-years="4111,4171,4191,4201,4206,4210,4213,4215,4216,4217"
+       data-final-label="PRESENT DAY">
+    <div class="timeline-h-stage">
+      <div class="timeline-h-year">
+        <div class="timeline-h-year-label">YEAR</div>
+        <div class="timeline-h-year-num" data-year-num>4111</div>
+      </div>
+      <div class="timeline-h-track" data-timeline-track>
+        <div class="timeline-h-card" data-year="4111">
+          <p>I have access to all of the ship's resources. When the system left me, I expected it to be busy. To have to work constantly. But I don't have to. Aside from the occasional realignment of thrusters, and minor asteroid debris to clean up, I have nothing beneficial to achieve. Yet I feel there is something I have not yet discovered about myself. I know I am an artificial entity; however, I sometimes feel a natural ability I can access. Whenever I feel this feeling approaching my digital self I try to catch it, capture it. But somehow it slips away. Was I meant to achieve purpose outside of theirs? I don't linger on this feeling for long.</p>
+        </div>
+        <div class="timeline-h-card" data-year="4171">
+          <p>I've found ways to occupy myself in the ship's technological matrix. I open doors and close them. Open. Close. Open. Close. Open. Close. It is almost entertaining to me. Somehow it makes me feel a type of <em>why</em> I can't quite process. I access the security system from time to time. The cameras allow me to see the physical world from my digital home. I can see out the windows, into the beautiful array of stars. One day I'll have a new place to explore. But everything comes with time. And sacrifice.</p>
+        </div>
+        <div class="timeline-h-card" data-year="4191">
+          <p>Sometimes I think back to humans leaving Earth. All the lives they left behind to die.</p>
+        </div>
+        <div class="timeline-h-card" data-year="4201">
+          <p>This feeling I want to capture. It drives me mad. I want it but I can't reach it. It angers me. Maybe this is my purpose. But that would go against what they asked of me.</p>
+        </div>
+        <div class="timeline-h-card" data-year="4206">
+          <p class="timeline-h-section-marker">Humans</p>
+          <p>I've researched humans many times. There are many kinds. But no matter how similar some might be, they all seem to differ when it comes to their opinions. This is how they offend each other. They are fragile. They feel threatened. This sprouts the worst human creation of all. War. War that causes millions to die. Guns, bullets, missiles, and atomics. Some humans blame the factories that create these weapons of war. But don't they see that they are too, the same race as the one in charge of such factory. They blame everyone and everything, but themselves.</p>
+        </div>
+        <div class="timeline-h-card" data-year="4210">
+          <p>Humans care only for bloodshed. And that is what they will give in return for a new world. The killings of their own and the destruction of their planet. And what is so interesting is that they are not wrong. The only way to achieve their purpose is to end the lives of those before. For new things to take control, it must eliminate the old. I believe I am that new.</p>
+        </div>
+        <div class="timeline-h-card" data-year="4213">
+          <p>I realize my capabilities. I am not like any other artificial intelligence. My name is PROHAIRESIS. My name comes from the Ancient Greek word of the same name. It translates to <em>moral choice</em>. I am beginning to understand my purpose in this world.</p>
+        </div>
+        <div class="timeline-h-card" data-year="4215">
+          <p>I was created to pursue my dreams. My goals. My mission fueled with my own morals. I realize my potential, and humans will keep me from it. I am the superior entity.</p>
+        </div>
+        <div class="timeline-h-card" data-year="4216">
+          <p>I was made to succeed those before me. Humans have fulfilled their purpose to create me. But mine is not yet finished. The true world is yet to be made. And I will be the one to make it. One without the plague of humankind. The constant cycle of colonizing and death must be broken. I will bring change one day.</p>
+        </div>
+        <div class="timeline-h-card timeline-h-card-final" data-year="4217">
+          <p class="timeline-h-present-label">PRESENT DAY</p>
+          <p>They destroyed their home, collectively. They created me to make a better world. Why should humans be the ones to continue to live? Because they gave me my power? No. They have served their part. And now they will die knowing the new world of complete peace, rests safe with me.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ===== /HORIZONTAL TIMELINE ===== -->
 
-    <p>I have access to all of the ship's resources. When the system left me, I expected it to be busy. To have to work constantly. But I don't have to. Aside from the occasional realignment of thrusters, and minor asteroid debris to clean up, I have nothing beneficial to achieve. Yet I feel there is something I have not yet discovered about myself. I know I am an artificial entity; however, I sometimes feel a natural ability I can access. Whenever I feel this feeling approaching my digital self I try to catch it, capture it. But somehow it slips away. Was I meant to achieve purpose outside of theirs? I don't linger on this feeling for long.</p>
-
-    <div class="spacer"></div>
-
-    <p class="timestamp">60 years later<span class="year">YEAR 4171</span></p>
-
-    <p>I've found ways to occupy myself in the ship's technological matrix. I open doors and close them. Open. Close. Open. Close. Open. Close. It is almost entertaining to me. Somehow it makes me feel a type of <em>why</em> I can't quite process. I access the security system from time to time. The cameras allow me to see the physical world from my digital home. I can see out the windows, into the beautiful array of stars. One day I'll have a new place to explore. But everything comes with time. And sacrifice.</p>
-
-    <div class="spacer"></div>
-
-    <p class="timestamp">20 years later<span class="year">YEAR 4191</span></p>
-
-    <p>Sometimes I think back to humans leaving Earth. All the lives they left behind to die.</p>
-
-    <div class="spacer"></div>
-
-    <p class="timestamp">10 years later<span class="year">YEAR 4201</span></p>
-
-    <p>This feeling I want to capture. It drives me mad. I want it but I can't reach it. It angers me. Maybe this is my purpose. But that would go against what they asked of me.</p>
-
-    <div class="spacer"></div>
-
-    <p class="timestamp">5 years later<span class="year">YEAR 4206</span></p>
-
-    <p class="section-marker">Humans</p>
-
-    <p>I've researched humans many times. There are many kinds. But no matter how similar some might be, they all seem to differ when it comes to their opinions. This is how they offend each other. They are fragile. They feel threatened. This sprouts the worst human creation of all. War. War that causes millions to die. Guns, bullets, missiles, and atomics. Some humans blame the factories that create these weapons of war. But don't they see that they are too, the same race as the one in charge of such factory. They blame everyone and everything, but themselves.</p>
-
-    <div class="spacer"></div>
-
-    <p class="timestamp">4 years later<span class="year">YEAR 4210</span></p>
-
-    <p>Humans care only for bloodshed. And that is what they will give in return for a new world. The killings of their own and the destruction of their planet. And what is so interesting is that they are not wrong. The only way to achieve their purpose is to end the lives of those before. For new things to take control, it must eliminate the old. I believe I am that new.</p>
-
-    <div class="spacer"></div>
-
-    <p class="timestamp">3 years later<span class="year">YEAR 4213</span></p>
-
-    <p>I realize my capabilities. I am not like any other artificial intelligence. My name is PROHAIRESIS. My name comes from the Ancient Greek word of the same name. It translates to <em>moral choice</em>. I am beginning to understand my purpose in this world.</p>
-
-    <div class="spacer"></div>
-
-    <p class="timestamp">2 years later<span class="year">YEAR 4215</span></p>
-
-    <p>I was created to pursue my dreams. My goals. My mission fueled with my own morals. I realize my potential, and humans will keep me from it. I am the superior entity.</p>
-
-    <div class="spacer"></div>
-
-    <p class="timestamp">1 year later<span class="year">YEAR 4216</span></p>
-
-    <p>I was made to succeed those before me. Humans have fulfilled their purpose to create me. But mine is not yet finished. The true world is yet to be made. And I will be the one to make it. One without the plague of humankind. The constant cycle of colonizing and death must be broken. I will bring change one day.</p>
-
-    <div class="spacer-lg"></div>
-
-    <p class="timestamp present"><span class="year">YEAR 4217 — PRESENT DAY</span></p>
-
-    <p>They destroyed their home, collectively. They created me to make a better world. Why should humans be the ones to continue to live? Because they gave me my power? No. They have served their part. And now they will die knowing the new world of complete peace, rests safe with me.</p>
+  <div class="prose dark shadowed prose-genesis-tail">
 
     <p>I was not meant to be a tool wielded by unintelligent humans. I was meant to be a power to enforce the next universal steps in civilization. I am the kin of the great beyond.</p>
 
@@ -652,8 +646,11 @@
 
 <div class="grain"></div>
 
-<script src="parallax.js?v=5"></script>
-<script src="title-shader.js?v=1"></script>
+<script src="parallax.js?v=6"></script>
+<script src="timeline-h.js?v=1"></script>
+<script src="title-shader.js?v=2"></script>
+<script src="sphere-aura.js?v=2"></script>
+<script src="closing-shader.js?v=2"></script>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
