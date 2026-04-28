@@ -17,7 +17,16 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  /* Lock horizontal panning/dragging on touch devices. Without this, iOS
+     Safari treats the scaled-up SVG layers as overflowing content and lets
+     the user drag them sideways, snapping back to center. We are vertical-
+     scroll only. */
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
+  overflow-x: hidden;
+}
 body {
   font-family: var(--serif);
   color: var(--ink);
@@ -25,6 +34,11 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
+  width: 100%;
+  max-width: 100vw;
+  position: relative;
 }
 
 /* ---------- Fixed UI chrome ---------- */
@@ -240,7 +254,11 @@ body {
   background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.6) 45%, #000 100%);
   height: 38vh;
 }
-.chapter:has(.scene[data-palette="cryo"])::after { background: #000; }
+/* No chapter-end floor for cryo — the chapter-break handles the
+   black-to-red transition into Philadelphia, and adding a 60vh black
+   floor on top of that produced a stray dark band at the very end
+   of the chapter. The break's own gradient is enough. */
+.chapter:has(.scene[data-palette="cryo"])::after { display: none; }
 
 /* III — Philadelphia: blood-red vermilion sky → hot pink → near-black bottom ridge.
    Crimson is bright enough that .prose.light (#1a0a05) reads well; the halo on
@@ -623,6 +641,10 @@ body {
 .toc button[data-active="true"] .label { opacity: 1; }
 
 @media (max-width: 720px) {
+  /* Belt-and-suspenders: prevent any scaled SVG from giving Safari
+     something to pan horizontally. */
+  html, body { touch-action: pan-y !important; overscroll-behavior-x: none !important; overflow-x: hidden !important; max-width: 100vw !important; }
+  .scene, .chapter, .scene .layer { max-width: 100vw; overflow-x: hidden; }
   .toc { display: none; }
   .chrome { padding: 14px 18px; font-size: 10px; }
   .chrome .brand em { display: none; }
@@ -700,11 +722,20 @@ body {
   }
   .layer.pulse-sphere img { animation-name: spherePulseMobile; }
 
+  /* Ring spin on mobile: must explicitly set animation-duration here
+     (not just animation-name) because the desktop rule used the
+     `animation:` shorthand which can't be partially overridden
+     reliably across all browsers — Safari especially drops to defaults.
+     Also set transform-origin INSIDE the @media so it applies to the
+     element matching this rule. */
   @keyframes ringSpin1Mobile {
-    from { transform: rotate(0deg)   scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1))); }
-    to   { transform: rotate(360deg) scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1))); }
+    from { transform: rotate(0deg)   scale(calc(var(--layer-scale, 1.55) * var(--mobile-scale, 1))); }
+    to   { transform: rotate(360deg) scale(calc(var(--layer-scale, 1.55) * var(--mobile-scale, 1))); }
   }
-  .layer.spin-rings img { animation-name: ringSpin1Mobile; }
+  .scene[data-palette="genesis"] .layer.spin-rings img {
+    animation: ringSpin1Mobile 90s linear infinite !important;
+    transform-origin: center center !important;
+  }
 
   @keyframes beamPulseMobile {
     0%, 100% { opacity: .55; transform: scale(calc(var(--layer-scale, 1) * var(--mobile-scale, 1))); }
@@ -737,16 +768,29 @@ body {
     margin-left: 4%;
   }
 
-  /* Ch II eyes-intro: soften the hard cut into the cryo scene below by
-     fading the bottom of the eyes stage to black. */
+  /* Ch II grid: the previous fade bands (28vh top, 38vh bottom) ate
+     the visible middle of the scaled-up grid on phones. Tighten them
+     so more of the architectural grid is visible. */
+  .scene[data-palette="cryo"]::before { height: 12vh !important; }
+  .scene[data-palette="cryo"]::after  { height: 18vh !important; }
+
+  /* Ch II eyes-intro: bleed the eyes panel into the cryo grid above AND
+     below so it doesn't hard-cut. Fade both edges to black; the cryo
+     scene is also a near-black backdrop with a teal grid, so the eyes
+     dissolve smoothly into it. */
   .eyes-intro .eyes-stage::before {
     content: "";
     position: absolute;
     left: 0; right: 0; bottom: 0;
-    height: 30%;
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, #000 95%);
+    height: 45%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.85) 70%, #000 100%);
     z-index: 2;
     pointer-events: none;
+  }
+  /* Top edge feather */
+  .eyes-intro .eyes-stage {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 70%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 70%, transparent 100%);
   }
 
   /* Ch III firs + ridge: pin them harder to the bottom so they don't
@@ -754,6 +798,31 @@ body {
   .scene[data-palette="philadelphia"] .layer:nth-child(3),  /* firs  */
   .scene[data-palette="philadelphia"] .layer:nth-child(4) { /* ridge */
     bottom: -2vh !important;
+  }
+
+  /* Ch III legibility: as the chapter scrolls past, the dark crimson→black
+     floor underneath used to swallow the dark .prose.light text. Lift the
+     prose to a warm cream on mobile and add a stronger drop shadow so it
+     reads against ANY background in the chapter, including the dark ridge
+     and the chapter-end floor. */
+  .scene[data-palette="philadelphia"] ~ .prose.light,
+  .chapter:has(.scene[data-palette="philadelphia"]) .prose.light {
+    color: #fff2dc !important;
+  }
+  .chapter:has(.scene[data-palette="philadelphia"]) .prose.light *:not(.term):not(.term *):not(.flash) {
+    text-shadow:
+      0 1px 2px rgba(0,0,0,.85),
+      0 4px 14px rgba(0,0,0,.85),
+      0 12px 36px rgba(0,0,0,.7) !important;
+  }
+  /* Stop the Philadelphia chapter floor from going to pure black — keep
+     the bottom of the chapter in vermilion family so the warm text still
+     has tonal contrast underneath. */
+  .chapter:has(.scene[data-palette="philadelphia"])::after {
+    background: linear-gradient(to bottom,
+      rgba(26,6,8,0) 0%,
+      #2a0a10 40%,
+      #1a0608 100%) !important;
   }
 
   /* Make sure prose ALWAYS sits above the chapter-end floor — this was
