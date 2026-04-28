@@ -47,17 +47,32 @@
   // tail prose).
   const layersByChapter = chapters.map(ch => {
     const sceneEls = Array.from(ch.querySelectorAll('.scene'));
-    const scenes = sceneEls.map(scene => ({
-      el: scene,
-      isTail: scene.dataset.tail === '1',
-      layers: Array.from(scene.querySelectorAll('.layer')).map(el => ({
-        el,
-        speed: parseFloat(el.dataset.speed || '0'),
-        offsetY: parseFloat(el.dataset.offset || '0'),
-        offsetX: parseFloat(el.dataset.offsetx || '0'),
-        scale: parseFloat(el.dataset.scale || '1'),
-      })),
-    }));
+    const scenes = sceneEls.map(scene => {
+      const isTail = scene.dataset.tail === '1';
+      // For tail scenes, cache the pin point NOW (before sticky engages and
+      // corrupts offsetTop). Use the next non-sticky sibling's offsetTop
+      // inside the chapter as the reliable anchor — a regular block element's
+      // offsetTop is stable regardless of scroll position.
+      let cachedPinOffsetTop = null;
+      if (isTail) {
+        const sib = scene.nextElementSibling;
+        // nextElementSibling is the .prose-genesis-tail (or equivalent), which
+        // is never sticky, so its offsetTop within the chapter is immutable.
+        cachedPinOffsetTop = sib ? sib.offsetTop : scene.offsetTop;
+      }
+      return {
+        el: scene,
+        isTail,
+        cachedPinOffsetTop,
+        layers: Array.from(scene.querySelectorAll('.layer')).map(el => ({
+          el,
+          speed: parseFloat(el.dataset.speed || '0'),
+          offsetY: parseFloat(el.dataset.offset || '0'),
+          offsetX: parseFloat(el.dataset.offsetx || '0'),
+          scale: parseFloat(el.dataset.scale || '1'),
+        })),
+      };
+    });
     return {
       chapter: ch,
       scene: sceneEls[0] || null,
@@ -100,18 +115,13 @@
       grp.scenes.forEach(sc => {
         let p;
         if (sc.isTail) {
-          // Tail scene: a sticky element with height:100vh inside the
-          // chapter. While its top is below 0 (still scrolling toward
-          // viewport) p stays 0; once pinned at top:0 we measure how far
-          // its NEXT-SIBLING content has scrolled to drive p toward 1.
-          // Practical proxy: use the scene's own bounding rect — when
-          // its top hits 0, p=0; as the chapter continues scrolling,
-          // simulate motion using remaining chapter scroll past that
-          // pin point.
-          const sceneRect = sc.el.getBoundingClientRect();
+          // Tail scene re-pins when the reader exits the timeline block.
+          // cachedPinOffsetTop is the offsetTop of the next sibling inside the
+          // chapter, captured at init before sticky ever engaged — so it is
+          // the stable natural document position (offsetTop on a sticky element
+          // itself changes once pinned, making it useless for this math).
           const chRect = grp.chapter.getBoundingClientRect();
-          // px scrolled since tail's natural position reached viewport top
-          const naturalOffsetTop = sc.el.offsetTop;          // within chapter
+          const naturalOffsetTop = sc.cachedPinOffsetTop;    // stable, set at init
           const chapterScrollY = -chRect.top;                // px scrolled into chapter
           const sincePin = Math.max(0, chapterScrollY - naturalOffsetTop);
           // Range of motion: from pin until end of chapter
