@@ -198,7 +198,7 @@ body {
    title screen, the new story.css landed. If it's still magenta (XXII) or
    cyan (XXI), the CSS file did NOT update. */
 .opening .meta-rule.bot span:first-child {
-  color: #a8ff5a !important;
+  color: #ffc14a !important;
   font-weight: 700 !important;
   letter-spacing: .35em !important;
   text-shadow: 0 0 14px rgba(255,138,58,.6) !important;

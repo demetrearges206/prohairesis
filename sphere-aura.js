@@ -41,13 +41,13 @@
     transition: 'opacity 2s ease-out',
     mixBlendMode: 'screen',
     zIndex: '1', // below sphere/rings layers, above bg
-    // Symmetric soft circular fade on the canvas so neither top nor bottom
-    // shows a hard edge. The shader's own radial mask handles luminance;
-    // this CSS mask handles geometry — the canvas itself becomes a soft
-    // circle, identical top and bottom, immune to whatever SVG layers
-    // happen to occlude one side or the other.
-    WebkitMaskImage: 'radial-gradient(circle at 50% 50%, #000 0%, #000 28%, rgba(0,0,0,.6) 42%, transparent 58%)',
-    maskImage: 'radial-gradient(circle at 50% 50%, #000 0%, #000 28%, rgba(0,0,0,.6) 42%, transparent 58%)'
+    // Soft elliptical vignette: opaque at center, fully transparent well
+    // before canvas edges on all four sides — the canvas rectangle is never
+    // visible. Ellipse is wider than tall (landscape scenes) so the fade
+    // reaches all edges symmetrically. Global rule: every shader canvas
+    // fades to 0 before its container edge so it floats rather than blocks.
+    WebkitMaskImage: 'radial-gradient(ellipse 70% 62% at 50% 50%, black 0%, black 32%, rgba(0,0,0,.5) 55%, transparent 78%)',
+    maskImage: 'radial-gradient(ellipse 70% 62% at 50% 50%, black 0%, black 32%, rgba(0,0,0,.5) 55%, transparent 78%)'
   });
   // Insert as first child of scene so the SVG layers render on top.
   // IMPORTANT: do NOT touch `scene.style.position` here — the scene must
