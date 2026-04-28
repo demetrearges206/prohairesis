@@ -151,11 +151,11 @@ body {
 }
 .opening .meta-rule.top { top: 78px; }
 .opening .meta-rule.bot { bottom: 78px; }
-/* v21 deploy marker — if you see a bright cyan VERSION XXI on the title
-   screen, the new story.css landed. If it's still dim/grey, the CSS
-   file did NOT update. */
+/* v22 deploy marker — if you see a bright magenta VERSION XXII on the title
+   screen, the new story.css landed. If it's still cyan (XXI) or dim/grey,
+   the CSS file did NOT update. */
 .opening .meta-rule.bot span:first-child {
-  color: #0fffd0 !important;
+  color: #ff5ad7 !important;
   font-weight: 700 !important;
   letter-spacing: .35em !important;
   text-shadow: 0 0 14px rgba(15,255,208,.6) !important;
@@ -416,6 +416,69 @@ body {
   padding: 6px 10px 0 0;
   margin: 4px 0 0;
 }
+/* Crimson "I am a GOD." climax line in Ch I */
+.prose p.drop.crimson {
+  color: #ff8a6a;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(28px, 4.4vw, 44px);
+  line-height: 1.15;
+  margin: 1.4em 0;
+  letter-spacing: -.005em;
+  text-shadow: 0 0 28px rgba(255,84,24,.45),
+               0 0 4px rgba(255,84,24,.5);
+}
+.prose p.drop.crimson::first-letter {
+  font-size: 1em;
+  float: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Dated time-jump markers in Ch I ("80 years later... YEAR 4111") */
+.prose p.timestamp {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: rgba(217,200,138,.78);
+  margin: 2.4em 0 1.2em;
+  padding-top: 1em;
+  border-top: 1px solid rgba(217,200,138,.18);
+  display: flex;
+  flex-wrap: wrap;
+  gap: .8em 1.4em;
+  align-items: baseline;
+  text-shadow: none !important;
+  max-width: 580px;
+}
+.prose p.timestamp .year {
+  font-size: 11px;
+  color: rgba(255,138,106,.85);
+  letter-spacing: .35em;
+}
+.prose p.timestamp.present {
+  border-top: 1px solid rgba(255,138,106,.5);
+  padding-top: 1.4em;
+  margin-top: 3em;
+}
+.prose p.timestamp.present .year {
+  color: #ffb09a;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Section marker — single-word divider like "Humans" */
+.prose p.section-marker {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(28px, 3.6vw, 38px);
+  letter-spacing: -.01em;
+  color: rgba(255,200,170,.92);
+  margin: 1em 0 1.2em;
+  text-shadow: 0 0 24px rgba(255,84,24,.25);
+}
 .prose p.pause {
   text-align: center;
   font-style: italic;
@@ -475,6 +538,12 @@ body {
 }
 .prose p.term .tag.dim {
   color: #6a8aa8;
+}
+/* PROHAIRESIS_B — the second consciousness, distinct hue from the original */
+.prose p.term .tag.b {
+  color: #d9c88a;
+  font-weight: 500;
+  margin-right: 6px;
 }
 .prose p.term.center-term {
   text-align: center;
