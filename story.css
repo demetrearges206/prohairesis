@@ -151,6 +151,15 @@ body {
 }
 .opening .meta-rule.top { top: 78px; }
 .opening .meta-rule.bot { bottom: 78px; }
+/* v21 deploy marker — if you see a bright cyan VERSION XXI on the title
+   screen, the new story.css landed. If it's still dim/grey, the CSS
+   file did NOT update. */
+.opening .meta-rule.bot span:first-child {
+  color: #0fffd0 !important;
+  font-weight: 700 !important;
+  letter-spacing: .35em !important;
+  text-shadow: 0 0 14px rgba(15,255,208,.6) !important;
+}
 
 .opening .scroll-hint {
   position: absolute;
