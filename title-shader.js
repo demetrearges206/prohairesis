@@ -110,27 +110,31 @@
       // Field strength — radial falloff so corners stay near-black
       float r = length(p);
       float falloff = smoothstep(0.95, 0.05, r);
-      float field = pow(n3, 1.6) * falloff;
+      float field = pow(n3, 1.1) * falloff;   // was 1.6 — less darkening = more visible
 
       // (No bottom-fade band: the canvas is now viewport-fixed and fades
       // out globally via u_alive when the reader leaves the title.)
 
-      // Two-tone mix: crimson (PROHAIRESIS sphere) + cyan (signal)
-      vec3 crimson = vec3(1.0, 0.33, 0.10);
+      // Three-tone palette: crimson → violet → cyan, cycling at a pace
+      // the eye can track. Each color is offset by 2π/3 so the whole wheel
+      // cycles smoothly rather than oscillating between just two poles.
+      vec3 crimson = vec3(1.0,  0.33, 0.10);
+      vec3 violet  = vec3(0.62, 0.12, 0.95);
       vec3 cyan    = vec3(0.06, 0.95, 0.82);
-      // Tone selector drifts slowly so it isn't static
-      float tone = 0.5 + 0.5 * sin(u_time*0.08 + n2*4.0 + r*3.0);
-      vec3 col = mix(cyan, crimson, tone);
+      float tc = u_time * 0.20 + n2 * 4.5 + r * 2.5;   // faster cycle
+      float t1 = 0.5 + 0.5 * sin(tc);
+      float t2 = 0.5 + 0.5 * sin(tc + 2.094);           // +2π/3
+      vec3 col = mix(mix(crimson, violet, t1), cyan, t2 * 0.6);
 
-      // Layer a faint deeper red glow at center to seed the sphere
-      float core = exp(-r*4.0) * 0.35;
-      col += crimson * core * (0.55 + 0.45*sin(u_time*0.7));
+      // Center glow seeds the sphere — brighter than before
+      float core = exp(-r*3.5) * 0.55;
+      col += crimson * core * (0.6 + 0.4*sin(u_time*0.7));
 
-      // Apply field as luminance, dim heavily so it sits behind type
-      vec3 final = col * field * 0.85;
+      // Apply field — boosted multiplier for visible brightness
+      vec3 final = col * field * 1.45;
 
-      // Slight desaturation toward black at large r
-      final *= mix(0.55, 1.0, falloff);
+      // Gentler edge desaturation (was 0.55)
+      final *= mix(0.72, 1.0, falloff);
 
       // Master alive multiplier
       final *= u_alive;
