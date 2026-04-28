@@ -94,6 +94,7 @@ body {
 /* ---------- Opening ---------- */
 .opening {
   position: relative;
+  z-index: 1;            /* keep title content above body-level title-shader-canvas */
   height: 100vh;
   width: 100%;
   display: grid;
@@ -170,6 +171,7 @@ body {
 }
 .opening .meta-rule {
   position: absolute;
+  z-index: 4;
   left: 32px; right: 32px;
   display: flex;
   justify-content: space-between;
@@ -185,7 +187,7 @@ body {
    title screen, the new story.css landed. If it's still magenta (XXII) or
    cyan (XXI), the CSS file did NOT update. */
 .opening .meta-rule.bot span:first-child {
-  color: #5ad7ff !important;
+  color: #ffd35a !important;
   font-weight: 700 !important;
   letter-spacing: .35em !important;
   text-shadow: 0 0 14px rgba(255,138,58,.6) !important;
@@ -1030,7 +1032,7 @@ body {
   font-family: var(--serif);
   font-style: italic;
   font-weight: 200;
-  font-size: clamp(120px, 22vw, 280px);
+  font-size: clamp(88px, 14vw, 200px);
   line-height: .9;
   letter-spacing: -.04em;
   color: #ff8a6a;
@@ -1040,12 +1042,9 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .timeline-h-year-num.ticking {
-  animation: yearTickerJitter .12s steps(2) infinite;
-}
-@keyframes yearTickerJitter {
-  0%   { transform: translate(0, 0); opacity: .9; }
-  50%  { transform: translate(1px, -1px); opacity: 1; }
-  100% { transform: translate(-1px, 1px); opacity: .92; }
+  /* No animation — year increments are now driven directly by scroll
+     progress, snapped to the nearest integer. The class is kept as a
+     hook in case we want a subtle scroll-speed-aware effect later. */
 }
 .timeline-h-track {
   position: absolute;
@@ -1067,7 +1066,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 60vh 6vw 8vh;  /* push prose below the year (year sits ~30%-50% down) */
+  padding: 42vh 6vw 6vh;  /* push prose below the year (year sits ~18vh+~120px ≈ 30vh) */
 }
 .timeline-h-card > * {
   max-width: 640px;
@@ -1113,12 +1112,12 @@ body {
 
 /* Mobile: same effect, smaller type, tighter padding */
 @media (max-width: 720px) {
-  .timeline-h-year { top: 12vh; }
-  .timeline-h-year-label { font-size: 10px; letter-spacing: .3em; margin-bottom: 8px; }
-  .timeline-h-year-num { font-size: clamp(80px, 26vw, 140px); }
-  .timeline-h-card { padding: 48vh 6vw 6vh; }
-  .timeline-h-card > * { font-size: 15px; line-height: 1.55; }
-  .timeline-h-section-marker { font-size: clamp(22px, 6vw, 28px) !important; margin-bottom: .9em !important; }
+  .timeline-h-year { top: 8vh; }
+  .timeline-h-year-label { font-size: 9px; letter-spacing: .3em; margin-bottom: 6px; }
+  .timeline-h-year-num { font-size: clamp(56px, 16vw, 96px); }
+  .timeline-h-card { padding: 30vh 6vw 4vh; }
+  .timeline-h-card > * { font-size: 15px; line-height: 1.5; }
+  .timeline-h-section-marker { font-size: clamp(20px, 5vw, 26px) !important; margin-bottom: .8em !important; }
   .timeline-h-present-label { font-size: 10px !important; letter-spacing: .3em !important; }
 }
 

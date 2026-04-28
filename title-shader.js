@@ -24,32 +24,43 @@
 (() => {
   // ---- Skip conditions ----------------------------------------------------
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const tooSmall = window.innerWidth < 720;
-  if (reduceMotion || tooSmall) return;
+  if (reduceMotion) return;
 
   const opening = document.querySelector('.opening');
   if (!opening) return;
+
+  const isMobile = window.innerWidth < 720;
 
   // ---- Canvas setup -------------------------------------------------------
   const canvas = document.createElement('canvas');
   canvas.className = 'title-shader-canvas';
   Object.assign(canvas.style, {
-    position: 'absolute',
-    inset: '0',
-    width: '100%',
-    height: '100%',
+    // FIXED to the viewport so it never butt-joins anything below the opening
+    // — the shader simply lives across the whole screen and fades out as we
+    // leave the title (driven by u_alive uniform from scroll progress).
+    position: 'fixed',
+    left: '0',
+    right: '0',
+    top: '0',
+    height: '100vh',
+    width: '100vw',
     zIndex: '0',
     pointerEvents: 'none',
     opacity: '0',
-    transition: 'opacity 1.2s ease-out',
-    mixBlendMode: 'screen'
+    transition: 'opacity 1.2s ease-out'
   });
-  // Insert as first child so opening-inner stays above
-  opening.style.position = 'relative';
-  opening.insertBefore(canvas, opening.firstChild);
+  // Append to <body> so it's truly viewport-fixed (not clipped by any
+  // ancestor's overflow / transform).
+  document.body.appendChild(canvas);
 
   const gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: false });
   if (!gl) { canvas.remove(); return; }
+  // Enable straight alpha blending so the shader's transparency actually
+  // composes with the page below — otherwise the canvas paints opaque
+  // black where the field is dark.
+  gl.enable(gl.BLEND);
+  gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+  gl.clearColor(0, 0, 0, 0);
 
   // ---- Shader sources -----------------------------------------------------
   const VS = `
@@ -101,6 +112,9 @@
       float falloff = smoothstep(0.95, 0.05, r);
       float field = pow(n3, 1.6) * falloff;
 
+      // (No bottom-fade band: the canvas is now viewport-fixed and fades
+      // out globally via u_alive when the reader leaves the title.)
+
       // Two-tone mix: crimson (PROHAIRESIS sphere) + cyan (signal)
       vec3 crimson = vec3(1.0, 0.33, 0.10);
       vec3 cyan    = vec3(0.06, 0.95, 0.82);
@@ -121,7 +135,11 @@
       // Master alive multiplier
       final *= u_alive;
 
-      gl_FragColor = vec4(final, 1.0);
+      // Use luminance as alpha so corners + bottom fade are TRULY transparent
+      // (not just dark). Without this the canvas paints a near-black rectangle
+      // over Ch I where it bleeds past the opening, which reads as a dark bar.
+      float lum = max(max(final.r, final.g), final.b);
+      gl_FragColor = vec4(final, lum);
     }
   `;
 
@@ -161,7 +179,8 @@
 
   // ---- Resize ------------------------------------------------------------
   function resize(){
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    // Lower DPR on mobile to keep frame budget low
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.0 : 1.5);
     const w = Math.floor(canvas.clientWidth * dpr);
     const h = Math.floor(canvas.clientHeight * dpr);
     if (canvas.width !== w || canvas.height !== h) {
@@ -175,7 +194,8 @@
   // ---- Render loop -------------------------------------------------------
   let visible = true;
   let last = 0;
-  const FRAME_MS = 1000 / 30; // 30fps cap
+  // 24fps on mobile, 30fps on desktop — the field is slow, no one notices
+  const FRAME_MS = 1000 / (isMobile ? 24 : 30);
 
   function render(now){
     requestAnimationFrame(render);
@@ -187,22 +207,46 @@
     gl.uniform2f(u_res, canvas.width, canvas.height);
     gl.uniform1f(u_time, now * 0.001);
 
+    // Clear with transparent black each frame so alpha truly composites.
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
     // Scroll-driven contract: 0 at top, 1 once title is fully off-screen
     const rect = opening.getBoundingClientRect();
     const vh = window.innerHeight;
-    // progress: 0 when opening fully visible, 1 when fully scrolled past
-    const progress = Math.max(0, Math.min(1, -rect.top / Math.max(1, rect.height - vh*0.5)));
-    gl.uniform1f(u_contract, progress);
-    gl.uniform1f(u_alive, 1.0);
+    // contract: 0 when opening fully visible, 1 when fully scrolled past
+    const contract = Math.max(0, Math.min(1, -rect.top / Math.max(1, rect.height - vh*0.5)));
+    gl.uniform1f(u_contract, contract);
+
+    // alive: 1.0 while opening is on screen, fades to 0 by ~1.5vh past the
+    // opening so the shader gracefully dissolves into the void of Ch I
+    // instead of cutting off with a hard edge.
+    const fadeStart = rect.height;             // when opening's bottom hits viewport top
+    const fadeEnd   = rect.height + vh * 1.2;  // 1.2vh into Ch I
+    const past = -rect.top;                    // px scrolled past opening's top
+    let alive = 1.0;
+    if (past > fadeStart) {
+      alive = 1.0 - Math.min(1, (past - fadeStart) / (fadeEnd - fadeStart));
+    }
+    gl.uniform1f(u_alive, alive);
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
   requestAnimationFrame(render);
 
-  // Pause when opening is fully out of view
+  // Pause when opening is fully out of view AND we're past the fade
+  // (opening can be off-screen but shader still rendering its fade tail).
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(entries => {
-      visible = entries[0].isIntersecting;
+      const inView = entries[0].isIntersecting;
+      // If opening still in view → render. If not, render only while
+      // alive > 0 (a few hundred ms after leaving).
+      if (inView) {
+        visible = true;
+      } else {
+        // Give it 1 second of trailing renders to finish the fade-out, then stop
+        visible = true;
+        setTimeout(() => { visible = false; }, 1500);
+      }
     }, { threshold: 0 });
     io.observe(opening);
   }

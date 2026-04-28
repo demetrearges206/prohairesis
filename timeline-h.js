@@ -38,35 +38,31 @@
     }
     sizeBlock();
 
-    // Ticker state (so we can stop a previous flicker before starting a new one)
-    let tickerCancel = null;
     let lastDisplayedYear = years[0];
     yearNumEl.textContent = String(years[0]);
 
-    function setYear(value, isMidTransition) {
-      // value can be a non-integer during transitions; we round.
+    function setYear(value) {
       const v = Math.round(value);
       if (v !== lastDisplayedYear) {
         lastDisplayedYear = v;
         yearNumEl.textContent = String(v);
       }
-      yearNumEl.classList.toggle('ticking', !!isMidTransition);
     }
 
     // Map global scroll progress (0..1 over the block) to:
     //  - track translateX (in vw)
     //  - active card index (float)
+    //  - displayed year (linear interpolation from years[from] -> years[to],
+    //    snapped to nearest integer — purely scroll-driven, no animation,
+    //    no jitter, no transitions).
     function update() {
       const rect = block.getBoundingClientRect();
       const vh = window.innerHeight;
       const blockH = block.offsetHeight;
-      // progress: 0 when the block's top hits viewport top, 1 when the block
-      // has finished its scroll (top + blockH - vh hits viewport top).
       const scrollable = blockH - vh;
       let p = -rect.top / Math.max(1, scrollable);
       p = Math.max(0, Math.min(1, p));
 
-      // floatIdx: 0..N-1
       const floatIdx = p * (N - 1);
       const fromIdx = Math.floor(floatIdx);
       const toIdx = Math.min(N - 1, fromIdx + 1);
@@ -75,31 +71,12 @@
       // Track translate: each card occupies 100vw, so track shifts by floatIdx * 100vw
       track.style.transform = `translate3d(${-floatIdx * 100}vw, 0, 0)`;
 
-      // Year ticker:
-      //  - When NOT mid-transition (subProgress near 0 or 1), show the exact year.
-      //  - When mid-transition, rapid-tick: interpolate years[from]→years[to] and
-      //    add a hash-based jitter so the digits feel "scrambling" rather than
-      //    smoothly counting. This visually reads as a fast number-flick.
+      // Year: linear lerp between fromYear and toYear, snapped to nearest int.
+      // No jitter, no setInterval, no CSS animation — pure scroll-position read.
       const fromYear = years[fromIdx];
       const toYear = years[toIdx];
-      const TRANS_BAND = 0.15; // last 15% of each card-span is the "ticking" zone
-      if (subProgress < TRANS_BAND || fromIdx === toIdx) {
-        // Settled on fromYear
-        setYear(fromYear, false);
-      } else if (subProgress > 1 - 0.02) {
-        // Settled on toYear (very end)
-        setYear(toYear, false);
-      } else {
-        // Mid-transition: interpolate with jitter
-        const tBand = (subProgress - TRANS_BAND) / (1 - TRANS_BAND); // 0..1 over the ticking range
-        const linear = fromYear + (toYear - fromYear) * tBand;
-        // Jitter: small random-ish offset that depends on tBand so it doesn't
-        // re-randomize every frame — pseudo-noise tied to floatIdx
-        const seed = Math.sin(performance.now() * 0.04 + floatIdx * 13.37) * 0.5;
-        const span = Math.abs(toYear - fromYear);
-        const jitter = seed * Math.min(span * 0.4, 8);
-        setYear(linear + jitter, true);
-      }
+      const linear = fromYear + (toYear - fromYear) * subProgress;
+      setYear(linear);
     }
 
     // RAF-throttled scroll handler
@@ -112,26 +89,28 @@
     window.addEventListener('resize', () => { sizeBlock(); schedule(); });
     window.addEventListener('load', () => { sizeBlock(); update(); });
 
-    // While inside a transition we want a continuous animation tick so the
-    // jitter looks alive even when the user holds still mid-scroll. Run a
-    // light RAF loop that only does work when we're inside the block AND
-    // currently in a ticking band.
-    let liveRaf = 0;
-    function liveLoop() {
-      const rect = block.getBoundingClientRect();
-      const vh = window.innerHeight;
-      // Only run when block is visible
-      if (rect.bottom > 0 && rect.top < vh) {
-        update();
-      }
-      liveRaf = requestAnimationFrame(liveLoop);
-    }
-    // Only start the live loop on desktop — on mobile, throttle to scroll-only
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      liveRaf = requestAnimationFrame(liveLoop);
-    }
-
     // Initial paint
     update();
+
+    // Continuous rAF poll while the block is in/near the viewport. This is
+    // a belt-and-braces fallback so the track stays in sync even when the
+    // host swallows scroll events (some iframe / programmatic-scroll cases
+    // don't fire 'scroll' on window). Throttled and only updates when the
+    // scroll position has actually changed since last frame.
+    let raf2 = 0;
+    let lastY = -1;
+    function pollLoop() {
+      raf2 = requestAnimationFrame(pollLoop);
+      const y = window.scrollY;
+      if (y === lastY) return;          // bail if scroll hasn't changed
+      lastY = y;
+      const rect = block.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // Only do work when the block is within ±2 viewports of the viewport
+      if (rect.bottom > -vh && rect.top < vh * 2) {
+        update();
+      }
+    }
+    raf2 = requestAnimationFrame(pollLoop);
   }
 })();
