@@ -15,7 +15,9 @@
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   // Find Ch I scene (genesis palette)
-  const scene = document.querySelector('.scene[data-palette="genesis"]');
+  // Only attach to the MAIN genesis scene (not the tail scene). The tail
+  // already gets its own parallax pin and doesn't need an aura.
+  const scene = document.querySelector('.scene[data-palette="genesis"]:not([data-tail])');
   if (!scene) return;
 
   const isMobile = window.innerWidth < 720;
@@ -23,16 +25,29 @@
   // ---- Canvas setup -------------------------------------------------------
   const canvas = document.createElement('canvas');
   canvas.className = 'sphere-aura-canvas';
+  // Mobile: pin canvas to top of the sticky scene, sized to viewport, so it
+  // tracks the sphere visually as the user scrolls. The sphere SVG sits
+  // anchored to the top of the scene at scaled-up size (mobile keyframes),
+  // so the canvas needs to ride along.
   Object.assign(canvas.style, {
     position: 'absolute',
-    inset: '0',
+    left: '0',
+    right: '0',
+    top: '0',
     width: '100%',
-    height: '100%',
+    height: isMobile ? '100vh' : '100%',
     pointerEvents: 'none',
     opacity: '0',
     transition: 'opacity 2s ease-out',
     mixBlendMode: 'screen',
-    zIndex: '1' // below sphere/rings layers (which sit at default z), above bg
+    zIndex: '1', // below sphere/rings layers, above bg
+    // Symmetric soft circular fade on the canvas so neither top nor bottom
+    // shows a hard edge. The shader's own radial mask handles luminance;
+    // this CSS mask handles geometry — the canvas itself becomes a soft
+    // circle, identical top and bottom, immune to whatever SVG layers
+    // happen to occlude one side or the other.
+    WebkitMaskImage: 'radial-gradient(circle at 50% 50%, #000 0%, #000 28%, rgba(0,0,0,.6) 42%, transparent 58%)',
+    maskImage: 'radial-gradient(circle at 50% 50%, #000 0%, #000 28%, rgba(0,0,0,.6) 42%, transparent 58%)'
   });
   // Insert as first child of scene so the SVG layers render on top.
   // IMPORTANT: do NOT touch `scene.style.position` here — the scene must

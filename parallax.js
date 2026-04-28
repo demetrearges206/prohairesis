@@ -38,18 +38,31 @@
   }
   sizeChapters();
 
+  // A chapter can have one OR many .scene blocks. Each scene parallaxes
+  // independently across its OWN sticky span (its own height inside the
+  // chapter). The first .scene at the top of the chapter is the main scene
+  // and uses the chapter's full progress; any extra .scene[data-tail] is a
+  // tail scene that re-pins later in the chapter so the background visibly
+  // scrolls again during a long tail (e.g. Genesis: prose → timeline →
+  // tail prose).
   const layersByChapter = chapters.map(ch => {
-    const scene = ch.querySelector('.scene');
-    return {
-      chapter: ch,
-      scene,
-      layers: Array.from(scene ? scene.querySelectorAll('.layer') : []).map(el => ({
+    const sceneEls = Array.from(ch.querySelectorAll('.scene'));
+    const scenes = sceneEls.map(scene => ({
+      el: scene,
+      isTail: scene.dataset.tail === '1',
+      layers: Array.from(scene.querySelectorAll('.layer')).map(el => ({
         el,
         speed: parseFloat(el.dataset.speed || '0'),
-        offsetY: parseFloat(el.dataset.offset || '0'), // in vh
-        offsetX: parseFloat(el.dataset.offsetx || '0'), // in vw
+        offsetY: parseFloat(el.dataset.offset || '0'),
+        offsetX: parseFloat(el.dataset.offsetx || '0'),
         scale: parseFloat(el.dataset.scale || '1'),
       })),
+    }));
+    return {
+      chapter: ch,
+      scene: sceneEls[0] || null,
+      scenes,
+      layers: scenes[0] ? scenes[0].layers : [],
     };
   });
 
@@ -73,7 +86,6 @@
       const top = rect.top;          // px from top of viewport
       const height = rect.height;    // total chapter height
       // progress = how far through the chapter we are (0..1)
-      // when chapter top hits viewport top, progress=0; when chapter bottom hits viewport bottom, progress=1
       const progress = Math.max(-0.25, Math.min(1.25, -top / (height - vh)));
 
       if (top <= vh * 0.5 && top + height >= vh * 0.5) {
@@ -81,13 +93,39 @@
         activeName = grp.chapter.dataset.name || '';
       }
 
-      grp.layers.forEach(L => {
-        // data-speed is expressed as % of viewport height over the full chapter.
-        // e.g. speed=-48 → layer drifts up by 48% of vh as the chapter scrolls past.
-        const dy = progress * L.speed * vh / 100;
-        const ox = L.offsetX * vw / 100;
-        const oy = L.offsetY * vh / 100;
-        L.el.style.transform = `translate3d(${ox}px, ${oy + dy}px, 0) scale(${L.scale})`;
+      // Drive each scene independently. Main scene uses chapter progress
+      // across the whole chapter. Tail scenes use their own sticky span
+      // — progress is computed from how far the tail scene's element has
+      // moved through its own range, so layers re-parallax fresh.
+      grp.scenes.forEach(sc => {
+        let p;
+        if (sc.isTail) {
+          // Tail scene: a sticky element with height:100vh inside the
+          // chapter. While its top is below 0 (still scrolling toward
+          // viewport) p stays 0; once pinned at top:0 we measure how far
+          // its NEXT-SIBLING content has scrolled to drive p toward 1.
+          // Practical proxy: use the scene's own bounding rect — when
+          // its top hits 0, p=0; as the chapter continues scrolling,
+          // simulate motion using remaining chapter scroll past that
+          // pin point.
+          const sceneRect = sc.el.getBoundingClientRect();
+          const chRect = grp.chapter.getBoundingClientRect();
+          // px scrolled since tail's natural position reached viewport top
+          const naturalOffsetTop = sc.el.offsetTop;          // within chapter
+          const chapterScrollY = -chRect.top;                // px scrolled into chapter
+          const sincePin = Math.max(0, chapterScrollY - naturalOffsetTop);
+          // Range of motion: from pin until end of chapter
+          const range = Math.max(1, (chRect.height - naturalOffsetTop) - vh);
+          p = Math.max(0, Math.min(1.1, sincePin / range));
+        } else {
+          p = progress;
+        }
+        sc.layers.forEach(L => {
+          const dy = p * L.speed * vh / 100;
+          const ox = L.offsetX * vw / 100;
+          const oy = L.offsetY * vh / 100;
+          L.el.style.transform = `translate3d(${ox}px, ${oy + dy}px, 0) scale(${L.scale})`;
+        });
       });
     });
 

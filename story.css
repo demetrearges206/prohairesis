@@ -97,17 +97,28 @@ body {
   z-index: 1;            /* keep title content above body-level title-shader-canvas */
   height: 100vh;
   width: 100%;
+  /* IMPORTANT: opening background is TRANSPARENT so the body-level fixed
+     title-shader-canvas (z-index: 0) shows through. The body itself is the
+     #000 void. Previously this had `background: #050608` which silently
+     occluded the entire shader. */
+  background: transparent;
   display: grid;
   place-items: center;
   text-align: center;
-  background: #050608;
   overflow: hidden;
 }
 .opening::before {
   content: "";
   position: absolute; inset: 0;
+  /* z-index: -1 so the soft tinted radial sits BEHIND opening's children
+     but does NOT occlude the body-level title-shader-canvas. Actually the
+     opening is z-index:1 with isolation default — its ::before will still
+     stack above the body canvas. Set pointer-events none + low alpha; the
+     real fix is keeping these tints faint enough that the shader reads
+     through them. */
+  pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 50% at 50% 50%, rgba(58,122,226,.12), transparent 70%),
+    radial-gradient(ellipse 80% 50% at 50% 50%, rgba(58,122,226,.06), transparent 70%),
     radial-gradient(ellipse 30% 20% at 50% 50%, rgba(226,74,74,.08), transparent 70%);
 }
 /* Fade the bottom of the title screen to pure black so it dissolves
@@ -187,7 +198,7 @@ body {
    title screen, the new story.css landed. If it's still magenta (XXII) or
    cyan (XXI), the CSS file did NOT update. */
 .opening .meta-rule.bot span:first-child {
-  color: #ffd35a !important;
+  color: #b388ff !important;
   font-weight: 700 !important;
   letter-spacing: .35em !important;
   text-shadow: 0 0 14px rgba(255,138,58,.6) !important;
@@ -285,6 +296,24 @@ body {
   height: 38vh;
 }
 .chapter:has(.scene[data-palette="genesis"])::after { background: #000; }
+
+/* Genesis tail scene — re-pinning a fresh sticky scene late in the chapter
+   so the parallax visibly re-engages between "I am a GOD" and the
+   "humming sound" line. The tail scene's natural position is just above
+   the .prose-genesis-tail; it pins for ~1 viewport while the tail prose
+   scrolls past, then unsticks at chapter end. */
+.scene.scene-tail {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  z-index: 2;
+  /* Same gradient as the main genesis scene so the visual transition
+     between them is invisible — the user just sees the void continue. */
+  background: radial-gradient(ellipse at 50% 50%,
+    #1a0408 0%, #0a0204 40%, #050102 70%, #000 100%);
+}
 
 /* II — Cryo: pure black with subtle teal rim from grid VP */
 .scene[data-palette="cryo"] {

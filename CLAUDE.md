@@ -3,21 +3,27 @@
 ## Project goal
 A long-form parallax scrolling web experience that presents Julian Arges's short story **PROHAIRESIS** (a 5-act sci-fi piece about Dr. Ada Lance, the Helios IV generation ship, and a fractured AI). Each act becomes a chapter with its own custom parallax scene built from layered SVGs. Audience is the writer (Julian) plus a small circle of literary/tech-adjacent readers — this is a portfolio-quality reading experience, not a marketing site. Single deliverable: an offline-capable HTML file, also deployed to GitHub Pages at `https://demetrearges206.github.io/prohairesis/Prohairesis.html`.
 
-## Current state (VERSION XXIII)
+## Current state (VERSION XXVI)
 - All five chapters are wired up in `Prohairesis.html`. **Ch I (Genesis) is complete with real manuscript prose. Ch II–V still use the placeholder/earlier prose** — Round 2 will go through the manuscript and replace verbatim text for II–V.
-- Ch I title is now **"Genesis"** (was "I Am God"). Lede: "Eighty years of solitude…". The chapter ends at the AI's split and the "I am a GOD" declaration.
-- Parallax engine works (`parallax.js`) — sticky scenes, per-chapter auto-sizing from prose height, layered transforms based on scroll progress.
+- Ch I title is **"Genesis"**. Lede: "Eighty years of solitude…". The chapter ends at the AI's split and the "I am a GOD" declaration.
+- **Ch I now has a horizontal-scroll-pinned timeline tickertape** (10 cards: 4111 → 4217) inserted mid-chapter via `<div class="timeline-h">` + `timeline-h.js`. The block is sticky-pinned vertically while the user scrolls; vertical scroll inside drives a horizontal `translateX` on a multi-card track. A big italic year-num is centered (driven by scroll progress, no animation/jitter — pure linear lerp snapped to nearest integer). See `timeline-h.js` for math; CSS in `story.css` `.timeline-h-*`.
+- Parallax engine works (`parallax.js`) — sticky scenes, per-chapter auto-sizing from prose height, layered transforms based on scroll progress. **Genesis layer speeds were boosted 4–6×** in v26 because the chapter is now ~16,000px tall (was much shorter pre-timeline).
 - Tweaks panel is wired up (`story-tweaks.jsx` + `tweaks-panel.jsx` starter), with a "Mobile / Scene zoom (phones)" slider for `--mobile-scale`.
 - Custom SVG art direction is complete for all 5 chapters and matches the inspiration imagery (`uploads/artdirection_inspiration/`).
 - **Three WebGL/canvas shaders now layered into the experience:**
-  - `title-shader.js` — full-screen WebGL flow-field behind the opening title, two-tone (crimson + cyan), contracts toward center as you scroll into Ch I. Bleeds 30vh past the opening with a soft bottom-fade so it dissolves into the void of Ch I instead of butt-joining the sphere.
-  - `sphere-aura.js` — subtle crimson aura behind the Ch I sphere (organic flow inside the orbital halo, masked to a circle so it doesn't compete with the SVG).
-  - `closing-shader.js` — drifting magenta + cobalt plasma behind "fin." at the end. Slower / more meditative than the title field.
-- Bonus effects already in place: sticky `ada_eyes` cinematic intro at the top of Ch II with cyan HUD scan + glitch flicker; full mission-control HUD overlay in Ch IV (radar with sweep, telemetry, camera-feed grid, pulsing red alert); halftone glitch overlay in Ch V triggers when the disc-snap moment crosses viewport center.
-- Chapter-end "floor" fix is in place: each `.chapter::after` paints a bottom band matching the scene-end color so silhouettes don't "creep up" off the page background. Philadelphia's floor is a vermilion→black GRADIENT (not a solid) so dark `.prose.light` text remains legible across the chapter break.
+  - `title-shader.js` — full-screen WebGL flow-field behind the opening title, two-tone (crimson + cyan), contracts toward center as you scroll into Ch I. **As of v26: canvas is now `position: fixed` on `<body>`, full-viewport, with `u_alive` uniform driven by scroll progress.** No bottom-fade band, no butt-join with Ch I. The shader globally fades out as you leave the title. Runs on mobile too.
+  - `sphere-aura.js` — subtle crimson aura behind the Ch I sphere. **v26: no longer overrides `scene.style.position` — was secretly clobbering the sticky pin on every scene that had it.**
+  - `closing-shader.js` — drifting magenta + cobalt plasma behind "fin." at the end.
+- Bonus effects already in place: sticky `ada_eyes` cinematic intro at the top of Ch II with cyan HUD scan + glitch flicker; full mission-control HUD overlay in Ch IV; halftone glitch overlay in Ch V triggers when the disc-snap moment crosses viewport center.
+- Chapter-end "floor" fix is in place: each `.chapter::after` paints a bottom band matching the scene-end color. Philadelphia's floor is a vermilion→black gradient (not a solid) so cream `.prose.light` text stays legible.
 - Mobile responsive rules are in (`@media max-width: 720px`) — TOC hidden, HUD shrunk, type scaled, prose padding tightened, **plus per-layer SVG scaling** (sphere 1.7×, firs 1.55×, fog 1.7×, etc.). Master `--mobile-scale` multiplier composes on top.
-- Standalone bundled output exists: `Prohairesis-standalone.html` (~2MB, fully offline, no em-dash in filename for download compatibility). **NOTE:** standalone is from an earlier version — needs re-bundling once XXIII is stable.
+- Standalone bundled output exists: `Prohairesis-standalone.html` (~2MB, fully offline). **Lags v26 — needs rebundle once content & UX is stable.**
 - **Deployed:** GitHub repo at `demetrearges206/prohairesis`, served via GitHub Pages from `main`. Deploy workflow goes through Claude Code Desktop (see Workflow below).
+
+## v24–v26 changelog (this round)
+- **v24:** added horizontal year-tickertape timeline component (`timeline-h.js`, `.timeline-h-*` CSS) inserted into Ch I prose. Initial layout used CSS grid + place-items: center, which stretched the year label off-screen — replaced with `position: absolute` year + flex track.
+- **v25:** **fixed major sticky bug.** `sphere-aura.js` was setting `scene.style.position = 'relative'` on every animation frame, overriding the CSS `position: sticky` on every scene with a sphere aura. This silently disabled sticky parallax for the entire site. Removed the override; sticky elements ARE positioned and serve as containing block for absolute children, so canvas works fine. **Also changed `body { overflow-x }` from `hidden` to `clip`** — `overflow: hidden` on `<body>` creates a scroll container that breaks `position: sticky` for descendants in some browsers.
+- **v26:** title shader → full-viewport fixed (no edge over sphere). `.opening` z-index 1 + `.meta-rule` z-index 4 (VERSION marker stays on top of shader). Year-num CSS halved (desktop `clamp(88px,14vw,200px)`, mobile `clamp(56px,16vw,96px)`). Card top-padding cut (desktop 42vh, mobile 30vh) so prose isn't clipped. Year-num animation (jitter / steps / live RAF) **removed entirely** — year is now a clean linear lerp snapped to nearest integer, driven purely by scroll position. Belt-and-braces rAF poll added to `timeline-h.js` for cases where scroll events get swallowed.
 
 ## Deploy version markers — important diagnostic
 The title screen shows `VERSION <Roman numeral>` in the bottom-left meta-rule. **The color of that text is the deploy diagnostic** — different version = different color so you can tell at a glance which deploy actually loaded:
@@ -26,12 +32,15 @@ The title screen shows `VERSION <Roman numeral>` in the bottom-left meta-rule. *
 |---------|----------|----------|------|
 | XXI     | cyan     | (legacy) | superseded |
 | XXII    | magenta  | `#ff5ad7`| superseded |
-| XXIII   | **lime green** | `#9eff5a` | **current** |
+| XXIII   | lime green | `#9eff5a` | superseded |
+| XXIV    | orange   | (legacy) | superseded |
+| XXV     | cyan     | `#5ad7ff`| superseded |
+| XXVI    | **amber** | `#ffd35a` | **current** |
 
-CSS rule (story.css around line 154):
+CSS rule (story.css `.opening .meta-rule.bot span:first-child`):
 ```
 .opening .meta-rule.bot span:first-child {
-  color: #9eff5a !important;
+  color: #ffd35a !important;
   font-weight: 700 !important;
 }
 ```
@@ -115,6 +124,8 @@ The user works between three environments:
 **There is no undo system.** Each `str_replace_edit` is destructive. The only real rollback is `git revert` on the user's local machine. Before risky multi-file changes, copy current state into `_snapshots/<name>/` so we can manually restore.
 
 ## Open threads / next steps
+- **Verify on real device:** confirm v26 title shader renders on mobile, year ticker counts smoothly with scroll (no jumpiness), and timeline cards aren't cut off. Eval-based testing in this environment doesn't fire scroll events the same way real devices do — only real-device confirmation is reliable.
+- **Verify horizontal-timeline pin works** for the user across full scroll range. We added a belt-and-braces rAF poll in `timeline-h.js` v4 in case scroll events get swallowed.
 - **Round 2: replace Ch II–V prose with manuscript verbatim** — Ch I has real text, II–V do not yet. Source of truth: `manuscript.txt` (or `uploads/PROHAIRESIS.docx` if extraction needs to be redone).
 - **Mobile chapter jump shortcut** — the desktop TOC is `display: none` on mobile. Need a small ⋯/dots menu so phone readers can jump between chapters. Not yet implemented.
 - **In-page Tweaks button on mobile** — Tweaks panel currently only opens via the design-tool toolbar (only visible inside Claude Design). For the deployed site, need a permanent in-page button (e.g. small gear icon, fixed bottom-right) to toggle the panel. Not yet implemented.
@@ -129,13 +140,14 @@ The user works between three environments:
 - **ada-eyes.jpg** — actual inspiration photograph in `assets/ada-eyes.jpg`, currently unused (the SVG stylization `II-eyes.svg` is what renders). User may prefer the photo; ask before swapping.
 
 ## File map
-- `Prohairesis.html` — main entry, single page. Sections: chrome / opening / 5× chapters / closing. Currently loading `story.css?v=23`, `parallax.js?v=5`, `tweaks-panel.jsx?v=3`, `story-tweaks.jsx?v=5`, `title-shader.js?v=2`, `sphere-aura.js?v=2`, `closing-shader.js?v=2`.
+- `Prohairesis.html` — main entry, single page. Sections: chrome / opening / 5× chapters / closing. Currently loading `story.css?v=26`, `parallax.js?v=7`, `tweaks-panel.jsx?v=3`, `story-tweaks.jsx?v=5`, `title-shader.js?v=3`, `sphere-aura.js?v=3`, `closing-shader.js?v=2`, `timeline-h.js?v=4`.
 - `Prohairesis-standalone.html` — bundled offline single-file deliverable (~2MB). **Lags current version — needs rebundle.**
 - `story.css` — all styling. Sections: chrome, opening, scenes, palettes, prose, chapter break, closing, TOC, mobile (~140 lines incl. per-layer scale tokens, mobile keyframe overrides), chapter-specific overlays/animations.
 - `parallax.js` — engine. Sizes chapters from prose height, applies layer transforms on scroll, drives TOC active state, triggers halftone glitch on `.flash` and `.shout.gentle` lines in Ch V.
-- `title-shader.js` — title-screen WebGL flow-field shader (NEW in v23).
-- `sphere-aura.js` — Ch I sphere aura shader (NEW in v23).
-- `closing-shader.js` — closing plasma shader (NEW in v23).
+- `title-shader.js` — title-screen WebGL flow-field shader. **As of v26: full-viewport `position: fixed` canvas appended to `<body>`, fades via `u_alive` uniform driven by scroll progress.**
+- `sphere-aura.js` — Ch I sphere aura shader. **v26: do NOT re-introduce `scene.style.position = 'relative'` — it clobbers sticky parallax site-wide.**
+- `closing-shader.js` — closing plasma shader.
+- `timeline-h.js` — horizontal scroll-pinned year tickertape for Ch I (NEW in v24, refined v25–v26). Sizes block tall (cards × ~115vh), pins `.timeline-h-stage`, drives track translateX + year integer interpolation from scroll position only. No animations on the year — pure scroll-position read.
 - `story-tweaks.jsx` — Tweaks panel app. Text shadow, card opacity, parallax intensity, font pairing, grain, progress bar, mobile scene zoom, chapter jump.
 - `tweaks-panel.jsx` — host protocol starter, do not modify.
 - `assets/I-*.svg` — Genesis (sphere, rings, hex floor, embers, etc.).
@@ -151,7 +163,7 @@ The user works between three environments:
 - `uploads/artdirection_inspiration/` — reference imagery the art direction was built against.
 
 ## Gotchas
-- **Bump `?v=N` query strings** on `story.css`, `parallax.js`, `story-tweaks.jsx`, `tweaks-panel.jsx`, `title-shader.js`, `sphere-aura.js`, `closing-shader.js` whenever you edit them — both the preview iframe AND deployed mobile browsers cache aggressively. Manual bump in `Prohairesis.html` only. Story.css is currently at v23.
+- **Bump `?v=N` query strings** on `story.css`, `parallax.js`, `story-tweaks.jsx`, `tweaks-panel.jsx`, `title-shader.js`, `sphere-aura.js`, `closing-shader.js`, `timeline-h.js` whenever you edit them — both the preview iframe AND deployed mobile browsers cache aggressively. Manual bump in `Prohairesis.html` only. Story.css is currently at v23.
 - **Mobile cache is the #1 cause of "your fix didn't work" reports.** Always remind the user to hard-clear cache or use `?bust=999` in the URL after deploy.
 - **`data-speed` is signed.** Negative = drifts UP as you scroll down (usual). Positive = drifts DOWN.
 - **Sticky scene + chapter-end floor.** When a `.scene` reaches the end of its `.chapter`, it unsticks and rises with the scroll, taking bottom-anchored silhouettes with it. The `.chapter::after { bottom: 0; height: 60vh; }` floor catches them. Don't remove. **Philadelphia's floor is a gradient, not a solid** — fades vermilion→black so cream `.prose.light` text stays legible.
@@ -175,3 +187,9 @@ The user will likely say "let's continue" or "Round 2." Before doing anything:
 3. Check `manuscript.txt` for the verbatim Ch II–V text.
 4. Confirm with the user whether they want to start Round 2 (Ch II–V prose) or address one of the open threads first (mobile TOC, I-rings rotation, II-grid fades, II-eyes background, etc).
 5. Always stage handoff into `_handoff/` and remind user to clear mobile cache.
+
+## Anti-regression notes (v25–v26 lessons)
+- **NEVER set `scene.style.position = 'relative'`** anywhere (sphere-aura, any new shader, any inline JS). It clobbers `position: sticky` on every scene with that script — silently breaks site-wide parallax. Sticky elements ARE positioned and serve as containing block for `position: absolute` children, so absolute canvases can be inserted into a sticky scene without overriding.
+- **`<body>` must use `overflow-x: clip`, not `overflow-x: hidden`.** `overflow: hidden` on `<body>` creates a scroll container that breaks `position: sticky` for descendants in some browsers (Safari especially). `clip` prevents horizontal overflow without creating a scroll container.
+- **Title shader canvas lives in `<body>`, not in `.opening`.** That way it's truly viewport-fixed and doesn't get clipped by ancestor `overflow: clip`. `.opening` has `z-index: 1` so the title content stays above the canvas; `.meta-rule` has `z-index: 4` so VERSION marker stays on top.
+- **Year-num MUST be pure scroll-driven.** No `setInterval`, no CSS keyframe pulse, no live RAF jitter loop. Past attempts at a "scrambling counter" effect were jarring and looked broken. The current correct approach: linear lerp `years[from] → years[to]` based on `subProgress`, snapped via `Math.round`. Only changes when scroll changes.
