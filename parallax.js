@@ -164,7 +164,10 @@
   toc.forEach((b, i) => {
     b.addEventListener('click', () => {
       const target = chapters[i];
-      if (target) window.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+      if (!target) return;
+      const head = target.querySelector('.chapter-head');
+      const scrollTarget = head ? target.offsetTop + head.offsetTop : target.offsetTop;
+      window.scrollTo({ top: scrollTarget, behavior: 'smooth' });
     });
   });
 
@@ -176,8 +179,8 @@
   // When it crosses near viewport center while scrolling, we briefly turn on
   // the halftone-overlay element. Same for the "I snapped the disc" line.
   const halftone = document.getElementById('halftoneFx');
-  const flashEl = document.querySelector('.chapter[data-name="V · Choice"] .flash');
-  const snapEl  = Array.from(document.querySelectorAll('.chapter[data-name="V · Choice"] .shout.gentle')).find(p => /snapped the disc/i.test(p.textContent));
+  const flashEl = document.querySelector('.chapter[data-name="V · Volition"] .flash');
+  const snapEl  = Array.from(document.querySelectorAll('.chapter[data-name="V · Volition"] .shout.gentle')).find(p => /snapped the disc/i.test(p.textContent));
   if (halftone) {
     let active = false;
     let lastTrigger = 0;
