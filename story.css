@@ -67,6 +67,7 @@ body {
   mix-blend-mode: difference;
 }
 .chrome .brand { font-weight: 600; }
+.chrome .brand a { pointer-events: auto; cursor: pointer; }
 .chrome .brand em { font-style: normal; opacity: .55; margin-left: 10px; font-weight: 400; }
 .chrome .counter { text-align: right; font-variant-numeric: tabular-nums; }
 .chrome .counter span.dim { opacity: .5; }
@@ -719,6 +720,7 @@ body {
 .prose .spacer     { height: 25vh; }
 .prose .spacer-sm  { height: 12vh; }
 .prose .spacer-lg  { height: 45vh; }
+.prose .spacer-xl  { height: 55vh; }
 
 /* Text sits as elevated layer with soft shadow onto the scene */
 .prose.shadowed,

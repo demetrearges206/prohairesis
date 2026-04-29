@@ -166,7 +166,10 @@
       const target = chapters[i];
       if (!target) return;
       const head = target.querySelector('.chapter-head');
-      const scrollTarget = head ? target.offsetTop + head.offsetTop : target.offsetTop;
+      // getBoundingClientRect gives current viewport-relative position;
+      // adding scrollY converts it to the absolute document position.
+      const el = head || target;
+      const scrollTarget = window.scrollY + el.getBoundingClientRect().top;
       window.scrollTo({ top: scrollTarget, behavior: 'smooth' });
     });
   });
