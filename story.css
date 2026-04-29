@@ -204,10 +204,10 @@ body {
    title screen, the new story.css landed. If it's still magenta (XXII) or
    cyan (XXI), the CSS file did NOT update. */
 .opening .meta-rule.bot span:first-child {
-  color: #5affb0 !important;  /* XXXVI — mint green */
+  color: #ffb347 !important;  /* XXXVII — warm orange */
   font-weight: 700 !important;
   letter-spacing: .35em !important;
-  text-shadow: 0 0 14px rgba(90,255,176,.5) !important;
+  text-shadow: 0 0 14px rgba(255,179,71,.5) !important;
 }
 
 .opening .scroll-hint {
