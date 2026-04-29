@@ -2,14 +2,16 @@
    timeline-h.js — Horizontal scroll-pinned timeline (Ch I)
    ------------------------------------------------------------
    Wraps a .timeline-h block:
-     • Sizes the block tall (cards * 100vh) so vertical scroll
-       inside it drives a horizontal track translateX.
+     • Sizes the block tall (cards * ~1.15vh each) so vertical
+       scroll drives horizontal card selection.
      • Sticky-pins .timeline-h-stage at top of viewport.
-     • Keeps a fixed YEAR + big year-number ticker centered.
-     • As scroll progresses, slides the track right→left and
-       rapidly tickers the year number between the from/to
-       year during each card-to-card transition.
-     • Reverses cleanly on scroll-back (no state drift).
+     • Magnetic snap: each card locks center until scroll
+       crosses the midpoint to the next/previous card, then
+       snaps with a smooth CSS transition. Within a card's
+       zone a 10% rubber-band pull gives tactile resistance.
+     • Year number jumps directly to the snapped card's year
+       — no lerp, no animation, purely scroll-driven.
+     • Reverses cleanly on scroll-back.
    ============================================================ */
 (function () {
   const blocks = Array.from(document.querySelectorAll('.timeline-h'));
@@ -26,60 +28,75 @@
     const years = cards.map(c => parseInt(c.dataset.year, 10));
     const N = cards.length;
 
-    // Per-card vertical scroll budget. 100vh = "one screen of scroll per card."
-    // Slightly over 1 keeps each card readable before the next starts moving.
-    const PER_CARD_VH = 1.15;
+    // Each card occupies this many viewports of vertical scroll budget.
+    // The snap triggers at ±0.5 of a card index, so effective hold per
+    // card = PER_CARD_VH viewports of scroll before the next snap fires.
+    const PER_CARD_VH = 1.3;
 
     function sizeBlock() {
       const vh = window.innerHeight;
-      // Total height = (N-1) transitions * PER_CARD_VH + 1 final card hold + 0.5 entry pad
+      // (N-1) transitions + 0.5 entry/exit pad
       const heightVh = (N - 1) * PER_CARD_VH + 0.5;
       block.style.height = (heightVh * vh) + 'px';
     }
     sizeBlock();
 
-    let lastDisplayedYear = years[0];
+    // ── Snap state ──────────────────────────────────────────
+    let snappedIdx = 0;
+    let transitioning = false;
+    let snapTimer = null;
+    const SNAP_MS = 420;
+    const SNAP_EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
     yearNumEl.textContent = String(years[0]);
 
-    function setYear(value) {
-      const v = Math.round(value);
-      if (v !== lastDisplayedYear) {
-        lastDisplayedYear = v;
-        yearNumEl.textContent = String(v);
-      }
+    function showYear(idx) {
+      const y = String(years[idx]);
+      if (yearNumEl.textContent !== y) yearNumEl.textContent = y;
     }
 
-    // Map global scroll progress (0..1 over the block) to:
-    //  - track translateX (in vw)
-    //  - active card index (float)
-    //  - displayed year (linear interpolation from years[from] -> years[to],
-    //    snapped to nearest integer — purely scroll-driven, no animation,
-    //    no jitter, no transitions).
+    function snapTo(idx) {
+      idx = Math.max(0, Math.min(N - 1, idx));
+      if (idx === snappedIdx && transitioning === false) return;
+      snappedIdx = idx;
+      transitioning = true;
+
+      track.style.transition = `transform ${SNAP_MS}ms ${SNAP_EASE}`;
+      track.style.transform = `translate3d(${-snappedIdx * 100}vw, 0, 0)`;
+      showYear(snappedIdx);
+
+      clearTimeout(snapTimer);
+      snapTimer = setTimeout(() => {
+        transitioning = false;
+        track.style.transition = '';
+      }, SNAP_MS + 20);
+    }
+
+    // ── Per-frame update ─────────────────────────────────────
     function update() {
       const rect = block.getBoundingClientRect();
       const vh = window.innerHeight;
-      const blockH = block.offsetHeight;
-      const scrollable = blockH - vh;
-      let p = -rect.top / Math.max(1, scrollable);
-      p = Math.max(0, Math.min(1, p));
+      const scrollable = Math.max(1, block.offsetHeight - vh);
+      const p = Math.max(0, Math.min(1, -rect.top / scrollable));
 
+      // Float card index across the full range
       const floatIdx = p * (N - 1);
-      const fromIdx = Math.floor(floatIdx);
-      const toIdx = Math.min(N - 1, fromIdx + 1);
-      const subProgress = floatIdx - fromIdx; // 0..1 within the current transition
 
-      // Track translate: each card occupies 100vw, so track shifts by floatIdx * 100vw
-      track.style.transform = `translate3d(${-floatIdx * 100}vw, 0, 0)`;
+      // Snap boundary: Math.round snaps at exactly ±0.5 from each card
+      const targetIdx = Math.max(0, Math.min(N - 1, Math.round(floatIdx)));
 
-      // Year: linear lerp between fromYear and toYear, snapped to nearest int.
-      // No jitter, no setInterval, no CSS animation — pure scroll-position read.
-      const fromYear = years[fromIdx];
-      const toYear = years[toIdx];
-      const linear = fromYear + (toYear - fromYear) * subProgress;
-      setYear(linear);
+      if (targetIdx !== snappedIdx) {
+        snapTo(targetIdx);
+      } else if (!transitioning) {
+        // Rubber-band: subtle pull toward current scroll position within
+        // the card's hold zone, capped to ±0.4 cards so it never crosses
+        // the snap boundary on its own.
+        const pull = Math.max(-0.4, Math.min(0.4, (floatIdx - snappedIdx) * 0.10));
+        track.style.transform = `translate3d(${-(snappedIdx + pull) * 100}vw, 0, 0)`;
+      }
     }
 
-    // RAF-throttled scroll handler
+    // ── Event wiring ─────────────────────────────────────────
     let raf = 0;
     function schedule() {
       if (raf) return;
@@ -89,28 +106,20 @@
     window.addEventListener('resize', () => { sizeBlock(); schedule(); });
     window.addEventListener('load', () => { sizeBlock(); update(); });
 
-    // Initial paint
     update();
 
-    // Continuous rAF poll while the block is in/near the viewport. This is
-    // a belt-and-braces fallback so the track stays in sync even when the
-    // host swallows scroll events (some iframe / programmatic-scroll cases
-    // don't fire 'scroll' on window). Throttled and only updates when the
-    // scroll position has actually changed since last frame.
-    let raf2 = 0;
+    // Belt-and-braces rAF poll — keeps track in sync when scroll events
+    // are swallowed (iframe / programmatic scroll edge cases).
     let lastY = -1;
     function pollLoop() {
-      raf2 = requestAnimationFrame(pollLoop);
+      requestAnimationFrame(pollLoop);
       const y = window.scrollY;
-      if (y === lastY) return;          // bail if scroll hasn't changed
+      if (y === lastY) return;
       lastY = y;
       const rect = block.getBoundingClientRect();
       const vh = window.innerHeight;
-      // Only do work when the block is within ±2 viewports of the viewport
-      if (rect.bottom > -vh && rect.top < vh * 2) {
-        update();
-      }
+      if (rect.bottom > -vh && rect.top < vh * 2) update();
     }
-    raf2 = requestAnimationFrame(pollLoop);
+    requestAnimationFrame(pollLoop);
   }
 })();
