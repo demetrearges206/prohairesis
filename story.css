@@ -199,10 +199,10 @@ body {
    title screen, the new story.css landed. If it's still magenta (XXII) or
    cyan (XXI), the CSS file did NOT update. */
 .opening .meta-rule.bot span:first-child {
-  color: #f0b030 !important;
+  color: #c8ff5a !important;  /* XXXII — lime */
   font-weight: 700 !important;
   letter-spacing: .35em !important;
-  text-shadow: 0 0 14px rgba(255,138,58,.6) !important;
+  text-shadow: 0 0 14px rgba(180,255,60,.5) !important;
 }
 
 .opening .scroll-hint {
@@ -513,6 +513,96 @@ body {
   margin: 0;
 }
 
+/* ── "I am a GOD." glitch animation ─────────────────────────────── */
+/* Fade-in on scroll via .god-visible class (added by IntersectionObserver) */
+.prose p.drop.crimson {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+  position: relative;
+}
+.prose p.drop.crimson.god-visible {
+  opacity: 1;
+  animation: godGlitch 4.5s ease-out 1.1s both;
+}
+/* Pseudo-elements carry color-shifted ghost copies of the text */
+.prose p.drop.crimson::before,
+.prose p.drop.crimson::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+.prose p.drop.crimson::before {
+  color: #0fffd0;   /* cyan channel */
+  text-shadow: none;
+  mix-blend-mode: screen;
+}
+.prose p.drop.crimson::after {
+  color: #ff5418;   /* extra crimson channel */
+  text-shadow: none;
+  mix-blend-mode: screen;
+}
+.prose p.drop.crimson.god-visible::before {
+  animation: godGlitchBefore 4.5s ease-out 1.1s both;
+}
+.prose p.drop.crimson.god-visible::after {
+  animation: godGlitchAfter 4.5s ease-out 1.1s both;
+}
+
+@keyframes godGlitch {
+  0%   { transform: translate(0); filter: none; }
+  /* Glitch burst starts around 40% of the animation (after fade settles) */
+  40%  { transform: translate(0); filter: none; }
+  41%  { transform: translate(-3px, 1px) skewX(-2deg); filter: brightness(1.4); }
+  42%  { transform: translate(3px, -1px) skewX(2deg); filter: brightness(0.8); }
+  43%  { transform: translate(-2px, 2px); clip-path: inset(30% 0 40% 0); }
+  44%  { transform: translate(0); clip-path: none; filter: none; }
+  45%  { transform: translate(4px, -2px) skewX(-3deg); filter: brightness(1.6); }
+  46%  { transform: translate(-4px, 1px); filter: brightness(0.7); }
+  47%  { transform: translate(0); filter: none; }
+  /* Second burst */
+  62%  { transform: translate(0); filter: none; }
+  63%  { transform: translate(-5px, 1px) skewX(-4deg); filter: brightness(1.3); }
+  64%  { transform: translate(5px, -2px); clip-path: inset(10% 0 70% 0); }
+  65%  { transform: translate(-2px, 0); clip-path: inset(60% 0 10% 0); }
+  66%  { transform: translate(0); clip-path: none; filter: none; }
+  /* Slow decay into glow */
+  80%  { transform: translate(0); filter: none; text-shadow: 0 0 28px rgba(255,84,24,.45), 0 0 4px rgba(255,84,24,.5); }
+  100% { transform: translate(0); filter: none; text-shadow: 0 0 60px rgba(255,84,24,.6), 0 0 120px rgba(255,84,24,.2); }
+}
+
+@keyframes godGlitchBefore {
+  0%   { opacity: 0; transform: translate(0); }
+  40%  { opacity: 0; transform: translate(0); }
+  41%  { opacity: 0.7; transform: translate(-4px, 0); clip-path: inset(0 0 60% 0); }
+  42%  { opacity: 0.5; transform: translate(3px, 0); clip-path: inset(40% 0 0 0); }
+  43%  { opacity: 0.8; transform: translate(-3px, 1px); clip-path: inset(20% 0 50% 0); }
+  47%  { opacity: 0; transform: translate(0); clip-path: none; }
+  62%  { opacity: 0; transform: translate(0); }
+  63%  { opacity: 0.6; transform: translate(-6px, 0); clip-path: inset(0 0 80% 0); }
+  65%  { opacity: 0.4; transform: translate(4px, 0); clip-path: inset(50% 0 0 0); }
+  66%  { opacity: 0; transform: translate(0); clip-path: none; }
+  100% { opacity: 0; }
+}
+
+@keyframes godGlitchAfter {
+  0%   { opacity: 0; transform: translate(0); }
+  40%  { opacity: 0; transform: translate(0); }
+  41%  { opacity: 0.6; transform: translate(4px, -1px); clip-path: inset(50% 0 10% 0); }
+  42%  { opacity: 0.4; transform: translate(-3px, 1px); clip-path: inset(0 0 55% 0); }
+  43%  { opacity: 0.7; transform: translate(2px, 0); clip-path: inset(35% 0 30% 0); }
+  47%  { opacity: 0; transform: translate(0); clip-path: none; }
+  62%  { opacity: 0; transform: translate(0); }
+  63%  { opacity: 0.5; transform: translate(5px, 1px); clip-path: inset(70% 0 0 0); }
+  65%  { opacity: 0.6; transform: translate(-5px, 0); clip-path: inset(0 0 40% 0); }
+  66%  { opacity: 0; transform: translate(0); clip-path: none; }
+  100% { opacity: 0; }
+}
+/* ──────────────────────────────────────────────────────────────── */
+
 /* Dated time-jump markers in Ch I ("80 years later... YEAR 4111") */
 .prose p.timestamp {
   font-family: var(--mono);
@@ -720,7 +810,7 @@ body {
 .prose .spacer     { height: 25vh; }
 .prose .spacer-sm  { height: 12vh; }
 .prose .spacer-lg  { height: 45vh; }
-.prose .spacer-xl  { height: 55vh; }
+.prose .spacer-xl  { height: 75vh; }
 
 /* Text sits as elevated layer with soft shadow onto the scene */
 .prose.shadowed,

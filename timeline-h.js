@@ -109,24 +109,47 @@
       snapTimer = setTimeout(afterSnap, SNAP_MS + 20);
     }
 
+    // ── Exit-snap: center "I am a GOD." when leaving last card ──
+    let exitSnapFired = false;
+    function maybeExitSnap(p) {
+      if (exitSnapFired) return;
+      if (snappedIdx !== N - 1) return;
+      if (p < 1.0) return;
+      // p has crossed 1 — we're past the last card. Smooth-scroll so the
+      // climax line sits centered in the viewport.
+      const godEl = document.querySelector('.prose p.drop.crimson');
+      if (!godEl) return;
+      exitSnapFired = true;
+      const rect = godEl.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const targetScroll = window.scrollY + rect.top + rect.height / 2 - vh / 2;
+      window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+    }
+
     // ── Per-frame update ─────────────────────────────────────
     function update() {
       const rect = block.getBoundingClientRect();
       const vh = window.innerHeight;
       const scrollable = Math.max(1, block.offsetHeight - vh);
-      const p = Math.max(0, Math.min(1, -rect.top / scrollable));
+      const rawP = -rect.top / scrollable;
+      const p = Math.max(0, Math.min(1.05, rawP));
 
       const floatIdx = p * (N - 1);
-      const targetIdx = Math.max(0, Math.min(N - 1, Math.round(floatIdx)));
+      // One card at a time: target may only move one step from current snap.
+      const rawTarget = Math.max(0, Math.min(N - 1, Math.round(floatIdx)));
+      const targetIdx = Math.max(snappedIdx - 1, Math.min(snappedIdx + 1, rawTarget));
 
       if (targetIdx !== snappedIdx) {
         snapTo(targetIdx);
       } else if (!transitioning) {
-        // Rubber-band: slight pull toward scroll position while in hold zone.
-        // Capped to ±0.4 so it can never cross the ±0.5 snap boundary alone.
-        const pull = Math.max(-0.4, Math.min(0.4, (floatIdx - snappedIdx) * 0.10));
-        applyTranslate(cardPx(snappedIdx + pull), false);
+        // Hold perfectly still — no rubber-band drift.
+        applyTranslate(cardPx(snappedIdx), false);
       }
+
+      // Once user scrolls past last card, snap to the climax line.
+      if (rawP >= 1.0) maybeExitSnap(rawP);
+      // Reset exit-snap guard if user scrolls back into the timeline.
+      if (rawP < 0.95) exitSnapFired = false;
     }
 
     // ── Event wiring ─────────────────────────────────────────
