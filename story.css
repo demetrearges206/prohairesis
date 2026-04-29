@@ -204,10 +204,10 @@ body {
    title screen, the new story.css landed. If it's still magenta (XXII) or
    cyan (XXI), the CSS file did NOT update. */
 .opening .meta-rule.bot span:first-child {
-  color: #ffb347 !important;  /* XXXVII — warm orange */
+  color: #ff9ef5 !important;  /* XXXVIII — soft pink */
   font-weight: 700 !important;
   letter-spacing: .35em !important;
-  text-shadow: 0 0 14px rgba(255,179,71,.5) !important;
+  text-shadow: 0 0 14px rgba(255,158,245,.5) !important;
 }
 
 .opening .scroll-hint {
@@ -394,6 +394,26 @@ body {
 /* Ch IV HUD — chromatic aberration SVG filter */
 .scene[data-palette="findme"] .layer img {
   filter: url(#hud-aberration);
+}
+/* Ch IV scan-line data stream overlay — animated phosphor horizontal lines */
+.scene[data-palette="findme"] .layer.iv-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(168, 208, 136, 0.025) 3px,
+    rgba(168, 208, 136, 0.025) 4px
+  );
+  background-size: 100% 4px;
+  animation: ivScanScroll 12s linear infinite;
+  pointer-events: none;
+  will-change: background-position;
+}
+@keyframes ivScanScroll {
+  from { background-position: 0 0; }
+  to   { background-position: 0 -48px; }
 }
 
 .scene .layer {
@@ -787,16 +807,33 @@ body {
   color: #5ad7ff; /* cryo-cyan — Ch II default */
   text-shadow: 0 0 40px rgba(90,215,255,.18);
 }
-/* Ch III Earth — white heading */
-.chapter[data-name="III · Earth"] .prose.human .chapter-head h2 {
+/* Ch II Waking Up — white headings (override cryo-cyan default) */
+.chapter[data-name="II · Waking Up"] .prose.human .chapter-head h2,
+.chapter[data-name="II · Waking Up"] .prose.human .chapter-head .roman {
+  color: #ffffff;
+  text-shadow: 0 0 40px rgba(255,255,255,.10);
+}
+/* Ch III Earth — white headings + drop cap */
+.chapter[data-name="III · Earth"] .prose.human .chapter-head h2,
+.chapter[data-name="III · Earth"] .prose.human .chapter-head .roman {
   color: #ffffff;
   text-shadow: 0 0 40px rgba(255,255,255,.12);
 }
-/* Ch IV Ghost in the Shell — phosphor green heading */
+.chapter[data-name="III · Earth"] .prose p.drop::first-letter {
+  color: #ffffff;
+}
+/* Ch IV Ghost in the Shell — phosphor green headings + drop cap */
 .chapter[data-name="IV · Ghost in the Shell"] .prose.human .chapter-head h2,
-.chapter[data-name="IV · Ghost in the Shell"] .chapter-head .roman {
+.chapter[data-name="IV · Ghost in the Shell"] .prose.human .chapter-head .roman {
   color: #a8d088;
   text-shadow: 0 0 40px rgba(168,208,136,.22);
+}
+.chapter[data-name="IV · Ghost in the Shell"] .prose p.drop::first-letter {
+  color: #a8d088;
+}
+/* Ch IV — tighter chapter-head top padding so prose arrives sooner */
+.chapter[data-name="IV · Ghost in the Shell"] .prose .chapter-head {
+  padding-top: 18vh;
 }
 .prose.human .chapter-head .lede {
   color: rgba(240, 237, 232, 0.82);
