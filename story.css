@@ -199,10 +199,10 @@ body {
    title screen, the new story.css landed. If it's still magenta (XXII) or
    cyan (XXI), the CSS file did NOT update. */
 .opening .meta-rule.bot span:first-child {
-  color: #c8ff5a !important;  /* XXXII — lime */
+  color: #ff9fff !important;  /* XXXIII — pink */
   font-weight: 700 !important;
   letter-spacing: .35em !important;
-  text-shadow: 0 0 14px rgba(180,255,60,.5) !important;
+  text-shadow: 0 0 14px rgba(255,140,255,.5) !important;
 }
 
 .opening .scroll-hint {
@@ -514,92 +514,114 @@ body {
 }
 
 /* ── "I am a GOD." glitch animation ─────────────────────────────── */
-/* Fade-in on scroll via .god-visible class (added by IntersectionObserver) */
+/* Technique: clip:rect() thin scan-line slices + skew + translateX,
+   looping infinitely. Mirrors the approach in the gist reference
+   (thetarnav / glitched-writer). clip:rect uses absolute px values
+   relative to the element's border box — narrow top/bottom gaps =
+   thin slivers, not big blotchy chunks. */
+
 .prose p.drop.crimson {
   opacity: 0;
   transition: opacity 0.9s ease;
   position: relative;
+  overflow: visible;
 }
 .prose p.drop.crimson.god-visible {
   opacity: 1;
-  animation: godGlitch 4.5s ease-out 1.1s both;
+  animation: godSkew 1.2s steps(10, end) infinite alternate-reverse;
 }
-/* Pseudo-elements carry color-shifted ghost copies of the text */
 .prose p.drop.crimson::before,
 .prose p.drop.crimson::after {
   content: attr(data-text);
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  white-space: nowrap;
   opacity: 0;
   pointer-events: none;
 }
 .prose p.drop.crimson::before {
-  color: #0fffd0;   /* cyan channel */
+  color: #0fffd0;    /* cyan channel */
   text-shadow: none;
-  mix-blend-mode: screen;
+  z-index: -1;
 }
 .prose p.drop.crimson::after {
-  color: #ff5418;   /* extra crimson channel */
+  color: #ff5418;    /* crimson channel */
   text-shadow: none;
-  mix-blend-mode: screen;
 }
 .prose p.drop.crimson.god-visible::before {
-  animation: godGlitchBefore 4.5s ease-out 1.1s both;
+  opacity: 1;
+  animation: godGlitch1 1.5s steps(20, end) infinite alternate-reverse;
 }
 .prose p.drop.crimson.god-visible::after {
-  animation: godGlitchAfter 4.5s ease-out 1.1s both;
+  opacity: 1;
+  animation: godGlitch2 2.0s steps(20, end) infinite alternate-reverse;
 }
 
-@keyframes godGlitch {
-  0%   { transform: translate(0); filter: none; }
-  /* Glitch burst starts around 40% of the animation (after fade settles) */
-  40%  { transform: translate(0); filter: none; }
-  41%  { transform: translate(-3px, 1px) skewX(-2deg); filter: brightness(1.4); }
-  42%  { transform: translate(3px, -1px) skewX(2deg); filter: brightness(0.8); }
-  43%  { transform: translate(-2px, 2px); clip-path: inset(30% 0 40% 0); }
-  44%  { transform: translate(0); clip-path: none; filter: none; }
-  45%  { transform: translate(4px, -2px) skewX(-3deg); filter: brightness(1.6); }
-  46%  { transform: translate(-4px, 1px); filter: brightness(0.7); }
-  47%  { transform: translate(0); filter: none; }
-  /* Second burst */
-  62%  { transform: translate(0); filter: none; }
-  63%  { transform: translate(-5px, 1px) skewX(-4deg); filter: brightness(1.3); }
-  64%  { transform: translate(5px, -2px); clip-path: inset(10% 0 70% 0); }
-  65%  { transform: translate(-2px, 0); clip-path: inset(60% 0 10% 0); }
-  66%  { transform: translate(0); clip-path: none; filter: none; }
-  /* Slow decay into glow */
-  80%  { transform: translate(0); filter: none; text-shadow: 0 0 28px rgba(255,84,24,.45), 0 0 4px rgba(255,84,24,.5); }
-  100% { transform: translate(0); filter: none; text-shadow: 0 0 60px rgba(255,84,24,.6), 0 0 120px rgba(255,84,24,.2); }
+/* Subtle body skew on the main text while glitching */
+@keyframes godSkew {
+  0%   { transform: skew(0deg); }
+  10%  { transform: skew(-2deg); }
+  20%  { transform: skew(1deg); }
+  30%  { transform: skew(-3deg); }
+  40%  { transform: skew(2deg); }
+  50%  { transform: skew(-1deg); }
+  60%  { transform: skew(3deg); }
+  70%  { transform: skew(-2deg); }
+  80%  { transform: skew(1deg); }
+  90%  { transform: skew(-1deg); }
+  100% { transform: skew(0deg); }
 }
 
-@keyframes godGlitchBefore {
-  0%   { opacity: 0; transform: translate(0); }
-  40%  { opacity: 0; transform: translate(0); }
-  41%  { opacity: 0.7; transform: translate(-4px, 0); clip-path: inset(0 0 60% 0); }
-  42%  { opacity: 0.5; transform: translate(3px, 0); clip-path: inset(40% 0 0 0); }
-  43%  { opacity: 0.8; transform: translate(-3px, 1px); clip-path: inset(20% 0 50% 0); }
-  47%  { opacity: 0; transform: translate(0); clip-path: none; }
-  62%  { opacity: 0; transform: translate(0); }
-  63%  { opacity: 0.6; transform: translate(-6px, 0); clip-path: inset(0 0 80% 0); }
-  65%  { opacity: 0.4; transform: translate(4px, 0); clip-path: inset(50% 0 0 0); }
-  66%  { opacity: 0; transform: translate(0); clip-path: none; }
-  100% { opacity: 0; }
+/* Cyan channel — thin clip slices + lateral drift */
+@keyframes godGlitch1 {
+  0%   { clip: rect(42px, 9999px, 56px, 0); transform: skew(-4deg) translateX(12px); }
+  5%   { clip: rect(12px, 9999px, 24px, 0); transform: skew(2deg) translateX(-8px); }
+  10%  { clip: rect(65px, 9999px, 78px, 0); transform: skew(-6deg) translateX(15px); }
+  15%  { clip: rect(28px, 9999px, 40px, 0); transform: skew(3deg) translateX(-12px); }
+  20%  { clip: rect(78px, 9999px, 90px, 0); transform: skew(-2deg) translateX(6px); }
+  25%  { clip: rect(5px,  9999px, 18px, 0); transform: skew(5deg) translateX(-10px); }
+  30%  { clip: rect(52px, 9999px, 64px, 0); transform: skew(-3deg) translateX(18px); }
+  35%  { clip: rect(33px, 9999px, 46px, 0); transform: skew(4deg) translateX(-6px); }
+  40%  { clip: rect(18px, 9999px, 30px, 0); transform: skew(-7deg) translateX(20px); }
+  45%  { clip: rect(72px, 9999px, 84px, 0); transform: skew(2deg) translateX(-14px); }
+  50%  { clip: rect(8px,  9999px, 22px, 0); transform: skew(-4deg) translateX(10px); }
+  55%  { clip: rect(45px, 9999px, 57px, 0); transform: skew(6deg) translateX(-8px); }
+  60%  { clip: rect(60px, 9999px, 72px, 0); transform: skew(-2deg) translateX(16px); }
+  65%  { clip: rect(22px, 9999px, 36px, 0); transform: skew(3deg) translateX(-18px); }
+  70%  { clip: rect(85px, 9999px, 96px, 0); transform: skew(-5deg) translateX(8px); }
+  75%  { clip: rect(15px, 9999px, 28px, 0); transform: skew(2deg) translateX(-4px); }
+  80%  { clip: rect(38px, 9999px, 50px, 0); transform: skew(-3deg) translateX(12px); }
+  85%  { clip: rect(68px, 9999px, 80px, 0); transform: skew(4deg) translateX(-16px); }
+  90%  { clip: rect(25px, 9999px, 38px, 0); transform: skew(-6deg) translateX(6px); }
+  95%  { clip: rect(55px, 9999px, 68px, 0); transform: skew(1deg) translateX(-10px); }
+  100% { clip: rect(10px, 9999px, 22px, 0); transform: skew(-2deg) translateX(14px); }
 }
 
-@keyframes godGlitchAfter {
-  0%   { opacity: 0; transform: translate(0); }
-  40%  { opacity: 0; transform: translate(0); }
-  41%  { opacity: 0.6; transform: translate(4px, -1px); clip-path: inset(50% 0 10% 0); }
-  42%  { opacity: 0.4; transform: translate(-3px, 1px); clip-path: inset(0 0 55% 0); }
-  43%  { opacity: 0.7; transform: translate(2px, 0); clip-path: inset(35% 0 30% 0); }
-  47%  { opacity: 0; transform: translate(0); clip-path: none; }
-  62%  { opacity: 0; transform: translate(0); }
-  63%  { opacity: 0.5; transform: translate(5px, 1px); clip-path: inset(70% 0 0 0); }
-  65%  { opacity: 0.6; transform: translate(-5px, 0); clip-path: inset(0 0 40% 0); }
-  66%  { opacity: 0; transform: translate(0); clip-path: none; }
-  100% { opacity: 0; }
+/* Crimson channel — offset timing for visual separation from cyan */
+@keyframes godGlitch2 {
+  0%   { clip: rect(30px, 9999px, 44px, 0); transform: skew(3deg) translateX(-10px); }
+  5%   { clip: rect(70px, 9999px, 84px, 0); transform: skew(-4deg) translateX(8px); }
+  10%  { clip: rect(18px, 9999px, 32px, 0); transform: skew(5deg) translateX(-14px); }
+  15%  { clip: rect(55px, 9999px, 68px, 0); transform: skew(-2deg) translateX(12px); }
+  20%  { clip: rect(8px,  9999px, 20px, 0); transform: skew(4deg) translateX(-6px); }
+  25%  { clip: rect(80px, 9999px, 93px, 0); transform: skew(-6deg) translateX(18px); }
+  30%  { clip: rect(40px, 9999px, 54px, 0); transform: skew(2deg) translateX(-8px); }
+  35%  { clip: rect(15px, 9999px, 28px, 0); transform: skew(-3deg) translateX(10px); }
+  40%  { clip: rect(62px, 9999px, 76px, 0); transform: skew(6deg) translateX(-16px); }
+  45%  { clip: rect(25px, 9999px, 38px, 0); transform: skew(-4deg) translateX(4px); }
+  50%  { clip: rect(88px, 9999px, 99px, 0); transform: skew(3deg) translateX(-12px); }
+  55%  { clip: rect(35px, 9999px, 48px, 0); transform: skew(-5deg) translateX(14px); }
+  60%  { clip: rect(12px, 9999px, 26px, 0); transform: skew(2deg) translateX(-6px); }
+  65%  { clip: rect(72px, 9999px, 85px, 0); transform: skew(-3deg) translateX(8px); }
+  70%  { clip: rect(48px, 9999px, 62px, 0); transform: skew(4deg) translateX(-20px); }
+  75%  { clip: rect(5px,  9999px, 18px, 0); transform: skew(-6deg) translateX(10px); }
+  80%  { clip: rect(65px, 9999px, 78px, 0); transform: skew(2deg) translateX(-8px); }
+  85%  { clip: rect(22px, 9999px, 36px, 0); transform: skew(-4deg) translateX(16px); }
+  90%  { clip: rect(50px, 9999px, 62px, 0); transform: skew(5deg) translateX(-12px); }
+  95%  { clip: rect(38px, 9999px, 50px, 0); transform: skew(-2deg) translateX(6px); }
+  100% { clip: rect(78px, 9999px, 92px, 0); transform: skew(3deg) translateX(-14px); }
 }
 /* ──────────────────────────────────────────────────────────────── */
 
