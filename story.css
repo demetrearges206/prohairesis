@@ -204,10 +204,10 @@ body {
    title screen, the new story.css landed. If it's still magenta (XXII) or
    cyan (XXI), the CSS file did NOT update. */
 .opening .meta-rule.bot span:first-child {
-  color: #d4a0ff !important;  /* XXXV — violet */
+  color: #5affb0 !important;  /* XXXVI — mint green */
   font-weight: 700 !important;
   letter-spacing: .35em !important;
-  text-shadow: 0 0 14px rgba(180,120,255,.5) !important;
+  text-shadow: 0 0 14px rgba(90,255,176,.5) !important;
 }
 
 .opening .scroll-hint {
@@ -391,11 +391,21 @@ body {
 }
 .chapter:has(.scene[data-palette="choice"])::after { background: #000; }
 
+/* Ch IV HUD — chromatic aberration SVG filter */
+.scene[data-palette="findme"] .layer img {
+  filter: url(#hud-aberration);
+}
+
 .scene .layer {
   position: absolute;
   left: 0; right: 0;
   pointer-events: none;
   will-change: transform;
+  contain: layout style;
+}
+/* Promote scenes to their own compositor layer */
+.scene {
+  transform: translateZ(0);
 }
 .scene .layer img { width: 100%; display: block; }
 
@@ -774,8 +784,19 @@ body {
   color: rgba(90, 215, 255, 0.55);
 }
 .prose.human .chapter-head h2 {
-  color: #5ad7ff; /* cryo-cyan */
+  color: #5ad7ff; /* cryo-cyan — Ch II default */
   text-shadow: 0 0 40px rgba(90,215,255,.18);
+}
+/* Ch III Earth — white heading */
+.chapter[data-name="III · Earth"] .prose.human .chapter-head h2 {
+  color: #ffffff;
+  text-shadow: 0 0 40px rgba(255,255,255,.12);
+}
+/* Ch IV Ghost in the Shell — phosphor green heading */
+.chapter[data-name="IV · Ghost in the Shell"] .prose.human .chapter-head h2,
+.chapter[data-name="IV · Ghost in the Shell"] .chapter-head .roman {
+  color: #a8d088;
+  text-shadow: 0 0 40px rgba(168,208,136,.22);
 }
 .prose.human .chapter-head .lede {
   color: rgba(240, 237, 232, 0.82);
@@ -1365,12 +1386,13 @@ body {
   width: 100%;
   display: grid;
   place-items: center;
-  background: #000;
+  background: transparent;
 }
 .eyes-intro .eyes-stage img {
   width: 100%; height: 100%;
   object-fit: cover;
   filter: contrast(1.05);
+  mix-blend-mode: screen;
 }
 .eyes-intro .eyes-cap {
   position: absolute;
