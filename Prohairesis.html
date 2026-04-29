@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;1,200;1,300;1,400&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="story.css?v=40">
+<link rel="stylesheet" href="story.css?v=41">
 
 <template id="__bundler_thumbnail" data-bg-color="#000000">
   <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
@@ -40,7 +40,7 @@
 <!-- OPENING -->
 <section class="opening">
   <div class="meta-rule bot">
-    <span>VERSION XXXVII</span>
+    <span>VERSION XXXVIII</span>
     <span>Approx. 18 min read</span>
   </div>
   <div class="opening-inner">
@@ -250,8 +250,8 @@
     <div class="layer" data-speed="-4"  data-offset="15"  style="top:0; height: 100%;"><img src="assets/II-dust.svg" alt=""></div>
     <!-- 3D grid receding — mid-ground architecture -->
     <div class="layer" data-speed="-18"  data-offset="0"  style="top:0; height: 100%;"><img src="assets/II-grid.svg" alt=""></div>
-    <!-- cyan beam piercing through — foreground, moves fastest -->
-    <div class="layer beam-pulse" data-speed="-55" data-offset="20" style="top:0; height: 100%;"><img src="assets/II-beam.svg" alt=""></div>
+    <!-- cyan beam piercing through — centered, moves faster than grid -->
+    <div class="layer beam-pulse" data-speed="-32" data-offset="0" style="top:0; height: 100%;"><img src="assets/II-beam.svg" alt=""></div>
   </div>
 
   <!-- Ada eyes opener: full-bleed sticky cinematic moment that fades out as you scroll -->
@@ -312,9 +312,9 @@
     <!-- hot pink fog band, drifts slowly horizontally -->
     <div class="layer fog-drift" data-speed="-14" data-offset="4" style="bottom:30%; height: 38%;"><img src="assets/III-fog.svg" alt=""></div>
     <!-- distant teal-frosted firs — pinned to bottom, creeps up from below -->
-    <div class="layer" data-speed="-12" data-offset="32"  style="bottom:0;"><img src="assets/III-firs.svg" alt=""></div>
-    <!-- foreground black ridge silhouette — starts furthest below, creeps slowest -->
-    <div class="layer" data-speed="-10" data-offset="27"  style="bottom:0;"><img src="assets/III-ridge.svg" alt=""></div>
+    <div class="layer" data-speed="-12" data-offset="18"  style="bottom:0;"><img src="assets/III-firs.svg" alt=""></div>
+    <!-- foreground black ridge silhouette — starts below, creeps slowest -->
+    <div class="layer" data-speed="-10" data-offset="14"  style="bottom:0;"><img src="assets/III-ridge.svg" alt=""></div>
   </div>
   <div class="prose light shadowed human">
     <div class="chapter-head">
@@ -344,6 +344,8 @@
   <div class="scene" data-palette="findme">
     <!-- Full HUD frame: header strips + bottom telemetry + side panels -->
     <div class="layer" data-speed="-2"  data-offset="0"  style="top:0; height: 100%;"><img src="assets/IV-hud.svg" alt=""></div>
+    <!-- Scan-line data stream — subtle animated overlay for visual variety -->
+    <div class="layer iv-scanlines" data-speed="0" data-offset="0" style="top:0; height: 100%;"></div>
   </div>
   <!-- Animated HUD overlay — fixed within the chapter -->
   <div class="hud-overlay" aria-hidden="true">
@@ -564,6 +566,7 @@
 <script src="timeline-h.js?v=8"></script>
 <script src="title-shader.js?v=4"></script>
 <script src="sphere-aura.js?v=4"></script>
+<script src="cryo-shader.js?v=1"></script>
 <script src="findme-shader.js?v=1"></script>
 <script src="closing-shader.js?v=2"></script>
 
