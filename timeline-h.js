@@ -33,7 +33,7 @@
     function sizeBlock() {
       const vh = window.innerHeight;
       // Total height = (N-1) transitions * PER_CARD_VH + 1 final card hold + 0.5 entry pad
-      const heightVh = (N - 1) * PER_CARD_VH + 1.0;
+      const heightVh = (N - 1) * PER_CARD_VH + 0.5;
       block.style.height = (heightVh * vh) + 'px';
     }
     sizeBlock();
