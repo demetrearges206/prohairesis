@@ -243,7 +243,7 @@
     /* ── Map ─────────────────────────────────────────────────── */
     .map-section { margin: 0 16px; }
     .map-frame { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); height: 300px; position: relative; }
-    #ferry-map { width: 100%; height: 100%; background: #b0cce4; }
+    #ferry-map { width: 100%; height: 100%; background: #060f1f; }
     .map-hint {
       position: absolute; bottom: 8px; right: 8px; z-index: 400;
       background: rgba(6,15,31,0.75); color: var(--mid); font-size: 10px;
@@ -251,7 +251,7 @@
     }
 
     /* Leaflet overrides */
-    .leaflet-container { background: #b0cce4 !important; }
+    .leaflet-container { background: #060f1f !important; }
     .leaflet-popup-content-wrapper {
       background: var(--navy-mid) !important; color: var(--white) !important;
       border: 1px solid var(--border) !important; box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
@@ -498,7 +498,9 @@ function jsonpFetch(url) {
   return new Promise((res, rej) => {
     const id = `_wsf_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const s = document.createElement('script');
-    const cleanup = () => { delete window[id]; s.remove(); };
+    let tid;
+    const cleanup = () => { delete window[id]; s.remove(); clearTimeout(tid); };
+    tid = setTimeout(() => { rej(new Error('JSONP timeout')); cleanup(); }, 10000);
     window[id] = data => { res(data); cleanup(); };
     s.onerror = () => { rej(new Error('JSONP failed')); cleanup(); };
     s.src = `${url}&callback=${id}`;
@@ -506,11 +508,15 @@ function jsonpFetch(url) {
   });
 }
 async function apiFetch(url) {
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), 10000);
   try {
-    const r = await fetch(url, { headers: { Accept: 'application/json' } });
+    const r = await fetch(url, { headers: { Accept: 'application/json' }, signal: ctrl.signal });
+    clearTimeout(tid);
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return r.json();
   } catch {
+    clearTimeout(tid);
     return jsonpFetch(url);
   }
 }
@@ -709,7 +715,8 @@ function getScheduleNotes() {
 }
 
 // ── Per-vessel color ─────────────────────────────────────
-const VESSEL_PALETTE = ['#4f9cf7','#ff8c42','#b47ff5','#f7c948','#ff6b9d','#4ecdc4','#a8e063','#ff8fab'];
+// 8 perceptually distinct hues, roughly 45° apart, calibrated for dark backgrounds
+const VESSEL_PALETTE = ['#00c9a7','#ffc947','#f472b6','#60a5fa','#fb923c','#a3e635','#c084fc','#f87171'];
 function getVesselColor(name) {
   if (!name) return VESSEL_PALETTE[0];
   let h = 0;
@@ -1068,15 +1075,11 @@ async function refresh(forceSchedReload) {
   try {
     const needSched = forceSchedReload || !schedData;
 
-    // schedroutes MUST complete first — it resolves routeId before loadSchedule fires
-    if (needSched) {
-      const sr = await loadSchedRoutes().catch(e => { console.warn('schedroutes failed:', e); return null; });
-      processSchedRoutes(sr);
-    }
-
-    // Now fetch vessels, wait times, and schedule (routeId is correct now) in parallel
+    // All four calls run in parallel — schedroutes no longer blocks the others.
+    // loadSchedule uses terminal-pair endpoints (not routeId) as primary path,
+    // so running it alongside schedroutes is safe.
     const fetches = [loadVessels(), loadWaitTimes()];
-    if (needSched) fetches.push(loadSchedule());
+    if (needSched) fetches.push(loadSchedRoutes(), loadSchedule());
 
     const results = await Promise.allSettled(fetches);
 
@@ -1086,8 +1089,9 @@ async function refresh(forceSchedReload) {
     if (results[1].status === 'fulfilled' && Array.isArray(results[1].value)) {
       waitData = results[1].value;
     }
-    if (needSched && results[2]?.status === 'fulfilled') {
-      schedData = results[2].value;
+    if (needSched) {
+      if (results[2]?.status === 'fulfilled') processSchedRoutes(results[2].value);
+      if (results[3]?.status === 'fulfilled') schedData = results[3].value;
     }
 
     if (!schedData) throw new Error('No schedule data');
