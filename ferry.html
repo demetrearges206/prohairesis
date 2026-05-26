@@ -407,6 +407,42 @@ const TERMINALS = {
   BI:  { id: 3, name: 'Bainbridge Island', abbrev: 'BI',  lat: 47.62375, lng: -122.51044 },
 };
 
+// Simplified Puget Sound coastline polygons (no tile dependency)
+// Coordinates are [longitude, latitude] per GeoJSON spec
+const PUGET_SOUND_LAND = { type: 'FeatureCollection', features: [
+  { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[
+    // Bainbridge Island — clockwise from north tip
+    [-122.525, 47.726], [-122.508, 47.715], [-122.480, 47.706], [-122.469, 47.681],
+    [-122.469, 47.659], [-122.479, 47.641],
+    // Eagle Harbor (cuts east into island; ferry dock is inside)
+    [-122.499, 47.634], [-122.513, 47.629], [-122.526, 47.624],
+    [-122.513, 47.617], [-122.499, 47.611],
+    // south shore
+    [-122.488, 47.595], [-122.487, 47.577], [-122.491, 47.566],
+    [-122.502, 47.563], [-122.514, 47.565], [-122.530, 47.570],
+    // west shore (Port Orchard Passage side) north to tip
+    [-122.547, 47.581], [-122.556, 47.598], [-122.558, 47.621],
+    [-122.556, 47.648], [-122.551, 47.671], [-122.547, 47.691],
+    [-122.540, 47.707], [-122.525, 47.726],
+  ]] } },
+  { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[
+    // Seattle / King County mainland — west-facing shoreline, extends east off-screen
+    [-122.412, 47.730], [-122.409, 47.700], [-122.404, 47.688], [-122.389, 47.672],
+    [-122.378, 47.656], [-122.367, 47.641], [-122.358, 47.628], [-122.350, 47.616],
+    [-122.344, 47.607], [-122.337, 47.597], [-122.335, 47.585],
+    [-122.340, 47.572], [-122.355, 47.560], [-122.376, 47.553],
+    [-122.416, 47.557], [-122.420, 47.540],
+    [-122.200, 47.540], [-122.200, 47.730], [-122.412, 47.730],
+  ]] } },
+  { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[
+    // Kitsap Peninsula — east-facing shore visible at wider zoom, extends west off-screen
+    [-122.600, 47.730], [-122.568, 47.718], [-122.556, 47.706], [-122.562, 47.688],
+    [-122.574, 47.666], [-122.580, 47.645], [-122.582, 47.620],
+    [-122.576, 47.598], [-122.570, 47.576], [-122.580, 47.554],
+    [-122.750, 47.540], [-122.750, 47.730], [-122.600, 47.730],
+  ]] } },
+] };
+
 // ── State ────────────────────────────────────────────────
 let schedData    = null;
 let vesselList   = [];
@@ -707,14 +743,12 @@ function openMiniMap(vesselName) {
     zoomControl: false, attributionControl: false,
     dragging: true, scrollWheelZoom: false, touchZoom: true,
   });
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 13,
-  }).addTo(miniMap);
+  L.geoJSON(PUGET_SOUND_LAND, { style: LAND_STYLE }).addTo(miniMap);
 
   L.polyline([
     [TERMINALS.SEA.lat, TERMINALS.SEA.lng],
     [TERMINALS.BI.lat,  TERMINALS.BI.lng],
-  ], { color: 'rgba(0,100,200,0.6)', weight: 2.5, dashArray: '7 5' }).addTo(miniMap);
+  ], { color: 'rgba(0,201,167,0.3)', weight: 2, dashArray: '6 5' }).addTo(miniMap);
 
   const mkLabel = (t) => L.marker([t.lat, t.lng], {
     icon: L.divIcon({
@@ -927,17 +961,16 @@ function renderVesselStrip() {
 }
 
 // ── Map ───────────────────────────────────────────────────
+const LAND_STYLE = { fillColor: '#0e2040', fillOpacity: 1, color: '#162d52', weight: 1 };
+
 function initMap() {
-  leafMap = L.map('ferry-map', { zoomControl: true, attributionControl: false });
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 13, attribution: '&copy; Esri &mdash; NOAA, NGA, GEBCO',
-  }).addTo(leafMap);
-  L.control.attribution({ position: 'bottomleft', prefix: false }).addTo(leafMap);
+  leafMap = L.map('ferry-map', { zoomControl: false, attributionControl: false });
+  L.geoJSON(PUGET_SOUND_LAND, { style: LAND_STYLE }).addTo(leafMap);
 
   L.polyline([
     [TERMINALS.SEA.lat, TERMINALS.SEA.lng],
     [TERMINALS.BI.lat,  TERMINALS.BI.lng],
-  ], { color: 'rgba(0,100,200,0.6)', weight: 3, dashArray: '8 6' }).addTo(leafMap);
+  ], { color: 'rgba(0,201,167,0.25)', weight: 2, dashArray: '7 6' }).addTo(leafMap);
 
   const termIcon = t => L.marker([t.lat, t.lng], {
     icon: L.divIcon({
