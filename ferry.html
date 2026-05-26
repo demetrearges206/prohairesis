@@ -59,6 +59,7 @@
     .route-name { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; line-height: 1; }
     .route-name .chevron { color: var(--teal); margin: 0 3px; }
     .live-row { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--mid); }
+    .build-tag { font-size: 10px; color: var(--dim); background: rgba(255,255,255,0.04); border-radius: 4px; padding: 1px 5px; font-variant-numeric: tabular-nums; }
     .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
     .live-dot.live  { animation: livepulse 2s ease-in-out infinite; }
     .live-dot.stale { background: var(--red); animation: none; }
@@ -345,6 +346,7 @@
     <div class="live-row">
       <span class="live-dot off" id="liveDot"></span>
       <span id="liveText">Loading…</span>
+      <span class="build-tag" id="buildTag"></span>
     </div>
   </div>
   <div class="hdr-actions">
@@ -400,6 +402,9 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 'use strict';
+
+// ── Build version — bump this string on every deploy ─────
+const BUILD = 'r30';
 
 // ── Config ───────────────────────────────────────────────
 const API_KEY   = 'ff39cd9c-729e-40ac-b740-1cebec6226f9';
@@ -1099,15 +1104,19 @@ function updateMap() {
   Object.keys(vMarkers).forEach(id => {
     if (!activeIds.has(+id)) { leafMap.removeLayer(vMarkers[id]); delete vMarkers[id]; }
   });
-  rv.forEach(v => {
+  rv.forEach((v, idx) => {
     if (!v.Latitude || !v.Longitude) return;
+    // Offset docked vessels slightly so markers don't overlap when multiple
+    // vessels share the same terminal GPS coordinates from WSDOT
+    const dockOffset = v.AtDock ? idx * 0.0015 : 0;
+    const latLng = [v.Latitude + dockOffset, v.Longitude];
     const icon   = vesselMarkerIcon(v.Heading, v.AtDock, v.VesselName);
     const popup  = popupHtml(v);
     if (vMarkers[v.VesselID]) {
-      vMarkers[v.VesselID].setLatLng([v.Latitude, v.Longitude]).setIcon(icon);
+      vMarkers[v.VesselID].setLatLng(latLng).setIcon(icon);
       vMarkers[v.VesselID].getPopup()?.setContent(popup);
     } else {
-      vMarkers[v.VesselID] = L.marker([v.Latitude, v.Longitude], { icon })
+      vMarkers[v.VesselID] = L.marker(latLng, { icon })
         .bindPopup(popup, { maxWidth: 230, closeButton: false })
         .addTo(leafMap);
     }
@@ -1198,6 +1207,7 @@ setInterval(() => refresh(true),   10 * 60 * 1000);
 
 // ── Boot ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('buildTag').textContent = BUILD;
   initMap();
   refresh(true);
 
