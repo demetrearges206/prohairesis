@@ -490,7 +490,7 @@ function countdownInfo(d) {
 }
 function todayDateStr() {
   const d = new Date();
-  return `${d.getMonth()+1}%2F${d.getDate()}%2F${d.getFullYear()}`;
+  return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
 }
 
 // ── API fetch with JSONP fallback ─────────────────────────
@@ -528,10 +528,20 @@ async function loadSchedRoutes() {
   return apiFetch(apiUrl(SCHED_BASE, 'schedroutes'));
 }
 
-// Fetch both crossing directions independently by terminal pair — ensures we
-// always get separate combos for SEA→BI and BI→SEA regardless of what
-// scheduletoday returns (it sometimes only includes one direction).
+// Primary: scheduletoday/{routeId} — no date required, reliably returns today's combos.
+// Fallback: terminal-pair date-based endpoints (date uses real / slashes as path segments).
 async function loadSchedule() {
+  try {
+    const data = await apiFetch(apiUrl(SCHED_BASE, `scheduletoday/${routeId}/false`));
+    if (data) {
+      const combos = Array.isArray(data)
+        ? data.flatMap(x => x.TerminalCombos || [])
+        : (data.TerminalCombos || []);
+      if (combos.length) return { TerminalCombos: combos };
+    }
+  } catch (e) { console.warn('scheduletoday failed, trying terminal-pair:', e); }
+
+  // Fallback: fetch both directions by terminal ID + date
   const td = todayDateStr();
   const [r1, r2] = await Promise.allSettled([
     apiFetch(apiUrl(SCHED_BASE, `schedule/${td}/${TERMINALS.SEA.id}/${TERMINALS.BI.id}`)),
@@ -545,18 +555,6 @@ async function loadSchedule() {
       ? v.flatMap(x => x.TerminalCombos || [])
       : (v.TerminalCombos || []);
     combos.push(...tc);
-  }
-  // If terminal fetch failed entirely, fall back to route-based
-  if (!combos.length) {
-    try {
-      const data = await apiFetch(apiUrl(SCHED_BASE, `scheduletoday/${routeId}/false`));
-      if (data) {
-        const tc = Array.isArray(data)
-          ? data.flatMap(x => x.TerminalCombos || [])
-          : (data.TerminalCombos || []);
-        combos.push(...tc);
-      }
-    } catch (e) { console.warn('scheduletoday fallback also failed:', e); }
   }
   return { TerminalCombos: combos };
 }
@@ -1071,9 +1069,8 @@ async function refresh(forceSchedReload) {
   try {
     const needSched = forceSchedReload || !schedData;
 
-    // All four calls run in parallel — schedroutes no longer blocks the others.
-    // loadSchedule uses terminal-pair endpoints (not routeId) as primary path,
-    // so running it alongside schedroutes is safe.
+    // All four calls run in parallel. loadSchedule uses scheduletoday/9 as primary
+    // (routeId defaults to 9 = SEA-BI so no dependency on schedroutes completing first).
     const fetches = [loadVessels(), loadWaitTimes()];
     if (needSched) fetches.push(loadSchedRoutes(), loadSchedule());
 
