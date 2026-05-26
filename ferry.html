@@ -220,10 +220,10 @@
       border: 0px solid var(--border);
     }
     .mini-map-wrap.open {
-      height: 170px;
+      height: 190px;
       border-width: 1px;
     }
-    #miniMapEl { height: 170px; }
+    #miniMapEl { height: 190px; }
 
     /* ── Wait Times ──────────────────────────────────────────── */
     .wait-row {
@@ -242,8 +242,8 @@
 
     /* ── Map ─────────────────────────────────────────────────── */
     .map-section { margin: 0 16px; }
-    .map-frame { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); height: 260px; position: relative; }
-    #ferry-map { width: 100%; height: 100%; background: var(--navy-mid); }
+    .map-frame { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); height: 300px; position: relative; }
+    #ferry-map { width: 100%; height: 100%; background: #b0cce4; }
     .map-hint {
       position: absolute; bottom: 8px; right: 8px; z-index: 400;
       background: rgba(6,15,31,0.75); color: var(--mid); font-size: 10px;
@@ -251,7 +251,7 @@
     }
 
     /* Leaflet overrides */
-    .leaflet-container { background: #060f1f !important; }
+    .leaflet-container { background: #b0cce4 !important; }
     .leaflet-popup-content-wrapper {
       background: var(--navy-mid) !important; color: var(--white) !important;
       border: 1px solid var(--border) !important; box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
@@ -262,8 +262,9 @@
     .pop-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
     .pop-row { font-size: 11px; color: var(--mid); line-height: 1.8; }
     .pop-row b { color: var(--white); font-weight: 600; }
-    .leaflet-control-attribution { background: rgba(6,15,31,0.7) !important; color: var(--dim) !important; }
-    .leaflet-control-attribution a { color: var(--mid) !important; }
+    .leaflet-control-attribution { background: rgba(255,255,255,0.75) !important; color: #555 !important; font-size: 9px !important; }
+    .leaflet-control-attribution a { color: #333 !important; }
+    .leaflet-control-zoom a { background: rgba(6,15,31,0.82) !important; color: var(--white) !important; border-color: var(--border) !important; }
 
     /* ── Vessel chips ────────────────────────────────────────── */
     .vessel-live-strip {
@@ -706,12 +707,14 @@ function openMiniMap(vesselName) {
     zoomControl: false, attributionControl: false,
     dragging: true, scrollWheelZoom: false, touchZoom: true,
   });
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(miniMap);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 13,
+  }).addTo(miniMap);
 
   L.polyline([
     [TERMINALS.SEA.lat, TERMINALS.SEA.lng],
     [TERMINALS.BI.lat,  TERMINALS.BI.lng],
-  ], { color: 'rgba(0,201,167,0.3)', weight: 2, dashArray: '6 5' }).addTo(miniMap);
+  ], { color: 'rgba(0,100,200,0.6)', weight: 2.5, dashArray: '7 5' }).addTo(miniMap);
 
   const mkLabel = (t) => L.marker([t.lat, t.lng], {
     icon: L.divIcon({
@@ -925,14 +928,16 @@ function renderVesselStrip() {
 
 // ── Map ───────────────────────────────────────────────────
 function initMap() {
-  leafMap = L.map('ferry-map', { zoomControl: false, attributionControl: false });
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(leafMap);
+  leafMap = L.map('ferry-map', { zoomControl: true, attributionControl: false });
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 13, attribution: '&copy; Esri &mdash; NOAA, NGA, GEBCO',
+  }).addTo(leafMap);
   L.control.attribution({ position: 'bottomleft', prefix: false }).addTo(leafMap);
 
   L.polyline([
     [TERMINALS.SEA.lat, TERMINALS.SEA.lng],
     [TERMINALS.BI.lat,  TERMINALS.BI.lng],
-  ], { color: 'rgba(0,201,167,0.25)', weight: 2, dashArray: '7 6' }).addTo(leafMap);
+  ], { color: 'rgba(0,100,200,0.6)', weight: 3, dashArray: '8 6' }).addTo(leafMap);
 
   const termIcon = t => L.marker([t.lat, t.lng], {
     icon: L.divIcon({
