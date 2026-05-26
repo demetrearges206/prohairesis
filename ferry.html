@@ -150,8 +150,11 @@
       padding: 18px 20px 16px; position: relative; overflow: hidden;
     }
     .next-card::before {
-      content: ''; position: absolute; inset: 0 0 auto 0; height: 2px;
+      content: ''; position: absolute; inset: 0 0 auto 0; height: 3px;
       background: linear-gradient(90deg, var(--teal) 0%, #2196f3 100%);
+      transform-origin: left;
+      transform: scaleX(var(--bar-w, 0));
+      transition: transform 20s linear;
     }
     .next-eyebrow {
       font-size: 9px; font-weight: 700; letter-spacing: 1.8px;
@@ -460,6 +463,7 @@ let leafMap      = null;
 let vMarkers     = {};
 let lastUpdate   = null;
 let isLoading    = false;
+let mapSized     = false;
 
 // ── Utilities ────────────────────────────────────────────
 function parseWSDot(s) {
@@ -500,6 +504,17 @@ function todayDateStr() {
   const mm   = String(d.getMonth() + 1).padStart(2, '0');
   const dd   = String(d.getDate()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd}`;
+}
+function getCachedSchedule() {
+  try {
+    const raw = localStorage.getItem('wsf_sched_v1');
+    if (!raw) return null;
+    const { date, data } = JSON.parse(raw);
+    return date === todayDateStr() ? data : null;
+  } catch { return null; }
+}
+function cacheSchedule(data) {
+  try { localStorage.setItem('wsf_sched_v1', JSON.stringify({ date: todayDateStr(), data })); } catch {}
 }
 
 // ── API fetch with JSONP fallback ─────────────────────────
@@ -547,6 +562,8 @@ async function loadSchedRoutes() {
 // Both directions fetched in parallel — no date required.
 // Fallback: date-based schedule/{ISO-date}/{dep}/{arr} endpoints.
 async function loadSchedule() {
+  const cached = getCachedSchedule();
+  if (cached) { setLoadingMsg('Schedule: from cache ✓'); return cached; }
   setLoadingMsg('Schedule API: trying scheduletoday/7/3…');
   const [p1, p2] = await Promise.allSettled([
     apiFetch(apiUrl(SCHED_BASE, `scheduletoday/${TERMINALS.SEA.id}/${TERMINALS.BI.id}/false`)),
@@ -560,7 +577,12 @@ async function loadSchedule() {
     const v = r.value;
     combos.push(...(Array.isArray(v) ? v.flatMap(x => x.TerminalCombos || []) : (v.TerminalCombos || [])));
   }
-  if (combos.length) { setLoadingMsg(`Schedule loaded (${combos.length} combos) ✓`); return { TerminalCombos: combos }; }
+  if (combos.length) {
+    const result = { TerminalCombos: combos };
+    cacheSchedule(result);
+    setLoadingMsg(`Schedule loaded (${combos.length} combos) ✓`);
+    return result;
+  }
 
   // Fallback: date-specific endpoint (ISO date as path segment, confirmed by ferry.fyi + wsf-ferry-schedule)
   const td = todayDateStr();
@@ -576,8 +598,13 @@ async function loadSchedule() {
     const v = r.value;
     combos.push(...(Array.isArray(v) ? v.flatMap(x => x.TerminalCombos || []) : (v.TerminalCombos || [])));
   }
-  if (combos.length) setLoadingMsg(`Schedule loaded via fallback (${combos.length} combos) ✓`);
-  else setLoadingMsg(`Both schedule endpoints returned empty — no combos`);
+  if (combos.length) {
+    setLoadingMsg(`Schedule loaded via fallback (${combos.length} combos) ✓`);
+    const result = { TerminalCombos: combos };
+    cacheSchedule(result);
+    return result;
+  }
+  setLoadingMsg(`Both schedule endpoints returned empty — no combos`);
   return { TerminalCombos: combos };
 }
 
@@ -717,8 +744,7 @@ function getDepartures() {
       const arrive = parseWSDot(t.ArrivingTime) || (depart ? new Date(depart.getTime() + CROSSING_MS) : null);
       return {
         depart, arrive,
-        vessel:     t.VesselName || '',
-        accessible: t.VesselHandicapAccessible,
+        vessel: t.VesselName || '',
       };
     })
     .filter(t => t.depart)
@@ -819,6 +845,14 @@ function routeVessels() {
   );
 }
 
+function vesselStatus(lv) {
+  if (!lv) return null;
+  if (lv.AtDock) return { text: 'At Dock', cls: 'badge-dock' };
+  const eta = parseWSDot(lv.Eta);
+  if (eta && minsTo(eta) <= 5) return { text: 'Arriving', cls: 'badge-underway' };
+  return { text: 'Sailing', cls: 'badge-underway' };
+}
+
 // ── Render schedule ───────────────────────────────────────
 function renderSchedule() {
   closeMiniMap(); // clean up any existing mini-map before overwriting DOM
@@ -839,33 +873,36 @@ function renderSchedule() {
 
   const next = upcoming[0];
   const rest = upcoming.slice(1, 4);
-  const { t: dt, ap: dap } = splitTime(next.depart);
-  const cd = countdownInfo(next.depart);
   const lv = getLiveVessel(next.vessel);
-  const statusBadge = lv
-    ? (lv.AtDock
-        ? `<span class="sail-badge badge-dock">At Dock</span>`
-        : `<span class="sail-badge badge-underway">Underway</span>`)
-    : '';
+  const isUnderway = !!(lv && !lv.AtDock);
+  const liveEta = isUnderway ? parseWSDot(lv.Eta) : null;
+  const bigTime   = isUnderway ? (liveEta || next.arrive) : next.depart;
+  const smallTime = isUnderway ? next.depart : next.arrive;
+  const smallLabel = isUnderway ? 'DEPARTED' : 'ARRIVES';
+  const cdTarget  = isUnderway ? (liveEta || next.arrive) : next.depart;
+  const { t: dt, ap: dap } = splitTime(bigTime);
+  const { t: depT, ap: depAp } = splitTime(next.depart);
+  const cd = countdownInfo(cdTarget);
+  const status = vesselStatus(lv);
 
   let html = `
-    <div class="next-card">
-      <div class="next-eyebrow">Next Sailing</div>
+    <div class="next-card" id="nextCard">
+      <div class="next-eyebrow">${isUnderway ? 'Current Sailing' : 'Next Sailing'}</div>
       <div class="next-body">
         <div class="next-depart">
           <span class="depart-big">${dt}</span><span class="depart-ampm">${dap}</span>
+          ${isUnderway ? `<div style="font-size:11px;color:var(--mid);margin-top:4px">Dep ${depT}<small style="font-size:9px;margin-left:2px">${depAp}</small></div>` : ''}
         </div>
         <div class="arrive-block">
-          <div class="arrive-label">ARRIVES</div>
-          <div class="arrive-time">${fmtTime(next.arrive)}</div>
+          <div class="arrive-label">${smallLabel}</div>
+          <div class="arrive-time">${fmtTime(smallTime)}</div>
         </div>
       </div>
       <div class="next-footer">
         <div class="vessel-tag">
           <span class="vessel-icon">⛴</span>
           <span class="vessel-tag-name" style="color:${getVesselColor(next.vessel)}">${next.vessel || 'Vessel TBD'}</span>
-          ${next.accessible ? '<span class="access-icon" title="Accessible">♿</span>' : ''}
-          ${statusBadge}
+          ${status ? `<span class="sail-badge ${status.cls}">${status.text}</span>` : ''}
         </div>
         <div class="countdown-pill ${cd.cls}" id="cdPill">${cd.text}</div>
       </div>
@@ -877,6 +914,8 @@ function renderSchedule() {
     rest.forEach(d => {
       const { t, ap } = splitTime(d.depart);
       const lv2 = getLiveVessel(d.vessel);
+      const liveEta2 = (lv2 && !lv2.AtDock) ? parseWSDot(lv2.Eta) : null;
+      const arriveTime = liveEta2 || d.arrive;
       const badge = lv2
         ? (lv2.AtDock
             ? `<span class="sail-badge badge-dock">Dock</span>`
@@ -884,11 +923,10 @@ function renderSchedule() {
         : '';
       html += `
         <div class="sail-row">
-          <div class="sail-dep">${t}<small> ${ap}</small></div>
-          <div class="sail-mid">
-            <div class="sail-arr">→ ${fmtTime(d.arrive)}</div>
+          <div class="sail-dep">${t}<small> ${ap}</small>
             <div class="sail-vessel">${d.vessel}</div>
           </div>
+          <div class="sail-arr">→ ${fmtTime(arriveTime)}</div>
           <div style="text-align:right">${badge}</div>
         </div>`;
     });
@@ -932,13 +970,25 @@ function renderSchedule() {
   // Auto-open mini-map when vessel is underway (no toggle needed)
   if (lv && !lv.AtDock) openMiniMap(next.vessel);
 
+  const nextCardEl = document.getElementById('nextCard');
+  function updateProgress() {
+    if (!nextCardEl || !lv || lv.AtDock) { nextCardEl?.style.setProperty('--bar-w', '0'); return; }
+    const left = parseWSDot(lv.LeftDock);
+    const eta  = liveEta || next.arrive;
+    if (!left || !eta) return;
+    const prog = Math.max(0, Math.min(1, (Date.now() - left) / (eta - left)));
+    nextCardEl.style.setProperty('--bar-w', prog.toFixed(3));
+  }
+  updateProgress();
+
   if (cdTimer) clearInterval(cdTimer);
   cdTimer = setInterval(() => {
     const pill = document.getElementById('cdPill');
     if (!pill) { clearInterval(cdTimer); return; }
-    const { text, cls } = countdownInfo(next.depart);
+    const { text, cls } = countdownInfo(cdTarget);
     pill.textContent = text;
     pill.className = `countdown-pill ${cls}`;
+    updateProgress();
   }, 20000);
 }
 
@@ -1007,6 +1057,7 @@ function initMap() {
     [TERMINALS.SEA.lat - 0.02, TERMINALS.SEA.lng + 0.01],
     [TERMINALS.BI.lat  + 0.02, TERMINALS.BI.lng  - 0.04],
   ], { padding: [28, 28] });
+  setTimeout(() => leafMap.invalidateSize(), 200);
 }
 
 function vesselMarkerIcon(heading, atDock, vesselName) {
@@ -1042,6 +1093,7 @@ function popupHtml(v) {
 
 function updateMap() {
   if (!leafMap) return;
+  if (!mapSized) { leafMap.invalidateSize(); mapSized = true; }
   const rv = routeVessels();
   const activeIds = new Set(rv.map(v => v.VesselID));
   Object.keys(vMarkers).forEach(id => {
@@ -1103,7 +1155,7 @@ async function refresh(forceSchedReload) {
 
     // Hard cap: if ANY fetch hangs past 15s the whole refresh fails visibly
     const masterTimeout = new Promise((_, rej) =>
-      setTimeout(() => { setLoadingMsg('⏱ 15s timeout reached — no response from WSDOT'); rej(new Error('Ferry data timed out after 15s')); }, 15000)
+      setTimeout(() => { setLoadingMsg('⏱ 45s timeout reached — no response from WSDOT'); rej(new Error('Ferry data timed out after 45s')); }, 45000)
     );
     const results = await Promise.race([Promise.allSettled(fetches), masterTimeout]);
 
