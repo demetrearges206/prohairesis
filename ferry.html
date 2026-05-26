@@ -500,7 +500,7 @@ function jsonpFetch(url) {
     const s = document.createElement('script');
     let tid;
     const cleanup = () => { delete window[id]; s.remove(); clearTimeout(tid); };
-    tid = setTimeout(() => { rej(new Error('JSONP timeout')); cleanup(); }, 10000);
+    tid = setTimeout(() => { rej(new Error('JSONP timeout')); cleanup(); }, 12000);
     window[id] = data => { res(data); cleanup(); };
     s.onerror = () => { rej(new Error('JSONP failed')); cleanup(); };
     s.src = `${url}&callback=${id}`;
@@ -508,15 +508,11 @@ function jsonpFetch(url) {
   });
 }
 async function apiFetch(url) {
-  const ctrl = new AbortController();
-  const tid = setTimeout(() => ctrl.abort(), 10000);
   try {
-    const r = await fetch(url, { headers: { Accept: 'application/json' }, signal: ctrl.signal });
-    clearTimeout(tid);
+    const r = await fetch(url, { headers: { Accept: 'application/json' } });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return r.json();
   } catch {
-    clearTimeout(tid);
     return jsonpFetch(url);
   }
 }
@@ -968,7 +964,7 @@ function renderVesselStrip() {
 }
 
 // ── Map ───────────────────────────────────────────────────
-const LAND_STYLE = { fillColor: '#0e2040', fillOpacity: 1, color: '#162d52', weight: 1 };
+const LAND_STYLE = { fillColor: '#162d52', fillOpacity: 1, color: '#2a4f82', weight: 1 };
 
 function initMap() {
   leafMap = L.map('ferry-map', { zoomControl: false, attributionControl: false });
@@ -1081,7 +1077,11 @@ async function refresh(forceSchedReload) {
     const fetches = [loadVessels(), loadWaitTimes()];
     if (needSched) fetches.push(loadSchedRoutes(), loadSchedule());
 
-    const results = await Promise.allSettled(fetches);
+    // Hard cap: if ANY fetch hangs past 15s the whole refresh fails visibly
+    const masterTimeout = new Promise((_, rej) =>
+      setTimeout(() => rej(new Error('Ferry data timed out — tap ↺ to retry')), 15000)
+    );
+    const results = await Promise.race([Promise.allSettled(fetches), masterTimeout]);
 
     if (results[0].status === 'fulfilled' && Array.isArray(results[0].value)) {
       vesselList = results[0].value;
