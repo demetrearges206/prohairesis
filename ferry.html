@@ -467,16 +467,10 @@ async function loadSchedRoutes() {
   return apiFetch(apiUrl(SCHED_BASE, 'schedroutes'));
 }
 
-// Today's departures for the resolved route ID
+// Fetch both crossing directions independently by terminal pair — ensures we
+// always get separate combos for SEA→BI and BI→SEA regardless of what
+// scheduletoday returns (it sometimes only includes one direction).
 async function loadSchedule() {
-  // Primary: route-based scheduletoday (no date required, always current)
-  try {
-    const data = await apiFetch(apiUrl(SCHED_BASE, `scheduletoday/${routeId}/false`));
-    if (data && (Array.isArray(data) ? data.length : data.TerminalCombos?.length)) return data;
-  } catch (e) {
-    console.warn('scheduletoday failed, falling back to terminal endpoint:', e);
-  }
-  // Fallback: terminal-pair based schedule for today
   const td = todayDateStr();
   const [r1, r2] = await Promise.allSettled([
     apiFetch(apiUrl(SCHED_BASE, `schedule/${td}/${TERMINALS.SEA.id}/${TERMINALS.BI.id}`)),
@@ -485,8 +479,23 @@ async function loadSchedule() {
   const combos = [];
   for (const r of [r1, r2]) {
     if (r.status !== 'fulfilled' || !r.value) continue;
-    const tc = r.value.TerminalCombos || (Array.isArray(r.value) ? r.value : null);
-    if (tc) combos.push(...tc);
+    const v = r.value;
+    const tc = Array.isArray(v)
+      ? v.flatMap(x => x.TerminalCombos || [])
+      : (v.TerminalCombos || []);
+    combos.push(...tc);
+  }
+  // If terminal fetch failed entirely, fall back to route-based
+  if (!combos.length) {
+    try {
+      const data = await apiFetch(apiUrl(SCHED_BASE, `scheduletoday/${routeId}/false`));
+      if (data) {
+        const tc = Array.isArray(data)
+          ? data.flatMap(x => x.TerminalCombos || [])
+          : (data.TerminalCombos || []);
+        combos.push(...tc);
+      }
+    } catch (e) { console.warn('scheduletoday fallback also failed:', e); }
   }
   return { TerminalCombos: combos };
 }
@@ -615,16 +624,22 @@ function findCombo() {
   return c || null;
 }
 
+const CROSSING_MS = 35 * 60 * 1000; // ~35 min crossing time
+
 function getDepartures() {
   const combo = findCombo();
   if (!combo || !combo.Times) return [];
   return combo.Times
-    .map(t => ({
-      depart:     parseWSDot(t.DepartingTime),
-      arrive:     parseWSDot(t.ArrivingTime),
-      vessel:     t.VesselName || '',
-      accessible: t.VesselHandicapAccessible,
-    }))
+    .map(t => {
+      const depart = parseWSDot(t.DepartingTime);
+      // ArrivingTime is sometimes null; fall back to depart + 35 min
+      const arrive = parseWSDot(t.ArrivingTime) || (depart ? new Date(depart.getTime() + CROSSING_MS) : null);
+      return {
+        depart, arrive,
+        vessel:     t.VesselName || '',
+        accessible: t.VesselHandicapAccessible,
+      };
+    })
     .filter(t => t.depart)
     .sort((a, b) => a.depart - b.depart);
 }
