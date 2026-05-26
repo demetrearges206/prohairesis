@@ -363,7 +363,7 @@
     <div id="alertBanner" class="alert-banner hidden"></div>
 
     <div id="schedContent">
-      <div class="loading-wrap"><div class="ring"></div><span>Fetching today's schedule…</span></div>
+      <div class="loading-wrap"><div class="ring"></div><span id="loadingMsg">Fetching today's schedule…</span></div>
     </div>
 
     <div class="section-label">Terminal Wait Times</div>
@@ -537,29 +537,37 @@ async function loadSchedRoutes() {
 // Both directions fetched in parallel — no date required.
 // Fallback: date-based schedule/{ISO-date}/{dep}/{arr} endpoints.
 async function loadSchedule() {
+  setLoadingMsg('Schedule API: trying scheduletoday/7/3…');
   const [p1, p2] = await Promise.allSettled([
     apiFetch(apiUrl(SCHED_BASE, `scheduletoday/${TERMINALS.SEA.id}/${TERMINALS.BI.id}/false`)),
     apiFetch(apiUrl(SCHED_BASE, `scheduletoday/${TERMINALS.BI.id}/${TERMINALS.SEA.id}/false`)),
   ]);
+  const p1ok = p1.status === 'fulfilled', p2ok = p2.status === 'fulfilled';
+  setLoadingMsg(`scheduletoday: SEA→BI ${p1ok ? '✓' : '✗'}, BI→SEA ${p2ok ? '✓' : '✗'}`);
   const combos = [];
   for (const r of [p1, p2]) {
     if (r.status !== 'fulfilled' || !r.value) continue;
     const v = r.value;
     combos.push(...(Array.isArray(v) ? v.flatMap(x => x.TerminalCombos || []) : (v.TerminalCombos || [])));
   }
-  if (combos.length) return { TerminalCombos: combos };
+  if (combos.length) { setLoadingMsg(`Schedule loaded (${combos.length} combos) ✓`); return { TerminalCombos: combos }; }
 
   // Fallback: date-specific endpoint (ISO date as path segment, confirmed by ferry.fyi + wsf-ferry-schedule)
   const td = todayDateStr();
+  setLoadingMsg(`scheduletoday empty — trying schedule/${td}/7/3…`);
   const [r1, r2] = await Promise.allSettled([
     apiFetch(apiUrl(SCHED_BASE, `schedule/${td}/${TERMINALS.SEA.id}/${TERMINALS.BI.id}`)),
     apiFetch(apiUrl(SCHED_BASE, `schedule/${td}/${TERMINALS.BI.id}/${TERMINALS.SEA.id}`)),
   ]);
+  const r1ok = r1.status === 'fulfilled', r2ok = r2.status === 'fulfilled';
+  setLoadingMsg(`schedule/${td}: SEA→BI ${r1ok ? '✓' : '✗'}, BI→SEA ${r2ok ? '✓' : '✗'}`);
   for (const r of [r1, r2]) {
     if (r.status !== 'fulfilled' || !r.value) continue;
     const v = r.value;
     combos.push(...(Array.isArray(v) ? v.flatMap(x => x.TerminalCombos || []) : (v.TerminalCombos || [])));
   }
+  if (combos.length) setLoadingMsg(`Schedule loaded via fallback (${combos.length} combos) ✓`);
+  else setLoadingMsg(`Both schedule endpoints returned empty — no combos`);
   return { TerminalCombos: combos };
 }
 
@@ -1047,6 +1055,11 @@ function updateMap() {
 }
 
 // ── Status bar ────────────────────────────────────────────
+function setLoadingMsg(msg) {
+  const el = document.getElementById('loadingMsg');
+  if (el) el.textContent = msg;
+}
+
 function setStatus(state) {
   const dot  = document.getElementById('liveDot');
   const text = document.getElementById('liveText');
@@ -1058,7 +1071,7 @@ function setStatus(state) {
 function showError(msg) {
   if (!schedData) {
     document.getElementById('schedContent').innerHTML =
-      `<div class="err-card">⚠ ${msg}<small>Tap ↺ to retry</small></div>`;
+      `<div class="err-card">⚠ ${msg} <small>Tap ↺ to retry</small></div>`;
   }
   setStatus('stale');
 }
@@ -1073,6 +1086,8 @@ async function refresh(forceSchedReload) {
   try {
     const needSched = forceSchedReload || !schedData;
 
+    setLoadingMsg(needSched ? 'Connecting to WSDOT API…' : 'Refreshing vessels + wait times…');
+
     // All four calls run in parallel. loadSchedule uses scheduletoday/7/3 (terminal IDs)
     // so it has no dependency on schedroutes completing first.
     const fetches = [loadVessels(), loadWaitTimes()];
@@ -1080,22 +1095,22 @@ async function refresh(forceSchedReload) {
 
     // Hard cap: if ANY fetch hangs past 15s the whole refresh fails visibly
     const masterTimeout = new Promise((_, rej) =>
-      setTimeout(() => rej(new Error('Ferry data timed out — tap ↺ to retry')), 15000)
+      setTimeout(() => { setLoadingMsg('⏱ 15s timeout reached — no response from WSDOT'); rej(new Error('Ferry data timed out after 15s')); }, 15000)
     );
     const results = await Promise.race([Promise.allSettled(fetches), masterTimeout]);
 
-    if (results[0].status === 'fulfilled' && Array.isArray(results[0].value)) {
-      vesselList = results[0].value;
-    }
-    if (results[1].status === 'fulfilled' && Array.isArray(results[1].value)) {
-      waitData = results[1].value;
-    }
+    const vesselsOk = results[0].status === 'fulfilled' && Array.isArray(results[0].value);
+    const waitOk    = results[1].status === 'fulfilled' && Array.isArray(results[1].value);
+    if (vesselsOk) vesselList = results[0].value;
+    if (waitOk)    waitData   = results[1].value;
     if (needSched) {
       if (results[2]?.status === 'fulfilled') processSchedRoutes(results[2].value);
       if (results[3]?.status === 'fulfilled') schedData = results[3].value;
     }
 
-    if (!schedData) throw new Error('No schedule data');
+    setLoadingMsg(`Vessels: ${vesselsOk ? `${vesselList.length} found` : `✗ ${results[0].reason?.message||'failed'}`} | Wait: ${waitOk ? '✓' : '✗'} | Sched: ${schedData ? `✓ ${schedData.TerminalCombos?.length||0} combos` : '✗ none'}`);
+
+    if (!schedData) throw new Error(`No schedule data — vessels ${vesselsOk?'ok':'failed'}, wait ${waitOk?'ok':'failed'}`);
 
     lastUpdate = new Date();
     renderAlerts();
@@ -1107,7 +1122,7 @@ async function refresh(forceSchedReload) {
 
   } catch (e) {
     console.error('Refresh error:', e);
-    showError('Could not load ferry data. Check your connection.');
+    showError(e.message || 'Could not load ferry data.');
   } finally {
     isLoading = false;
     document.getElementById('refreshBtn').classList.remove('spinning');
