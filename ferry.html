@@ -372,8 +372,10 @@
       <div style="padding:0 16px 8px"><div style="height:56px;border-radius:var(--radius);background:var(--navy-card);border:1px solid var(--border)"></div></div>
     </div>
 
-    <div class="section-label">Live Vessels</div>
-    <div id="vesselStrip" style="margin-bottom:10px"></div>
+    <button id="vesselLabel" class="section-label" style="width:100%;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;-webkit-tap-highlight-color:transparent">
+      Live Vessels <span id="vesselChevron" style="font-size:10px;color:var(--mid);font-weight:400">▼</span>
+    </button>
+    <div id="vesselStrip" style="display:none;margin-bottom:10px"></div>
 
     <div class="map-section">
       <div class="map-frame">
@@ -451,7 +453,8 @@ let routeId      = 9;       // overridden dynamically via schedroutes
 let disruptions  = [];
 let waitData     = [];
 let direction    = 'SEA-BI';
-let schedOpen    = false;
+let schedOpen        = false;
+let vesselStripOpen  = false;
 let cdTimer      = null;
 let leafMap      = null;
 let vMarkers     = {};
@@ -515,9 +518,15 @@ function jsonpFetch(url) {
 }
 async function apiFetch(url) {
   try {
-    const r = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
+    // No custom headers → avoids CORS preflight. Abort after 5s so JSONP starts quickly.
+    const ac  = new AbortController();
+    const tid = setTimeout(() => ac.abort(), 5000);
+    try {
+      const r = await fetch(url, { signal: ac.signal });
+      clearTimeout(tid);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    } finally { clearTimeout(tid); }
   } catch {
     return jsonpFetch(url);
   }
@@ -735,11 +744,12 @@ function getVesselColor(name) {
 let miniMap = null;
 
 function closeMiniMap() {
-  const wrap = document.getElementById('miniMapWrap');
-  const btn  = document.getElementById('trackBtn');
-  if (wrap) wrap.classList.remove('open');
-  if (btn)  btn.classList.remove('active');
-  if (miniMap) { miniMap.remove(); miniMap = null; }
+  if (miniMap) {
+    const container = miniMap.getContainer();
+    miniMap.remove();
+    if (container) delete container._leaflet_id;
+    miniMap = null;
+  }
 }
 
 function openMiniMap(vesselName) {
@@ -762,7 +772,7 @@ function openMiniMap(vesselName) {
   L.polyline([
     [TERMINALS.SEA.lat, TERMINALS.SEA.lng],
     [TERMINALS.BI.lat,  TERMINALS.BI.lng],
-  ], { color: 'rgba(0,201,167,0.3)', weight: 2, dashArray: '6 5' }).addTo(miniMap);
+  ], { color: 'rgba(0,201,167,0.6)', weight: 2.5, dashArray: '6 5' }).addTo(miniMap);
 
   const mkLabel = (t) => L.marker([t.lat, t.lng], {
     icon: L.divIcon({
@@ -811,6 +821,7 @@ function routeVessels() {
 
 // ── Render schedule ───────────────────────────────────────
 function renderSchedule() {
+  closeMiniMap(); // clean up any existing mini-map before overwriting DOM
   const wrap = document.getElementById('schedContent');
   const departures = getDepartures();
 
@@ -858,15 +869,7 @@ function renderSchedule() {
         </div>
         <div class="countdown-pill ${cd.cls}" id="cdPill">${cd.text}</div>
       </div>
-      ${lv && !lv.AtDock ? `
-      <button class="track-btn" id="trackBtn">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0">
-          <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/>
-          <circle cx="6" cy="6" r="2" fill="currentColor"/>
-        </svg>
-        Track ${next.vessel}
-      </button>
-      <div class="mini-map-wrap" id="miniMapWrap"><div id="miniMapEl"></div></div>` : ''}
+      ${lv && !lv.AtDock ? `<div class="mini-map-wrap open" id="miniMapWrap"><div id="miniMapEl"></div></div>` : ''}
     </div>`;
 
   if (rest.length) {
@@ -926,15 +929,8 @@ function renderSchedule() {
     document.getElementById('schedChevron').classList.toggle('open', schedOpen);
   });
 
-  // Track button: toggle mini-map in the next-sailing card
-  document.getElementById('trackBtn')?.addEventListener('click', () => {
-    const wrap = document.getElementById('miniMapWrap');
-    if (wrap?.classList.contains('open')) {
-      closeMiniMap();
-    } else {
-      openMiniMap(next.vessel);
-    }
-  });
+  // Auto-open mini-map when vessel is underway (no toggle needed)
+  if (lv && !lv.AtDock) openMiniMap(next.vessel);
 
   if (cdTimer) clearInterval(cdTimer);
   cdTimer = setInterval(() => {
@@ -948,9 +944,20 @@ function renderSchedule() {
 
 // ── Vessel strip ──────────────────────────────────────────
 function renderVesselStrip() {
-  const strip = document.getElementById('vesselStrip');
-  const rv = routeVessels();
-  if (!rv.length) { strip.innerHTML = ''; return; }
+  const strip   = document.getElementById('vesselStrip');
+  const chevron = document.getElementById('vesselChevron');
+  const rv      = routeVessels();
+
+  // Update chevron count
+  const label = document.getElementById('vesselLabel');
+  if (label) {
+    label.querySelector('span:first-child') &&
+      (label.childNodes[0].textContent = `Live Vessels${rv.length ? ` · ${rv.length}` : ''} `);
+    if (chevron) chevron.textContent = vesselStripOpen ? '▲' : '▼';
+  }
+
+  strip.style.display = vesselStripOpen ? '' : 'none';
+  if (!vesselStripOpen || !rv.length) { strip.innerHTML = ''; return; }
 
   strip.innerHTML = '<div class="vessel-live-strip">' +
     rv.map(v => {
@@ -975,7 +982,7 @@ function renderVesselStrip() {
 }
 
 // ── Map ───────────────────────────────────────────────────
-const LAND_STYLE = { fillColor: '#162d52', fillOpacity: 1, color: '#2a4f82', weight: 1 };
+const LAND_STYLE = { fillColor: '#1e3d6e', fillOpacity: 1, color: '#4a7ab5', weight: 1.5 };
 
 function initMap() {
   leafMap = L.map('ferry-map', { zoomControl: false, attributionControl: false });
@@ -984,7 +991,7 @@ function initMap() {
   L.polyline([
     [TERMINALS.SEA.lat, TERMINALS.SEA.lng],
     [TERMINALS.BI.lat,  TERMINALS.BI.lng],
-  ], { color: 'rgba(0,201,167,0.25)', weight: 2, dashArray: '7 6' }).addTo(leafMap);
+  ], { color: 'rgba(0,201,167,0.6)', weight: 2.5, dashArray: '7 6' }).addTo(leafMap);
 
   const termIcon = t => L.marker([t.lat, t.lng], {
     icon: L.divIcon({
@@ -1154,6 +1161,11 @@ document.addEventListener('DOMContentLoaded', () => {
       renderWaitTimes();
       if (schedData) renderSchedule();
     });
+  });
+
+  document.getElementById('vesselLabel').addEventListener('click', () => {
+    vesselStripOpen = !vesselStripOpen;
+    renderVesselStrip();
   });
 
   const tipKey = 'ferry_tip_v1';
