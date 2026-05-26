@@ -396,7 +396,7 @@
 'use strict';
 
 // ── Config ───────────────────────────────────────────────
-const API_KEY   = '3cf97d36-63f9-42fe-9125-2675594d6c9e';
+const API_KEY   = 'ff39cd9c-729e-40ac-b740-1cebec6226f9';
 const SCHED_BASE = 'https://www.wsdot.wa.gov/ferries/api/schedule/rest';
 const TERM_BASE  = 'https://www.wsdot.wa.gov/ferries/api/terminals/rest';
 const VESS_BASE  = 'https://www.wsdot.wa.gov/ferries/api/vessels/rest';
@@ -489,8 +489,13 @@ function countdownInfo(d) {
   return { text: h ? `${h}h ${rm}m` : `${m}m`, cls: '' };
 }
 function todayDateStr() {
-  const d = new Date();
-  return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+  // WSF schedule day ends at 3 AM Pacific; before 3 AM use yesterday's date
+  const d = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+  if (d.getHours() < 3) d.setDate(d.getDate() - 1);
+  const yyyy = d.getFullYear();
+  const mm   = String(d.getMonth() + 1).padStart(2, '0');
+  const dd   = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 // ── API fetch with JSONP fallback ─────────────────────────
@@ -528,33 +533,32 @@ async function loadSchedRoutes() {
   return apiFetch(apiUrl(SCHED_BASE, 'schedroutes'));
 }
 
-// Primary: scheduletoday/{routeId} — no date required, reliably returns today's combos.
-// Fallback: terminal-pair date-based endpoints (date uses real / slashes as path segments).
+// Primary: scheduletoday/{DepartingTerminalID}/{ArrivingTerminalID}/false
+// Both directions fetched in parallel — no date required.
+// Fallback: date-based schedule/{ISO-date}/{dep}/{arr} endpoints.
 async function loadSchedule() {
-  try {
-    const data = await apiFetch(apiUrl(SCHED_BASE, `scheduletoday/${routeId}/false`));
-    if (data) {
-      const combos = Array.isArray(data)
-        ? data.flatMap(x => x.TerminalCombos || [])
-        : (data.TerminalCombos || []);
-      if (combos.length) return { TerminalCombos: combos };
-    }
-  } catch (e) { console.warn('scheduletoday failed, trying terminal-pair:', e); }
+  const [p1, p2] = await Promise.allSettled([
+    apiFetch(apiUrl(SCHED_BASE, `scheduletoday/${TERMINALS.SEA.id}/${TERMINALS.BI.id}/false`)),
+    apiFetch(apiUrl(SCHED_BASE, `scheduletoday/${TERMINALS.BI.id}/${TERMINALS.SEA.id}/false`)),
+  ]);
+  const combos = [];
+  for (const r of [p1, p2]) {
+    if (r.status !== 'fulfilled' || !r.value) continue;
+    const v = r.value;
+    combos.push(...(Array.isArray(v) ? v.flatMap(x => x.TerminalCombos || []) : (v.TerminalCombos || [])));
+  }
+  if (combos.length) return { TerminalCombos: combos };
 
-  // Fallback: fetch both directions by terminal ID + date
+  // Fallback: date-specific endpoint (ISO date as path segment, confirmed by ferry.fyi + wsf-ferry-schedule)
   const td = todayDateStr();
   const [r1, r2] = await Promise.allSettled([
     apiFetch(apiUrl(SCHED_BASE, `schedule/${td}/${TERMINALS.SEA.id}/${TERMINALS.BI.id}`)),
     apiFetch(apiUrl(SCHED_BASE, `schedule/${td}/${TERMINALS.BI.id}/${TERMINALS.SEA.id}`)),
   ]);
-  const combos = [];
   for (const r of [r1, r2]) {
     if (r.status !== 'fulfilled' || !r.value) continue;
     const v = r.value;
-    const tc = Array.isArray(v)
-      ? v.flatMap(x => x.TerminalCombos || [])
-      : (v.TerminalCombos || []);
-    combos.push(...tc);
+    combos.push(...(Array.isArray(v) ? v.flatMap(x => x.TerminalCombos || []) : (v.TerminalCombos || [])));
   }
   return { TerminalCombos: combos };
 }
@@ -1069,8 +1073,8 @@ async function refresh(forceSchedReload) {
   try {
     const needSched = forceSchedReload || !schedData;
 
-    // All four calls run in parallel. loadSchedule uses scheduletoday/9 as primary
-    // (routeId defaults to 9 = SEA-BI so no dependency on schedroutes completing first).
+    // All four calls run in parallel. loadSchedule uses scheduletoday/7/3 (terminal IDs)
+    // so it has no dependency on schedroutes completing first.
     const fetches = [loadVessels(), loadWaitTimes()];
     if (needSched) fetches.push(loadSchedRoutes(), loadSchedule());
 
