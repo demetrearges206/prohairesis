@@ -209,21 +209,14 @@
       border: 1px solid var(--border); overflow: hidden;
     }
     .wait-cell {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 13px 16px; background: var(--navy-card); gap: 10px;
+      padding: 12px 16px; background: var(--navy-card);
       border-bottom: 1px solid var(--border);
     }
     .wait-cell:last-child { border-bottom: none; }
-    .wait-terminal { font-size: 13px; font-weight: 600; }
-    .wait-terminal small { display: block; font-size: 10px; color: var(--mid); font-weight: 400; margin-top: 2px; }
-    .wait-value {
-      font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--teal);
-      text-align: right; flex-shrink: 0;
-    }
-    .wait-value.busy  { color: var(--amber); }
-    .wait-value.full  { color: var(--red); }
-    .wait-value small { display: block; font-size: 10px; font-weight: 500; color: var(--mid); letter-spacing: 0; }
-    .wait-na { color: var(--dim); font-size: 12px; }
+    .wait-route { font-size: 12px; font-weight: 700; color: var(--teal); margin-bottom: 3px; }
+    .wait-note  { font-size: 13px; color: var(--white); line-height: 1.4; }
+    .wait-meta  { font-size: 10px; color: var(--mid); margin-top: 4px; }
+    .wait-na    { font-size: 12px; color: var(--dim); }
 
     /* ── Map ─────────────────────────────────────────────────── */
     .map-section { margin: 0 16px; }
@@ -558,48 +551,35 @@ function renderWaitTimes() {
   const deptTermId = direction === 'SEA-BI' ? TERMINALS.SEA.id : TERMINALS.BI.id;
   const deptName   = direction === 'SEA-BI' ? 'Seattle (Colman Dock)' : 'Bainbridge Island';
 
-  if (!waitData || !waitData.length) {
-    wrap.innerHTML = `
-      <div class="wait-row">
-        <div class="wait-cell">
-          <div class="wait-terminal">${deptName}<small>Departure terminal</small></div>
-          <span class="wait-na">No data</span>
-        </div>
-      </div>`;
-    return;
-  }
-
   const terminal = waitData.find(t => t.TerminalID === deptTermId);
-  if (!terminal || !terminal.WaitTimes || !terminal.WaitTimes.length) {
+  const allWaits = terminal?.WaitTimes || [];
+
+  // Only show the Bainbridge ↔ Seattle route, not Bremerton or others
+  const biWaits = allWaits.filter(wt =>
+    (wt.RouteName || '').toLowerCase().includes('bainbridge')
+  );
+  const waits = biWaits.length ? biWaits : allWaits.slice(0, 1); // graceful fallback
+
+  if (!waits.length) {
     wrap.innerHTML = `
       <div class="wait-row">
         <div class="wait-cell">
-          <div class="wait-terminal">${deptName}<small>Departure terminal</small></div>
-          <span class="wait-na">No wait data</span>
+          <div class="wait-route">Seattle / Bainbridge Island</div>
+          <span class="wait-na">No wait data available</span>
         </div>
       </div>`;
     return;
   }
 
-  const rows = terminal.WaitTimes.map(wt => {
-    const count = wt.VehicleSpaceCount;
-    const note  = wt.WaitTimeNotes || '';
-    // WaitTimeNotes typically: "0-30 min", "30-60 min", "Over 1 hour", or blank
-    let valueClass = '';
-    if (typeof count === 'number') {
-      if (count > 100) valueClass = 'full';
-      else if (count > 50) valueClass = 'busy';
-    }
-    const displayNote = note || (count != null ? `${count} vehicles` : '—');
+  const rows = waits.map(wt => {
+    const note    = (wt.WaitTimeNotes || '').trim();
+    const updated = wt.WaitTimeLastUpdated ? parseWSDot(wt.WaitTimeLastUpdated) : null;
+    const displayNote = note || 'No current wait information';
     return `
       <div class="wait-cell">
-        <div class="wait-terminal">
-          ${wt.RouteName || deptName}
-          <small>Est. wait · ${wt.WaitTimeLastUpdated ? fmtTime(parseWSDot(wt.WaitTimeLastUpdated)) : 'live'}</small>
-        </div>
-        <div class="wait-value ${valueClass}">
-          ${displayNote}<small>at dock</small>
-        </div>
+        <div class="wait-route">${wt.RouteName || deptName}</div>
+        <div class="wait-note">${displayNote}</div>
+        <div class="wait-meta">As of ${updated ? fmtTime(updated) : 'recent update'} · ${deptName}</div>
       </div>`;
   }).join('');
 
@@ -920,27 +900,26 @@ async function refresh(forceSchedReload) {
   try {
     const needSched = forceSchedReload || !schedData;
 
-    // Fetch everything in parallel
+    // schedroutes MUST complete first — it resolves routeId before loadSchedule fires
+    if (needSched) {
+      const sr = await loadSchedRoutes().catch(e => { console.warn('schedroutes failed:', e); return null; });
+      processSchedRoutes(sr);
+    }
+
+    // Now fetch vessels, wait times, and schedule (routeId is correct now) in parallel
     const fetches = [loadVessels(), loadWaitTimes()];
-    if (needSched) fetches.push(loadSchedRoutes(), loadSchedule());
+    if (needSched) fetches.push(loadSchedule());
 
     const results = await Promise.allSettled(fetches);
 
-    // Vessels (always index 0)
     if (results[0].status === 'fulfilled' && Array.isArray(results[0].value)) {
       vesselList = results[0].value;
     }
-    // Wait times (always index 1)
     if (results[1].status === 'fulfilled' && Array.isArray(results[1].value)) {
       waitData = results[1].value;
     }
-    // SchedRoutes (index 2 when reloading)
     if (needSched && results[2]?.status === 'fulfilled') {
-      processSchedRoutes(results[2].value);
-    }
-    // Schedule (index 3 when reloading)
-    if (needSched && results[3]?.status === 'fulfilled') {
-      schedData = results[3].value;
+      schedData = results[2].value;
     }
 
     if (!schedData) throw new Error('No schedule data');
