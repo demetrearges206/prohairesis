@@ -29,9 +29,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { -webkit-text-size-adjust: 100%; }
-
     body {
       background: var(--navy);
       color: var(--white);
@@ -41,7 +39,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Header ─────────────────────────────────────────── */
+    /* ── Header ─────────────────────────────────────────────── */
     .hdr {
       background: var(--navy-mid);
       border-bottom: 1px solid var(--border);
@@ -56,46 +54,20 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
-
     .hdr-left { display: flex; flex-direction: column; gap: 3px; }
-
-    .route-name {
-      font-size: 17px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-      line-height: 1;
-    }
+    .route-name { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; line-height: 1; }
     .route-name .chevron { color: var(--teal); margin: 0 3px; }
-
-    .live-row {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      color: var(--mid);
-    }
-    .live-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--teal);
-      flex-shrink: 0;
-    }
+    .live-row { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--mid); }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
     .live-dot.live  { animation: livepulse 2s ease-in-out infinite; }
     .live-dot.stale { background: var(--red); animation: none; }
     .live-dot.off   { background: var(--dim); animation: none; }
     @keyframes livepulse { 0%,100%{opacity:1} 50%{opacity:.25} }
-
     .hdr-actions { display: flex; align-items: center; gap: 6px; }
-
     .icon-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--mid);
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
+      background: none; border: 1px solid var(--border); color: var(--mid);
+      width: 36px; height: 36px; border-radius: 10px; font-size: 16px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: background 0.12s, color 0.12s;
       -webkit-tap-highlight-color: transparent;
     }
@@ -103,374 +75,192 @@
     .icon-btn.spinning svg { animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Direction Tabs ──────────────────────────────────── */
-    .tabs {
-      display: flex;
-      background: var(--navy-mid);
-      border-bottom: 1px solid var(--border);
-    }
+    /* ── Direction Tabs ──────────────────────────────────────── */
+    .tabs { display: flex; background: var(--navy-mid); border-bottom: 1px solid var(--border); }
     .tab {
-      flex: 1;
-      padding: 11px 6px;
-      background: none;
-      border: none;
-      border-bottom: 2px solid transparent;
-      color: var(--mid);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-      cursor: pointer;
-      transition: color 0.15s, border-color 0.15s;
-      -webkit-tap-highlight-color: transparent;
-      text-align: center;
-      white-space: nowrap;
+      flex: 1; padding: 11px 6px; background: none;
+      border: none; border-bottom: 2px solid transparent;
+      color: var(--mid); font-size: 12px; font-weight: 600; letter-spacing: 0.3px;
+      cursor: pointer; transition: color 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent; text-align: center; white-space: nowrap;
     }
     .tab.active { color: var(--teal); border-bottom-color: var(--teal); }
 
-    /* ── Scroll body ─────────────────────────────────────── */
-    .scroll-body {
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+    /* ── Alert Banner ────────────────────────────────────────── */
+    .alert-banner {
+      margin: 12px 16px 0;
+      border-radius: var(--radius);
+      background: rgba(255,84,73,0.1);
+      border: 1px solid rgba(255,84,73,0.3);
+      padding: 12px 14px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--white);
     }
+    .alert-banner.hidden { display: none; }
+    .alert-banner.warn {
+      background: rgba(255,201,71,0.1);
+      border-color: rgba(255,201,71,0.3);
+    }
+    .alert-title {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.4px;
+      text-transform: uppercase; color: var(--red); margin-bottom: 5px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .alert-banner.warn .alert-title { color: var(--amber); }
+    .alert-item { padding: 3px 0; color: var(--mid); font-size: 12px; }
+    .alert-item + .alert-item { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 7px; }
+    .alert-item strong { display: block; color: var(--white); margin-bottom: 2px; }
 
+    /* ── Layout ──────────────────────────────────────────────── */
+    .scroll-body { overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .main {
-      max-width: 520px;
-      margin: 0 auto;
+      max-width: 520px; margin: 0 auto;
       padding: 0 0 max(40px, env(safe-area-inset-bottom));
     }
 
-    /* ── Loading ─────────────────────────────────────────── */
+    /* ── Loading ─────────────────────────────────────────────── */
     .loading-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      padding: 64px 24px;
-      color: var(--mid);
-      font-size: 13px;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 14px; padding: 64px 24px; color: var(--mid); font-size: 13px;
     }
     .ring {
-      width: 36px; height: 36px;
-      border: 3px solid var(--dim);
-      border-top-color: var(--teal);
-      border-radius: 50%;
+      width: 36px; height: 36px; border: 3px solid var(--dim);
+      border-top-color: var(--teal); border-radius: 50%;
       animation: spin 0.75s linear infinite;
     }
 
-    /* ── Error ───────────────────────────────────────────── */
+    /* ── Error ───────────────────────────────────────────────── */
     .err-card {
-      margin: 16px;
-      padding: 16px 18px;
-      border-radius: var(--radius);
-      background: rgba(255,84,73,0.08);
-      border: 1px solid rgba(255,84,73,0.25);
-      color: var(--red);
-      font-size: 13px;
-      line-height: 1.5;
+      margin: 16px; padding: 16px 18px; border-radius: var(--radius);
+      background: rgba(255,84,73,0.08); border: 1px solid rgba(255,84,73,0.25);
+      color: var(--red); font-size: 13px; line-height: 1.5;
     }
     .err-card small { display: block; margin-top: 4px; color: var(--mid); font-size: 11px; }
 
-    /* ── No more ferries ─────────────────────────────────── */
-    .empty-state {
-      text-align: center;
-      padding: 48px 24px 24px;
-      color: var(--mid);
-    }
+    /* ── Empty state ─────────────────────────────────────────── */
+    .empty-state { text-align: center; padding: 48px 24px 24px; color: var(--mid); }
     .empty-state strong { display: block; font-size: 17px; color: var(--white); margin-bottom: 5px; }
 
-    /* ── Next Ferry Hero ─────────────────────────────────── */
+    /* ── Next Ferry Hero ─────────────────────────────────────── */
     .next-card {
-      margin: 16px 16px 0;
-      border-radius: var(--radius);
-      background: var(--navy-card);
-      border: 1px solid var(--border);
-      padding: 18px 20px 16px;
-      position: relative;
-      overflow: hidden;
+      margin: 16px 16px 0; border-radius: var(--radius);
+      background: var(--navy-card); border: 1px solid var(--border);
+      padding: 18px 20px 16px; position: relative; overflow: hidden;
     }
     .next-card::before {
-      content: '';
-      position: absolute;
-      inset: 0 0 auto 0;
-      height: 2px;
+      content: ''; position: absolute; inset: 0 0 auto 0; height: 2px;
       background: linear-gradient(90deg, var(--teal) 0%, #2196f3 100%);
     }
-
     .next-eyebrow {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      color: var(--teal);
-      margin-bottom: 10px;
+      font-size: 9px; font-weight: 700; letter-spacing: 1.8px;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 10px;
     }
-
     .next-body {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 14px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 8px; margin-bottom: 14px;
     }
-
     .next-depart { line-height: 1; }
-    .depart-big {
-      font-size: 52px;
-      font-weight: 800;
-      letter-spacing: -2.5px;
-      line-height: 1;
-    }
-    .depart-ampm {
-      font-size: 17px;
-      font-weight: 600;
-      color: var(--mid);
-      margin-left: 2px;
-      letter-spacing: 0;
-    }
-    .arrive-block {
-      text-align: right;
-      padding-bottom: 5px;
-    }
-    .arrive-label {
-      font-size: 10px;
-      color: var(--mid);
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      margin-bottom: 2px;
-    }
-    .arrive-time {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -1px;
-      color: var(--mid);
-    }
-
-    .next-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .vessel-tag {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--mid);
-      min-width: 0;
-    }
+    .depart-big { font-size: 52px; font-weight: 800; letter-spacing: -2.5px; line-height: 1; }
+    .depart-ampm { font-size: 17px; font-weight: 600; color: var(--mid); margin-left: 2px; letter-spacing: 0; }
+    .arrive-block { text-align: right; padding-bottom: 5px; }
+    .arrive-label { font-size: 10px; color: var(--mid); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .arrive-time { font-size: 24px; font-weight: 700; letter-spacing: -1px; color: var(--mid); }
+    .next-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .vessel-tag { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--mid); min-width: 0; }
     .vessel-icon { font-size: 16px; flex-shrink: 0; }
     .vessel-tag-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .access-icon { font-size: 11px; color: var(--blue); flex-shrink: 0; }
-
     .countdown-pill {
-      font-size: 14px;
-      font-weight: 700;
-      padding: 5px 14px;
-      border-radius: 20px;
-      background: var(--teal-dim);
-      color: var(--teal);
-      flex-shrink: 0;
-      white-space: nowrap;
-      transition: background 0.3s, color 0.3s;
+      font-size: 14px; font-weight: 700; padding: 5px 14px; border-radius: 20px;
+      background: var(--teal-dim); color: var(--teal); flex-shrink: 0;
+      white-space: nowrap; transition: background 0.3s, color 0.3s;
     }
-    .countdown-pill.soon  { background: rgba(255,201,71,0.18); color: var(--amber); }
-    .countdown-pill.now   { background: rgba(255,84,73,0.18);  color: var(--red); }
-    .countdown-pill.gone  { background: rgba(255,255,255,0.06); color: var(--mid); }
+    .countdown-pill.soon { background: rgba(255,201,71,0.18); color: var(--amber); }
+    .countdown-pill.now  { background: rgba(255,84,73,0.18);  color: var(--red); }
+    .countdown-pill.gone { background: rgba(255,255,255,0.06); color: var(--mid); }
 
-    /* ── Section label ───────────────────────────────────── */
+    /* ── Section label ───────────────────────────────────────── */
     .section-label {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      color: var(--mid);
-      padding: 18px 20px 8px;
+      font-size: 9px; font-weight: 700; letter-spacing: 1.8px;
+      text-transform: uppercase; color: var(--mid); padding: 18px 20px 8px;
     }
 
-    /* ── Upcoming list ───────────────────────────────────── */
-    .upcoming-list {
-      margin: 0 16px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
+    /* ── Upcoming list ───────────────────────────────────────── */
+    .upcoming-list { margin: 0 16px; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
     .sail-row {
-      display: grid;
-      grid-template-columns: 80px 1fr auto;
-      align-items: center;
-      gap: 8px;
-      padding: 13px 16px;
-      background: var(--navy-card);
+      display: grid; grid-template-columns: 80px 1fr auto; align-items: center;
+      gap: 8px; padding: 13px 16px; background: var(--navy-card);
       border-bottom: 1px solid var(--border);
     }
     .sail-row:last-child { border-bottom: none; }
-    .sail-row.dim { opacity: 0.38; }
-
-    .sail-dep {
-      font-size: 15px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
+    .sail-dep { font-size: 15px; font-weight: 700; white-space: nowrap; }
     .sail-dep small { font-size: 11px; font-weight: 500; color: var(--mid); margin-left: 1px; }
-
-    .sail-mid {
-      min-width: 0;
-    }
-    .sail-arr {
-      font-size: 12px;
-      color: var(--mid);
-    }
-    .sail-vessel {
-      font-size: 11px;
-      color: var(--dim);
-      margin-top: 1px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .sail-badge {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 8px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+    .sail-mid { min-width: 0; }
+    .sail-arr { font-size: 12px; color: var(--mid); }
+    .sail-vessel { font-size: 11px; color: var(--dim); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sail-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 8px; white-space: nowrap; flex-shrink: 0; }
     .badge-dock     { background: rgba(255,201,71,0.15); color: var(--amber); }
     .badge-underway { background: var(--teal-glow); color: var(--teal); }
-    .badge-soon     { background: rgba(255,84,73,0.12); color: var(--red); }
 
-    /* ── Map ─────────────────────────────────────────────── */
-    .map-section { margin: 0 16px; }
-    .map-frame {
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      height: 260px;
-      position: relative;
+    /* ── Wait Times ──────────────────────────────────────────── */
+    .wait-row {
+      margin: 0 16px; border-radius: var(--radius);
+      border: 1px solid var(--border); overflow: hidden;
     }
-    #ferry-map { width: 100%; height: 100%; background: var(--navy-mid); }
+    .wait-cell {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 16px; background: var(--navy-card); gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .wait-cell:last-child { border-bottom: none; }
+    .wait-terminal { font-size: 13px; font-weight: 600; }
+    .wait-terminal small { display: block; font-size: 10px; color: var(--mid); font-weight: 400; margin-top: 2px; }
+    .wait-value {
+      font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--teal);
+      text-align: right; flex-shrink: 0;
+    }
+    .wait-value.busy  { color: var(--amber); }
+    .wait-value.full  { color: var(--red); }
+    .wait-value small { display: block; font-size: 10px; font-weight: 500; color: var(--mid); letter-spacing: 0; }
+    .wait-na { color: var(--dim); font-size: 12px; }
 
+    /* ── Map ─────────────────────────────────────────────────── */
+    .map-section { margin: 0 16px; }
+    .map-frame { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); height: 260px; position: relative; }
+    #ferry-map { width: 100%; height: 100%; background: var(--navy-mid); }
     .map-hint {
-      position: absolute;
-      bottom: 8px; right: 8px;
-      z-index: 400;
-      background: rgba(6,15,31,0.75);
-      color: var(--mid);
-      font-size: 10px;
-      padding: 3px 7px;
-      border-radius: 6px;
-      pointer-events: none;
+      position: absolute; bottom: 8px; right: 8px; z-index: 400;
+      background: rgba(6,15,31,0.75); color: var(--mid); font-size: 10px;
+      padding: 3px 7px; border-radius: 6px; pointer-events: none;
     }
 
     /* Leaflet overrides */
     .leaflet-container { background: #060f1f !important; }
     .leaflet-popup-content-wrapper {
-      background: var(--navy-mid) !important;
-      color: var(--white) !important;
-      border: 1px solid var(--border) !important;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+      background: var(--navy-mid) !important; color: var(--white) !important;
+      border: 1px solid var(--border) !important; box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
       border-radius: 10px !important;
     }
     .leaflet-popup-tip-container { display: none; }
     .leaflet-popup-content { margin: 12px 14px !important; min-width: 160px; }
-    .pop-name  { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
-    .pop-row   { font-size: 11px; color: var(--mid); line-height: 1.8; }
+    .pop-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .pop-row { font-size: 11px; color: var(--mid); line-height: 1.8; }
     .pop-row b { color: var(--white); font-weight: 600; }
     .leaflet-control-attribution { background: rgba(6,15,31,0.7) !important; color: var(--dim) !important; }
     .leaflet-control-attribution a { color: var(--mid) !important; }
 
-    /* ── Full Schedule ───────────────────────────────────── */
-    .sched-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: calc(100% - 32px);
-      margin: 0 16px;
-      padding: 14px 18px;
-      background: var(--navy-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--white);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.12s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .sched-toggle:active { background: var(--navy-light); }
-    .sched-chevron {
-      font-size: 12px;
-      color: var(--mid);
-      transition: transform 0.2s;
-    }
-    .sched-chevron.open { transform: rotate(180deg); }
-
-    .sched-list {
-      margin: 8px 16px 0;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      display: none;
-    }
-    .sched-list.open { display: block; }
-
-    .sched-row {
-      display: grid;
-      grid-template-columns: 80px 1fr 100px;
-      align-items: center;
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-      background: var(--navy-card);
-      font-size: 13px;
-      gap: 6px;
-    }
-    .sched-row:last-child { border-bottom: none; }
-    .sched-row.past { opacity: 0.3; }
-    .sched-row.next-sail {
-      background: var(--navy-light);
-      border-left: 2px solid var(--teal);
-    }
-    .sched-t { font-weight: 700; }
-    .sched-t small { font-size: 10px; font-weight: 500; color: var(--mid); }
-    .sched-arr-t { color: var(--mid); font-size: 12px; }
-    .sched-v { color: var(--dim); font-size: 11px; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-    .sched-note {
-      font-size: 10px;
-      color: var(--mid);
-      padding: 8px 16px;
-      background: var(--navy-mid);
-      border-bottom: 1px solid var(--border);
-      font-style: italic;
-    }
-
-    /* ── Vessel status in upcoming ───────────────────────── */
+    /* ── Vessel chips ────────────────────────────────────────── */
     .vessel-live-strip {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      padding: 0 16px;
-      -webkit-overflow-scrolling: touch;
+      display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+      padding: 0 16px; -webkit-overflow-scrolling: touch;
     }
     .vessel-live-strip::-webkit-scrollbar { display: none; }
-
     .vessel-chip {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--navy-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 12px;
-      font-size: 12px;
-      white-space: nowrap;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
+      flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+      background: var(--navy-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 12px; font-size: 12px;
+      white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
     .vessel-chip:active { background: var(--navy-light); }
     .chip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
@@ -479,30 +269,52 @@
     .chip-name { font-weight: 600; }
     .chip-sub  { color: var(--mid); font-size: 11px; }
 
-    /* ── Add to homescreen tip ───────────────────────────── */
+    /* ── Full schedule ───────────────────────────────────────── */
+    .sched-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      width: calc(100% - 32px); margin: 0 16px; padding: 14px 18px;
+      background: var(--navy-card); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--white);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: background 0.12s; -webkit-tap-highlight-color: transparent;
+    }
+    .sched-toggle:active { background: var(--navy-light); }
+    .sched-chevron { font-size: 12px; color: var(--mid); transition: transform 0.2s; }
+    .sched-chevron.open { transform: rotate(180deg); }
+    .sched-list {
+      margin: 8px 16px 0; border-radius: var(--radius);
+      border: 1px solid var(--border); overflow: hidden; display: none;
+    }
+    .sched-list.open { display: block; }
+    .sched-row {
+      display: grid; grid-template-columns: 80px 1fr 100px; align-items: center;
+      padding: 10px 16px; border-bottom: 1px solid var(--border);
+      background: var(--navy-card); font-size: 13px; gap: 6px;
+    }
+    .sched-row:last-child { border-bottom: none; }
+    .sched-row.past { opacity: 0.3; }
+    .sched-row.next-sail { background: var(--navy-light); border-left: 2px solid var(--teal); }
+    .sched-t { font-weight: 700; }
+    .sched-t small { font-size: 10px; font-weight: 500; color: var(--mid); }
+    .sched-arr-t { color: var(--mid); font-size: 12px; }
+    .sched-v { color: var(--dim); font-size: 11px; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sched-note {
+      font-size: 10px; color: var(--mid); padding: 8px 16px;
+      background: var(--navy-mid); border-bottom: 1px solid var(--border); font-style: italic;
+    }
+
+    /* ── Home tip ────────────────────────────────────────────── */
     .home-tip {
-      margin: 16px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      background: rgba(33,150,243,0.08);
-      border: 1px solid rgba(33,150,243,0.2);
-      font-size: 12px;
-      color: var(--mid);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      margin: 16px; padding: 12px 14px; border-radius: 10px;
+      background: rgba(33,150,243,0.08); border: 1px solid rgba(33,150,243,0.2);
+      font-size: 12px; color: var(--mid);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
     }
     .home-tip-text span { color: var(--white); font-weight: 600; }
-    .home-tip-close {
-      background: none; border: none; color: var(--mid);
-      font-size: 16px; cursor: pointer; flex-shrink: 0; padding: 0 4px;
-    }
+    .home-tip-close { background: none; border: none; color: var(--mid); font-size: 16px; cursor: pointer; flex-shrink: 0; padding: 0 4px; }
     .home-tip.hidden { display: none; }
 
-    @media (min-width: 520px) {
-      .depart-big { font-size: 58px; }
-    }
+    @media (min-width: 520px) { .depart-big { font-size: 58px; } }
   </style>
 </head>
 <body>
@@ -518,37 +330,33 @@
   <div class="hdr-actions">
     <button class="icon-btn" id="refreshBtn" title="Refresh" aria-label="Refresh">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M13.65 2.35A8 8 0 1 0 15 8h-2a6 6 0 1 1-1.04-3.35L10 6h5V1l-1.35 1.35Z"
-              fill="currentColor"/>
+        <path d="M13.65 2.35A8 8 0 1 0 15 8h-2a6 6 0 1 1-1.04-3.35L10 6h5V1l-1.35 1.35Z" fill="currentColor"/>
       </svg>
     </button>
   </div>
 </header>
 
 <div class="tabs">
-  <button class="tab active" data-dir="SEA-BI" id="tabSeaBi">
-    Seattle → Bainbridge
-  </button>
-  <button class="tab" data-dir="BI-SEA" id="tabBiSea">
-    Bainbridge → Seattle
-  </button>
+  <button class="tab active" data-dir="SEA-BI" id="tabSeaBi">Seattle → Bainbridge</button>
+  <button class="tab" data-dir="BI-SEA" id="tabBiSea">Bainbridge → Seattle</button>
 </div>
 
 <div class="scroll-body">
   <main class="main">
 
+    <div id="alertBanner" class="alert-banner hidden"></div>
+
     <div id="schedContent">
-      <div class="loading-wrap">
-        <div class="ring"></div>
-        <span>Fetching today's schedule…</span>
-      </div>
+      <div class="loading-wrap"><div class="ring"></div><span>Fetching today's schedule…</span></div>
+    </div>
+
+    <div class="section-label">Terminal Wait Times</div>
+    <div id="waitContent">
+      <div style="padding:0 16px 8px"><div style="height:56px;border-radius:var(--radius);background:var(--navy-card);border:1px solid var(--border)"></div></div>
     </div>
 
     <div class="section-label">Live Vessels</div>
-
-    <div id="vesselStrip" style="margin-bottom:10px">
-      <!-- vessel chips injected here -->
-    </div>
+    <div id="vesselStrip" style="margin-bottom:10px"></div>
 
     <div class="map-section">
       <div class="map-frame">
@@ -559,7 +367,7 @@
 
     <div id="homeTip" class="home-tip" style="margin-top:16px">
       <div class="home-tip-text">
-        <span>Save to your home screen</span> — tap the share icon in Safari, then "Add to Home Screen" for quick access.
+        <span>Save to your home screen</span> — tap the share icon in Safari, then "Add to Home Screen."
       </div>
       <button class="home-tip-close" id="closeTip" aria-label="Dismiss">✕</button>
     </div>
@@ -571,48 +379,54 @@
 <script>
 'use strict';
 
-// ── Config ──────────────────────────────────────────────
+// ── Config ───────────────────────────────────────────────
 const API_KEY   = '3cf97d36-63f9-42fe-9125-2675594d6c9e';
-const ROUTE_ID  = 9;  // Seattle / Bainbridge Island
+const SCHED_BASE = 'https://www.wsdot.wa.gov/ferries/api/schedule/rest';
+const TERM_BASE  = 'https://www.wsdot.wa.gov/ferries/api/terminals/rest';
+const VESS_BASE  = 'https://www.wsdot.wa.gov/ferries/api/vessels/rest';
+
+// Terminal IDs confirmed from WSDOT VesselWatch URL params
 const TERMINALS = {
   SEA: { id: 7, name: 'Seattle',           abbrev: 'SEA', lat: 47.60328, lng: -122.33787 },
   BI:  { id: 3, name: 'Bainbridge Island', abbrev: 'BI',  lat: 47.62375, lng: -122.51044 },
 };
-const BASE = 'https://www.wsdot.wa.gov/ferries/api';
 
 // ── State ────────────────────────────────────────────────
-let schedData   = null;
-let vesselList  = [];
-let direction   = 'SEA-BI';
-let schedOpen   = false;
-let cdTimer     = null;
-let leafMap     = null;
-let vMarkers    = {};
-let lastUpdate  = null;
-let isLoading   = false;
+let schedData    = null;
+let vesselList   = [];
+let routeId      = 9;       // overridden dynamically via schedroutes
+let disruptions  = [];
+let waitData     = [];
+let direction    = 'SEA-BI';
+let schedOpen    = false;
+let cdTimer      = null;
+let leafMap      = null;
+let vMarkers     = {};
+let lastUpdate   = null;
+let isLoading    = false;
 
-// ── Helpers ──────────────────────────────────────────────
+// ── Utilities ────────────────────────────────────────────
 function parseWSDot(s) {
   if (!s) return null;
   const m = String(s).match(/\/Date\((-?\d+)(?:[+-]\d{4})?\)\//);
   return m ? new Date(+m[1]) : null;
 }
-
 function fmtTime(d) {
   if (!d) return '—';
   return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
-
 function splitTime(d) {
   if (!d) return { t: '—', ap: '' };
   const s = fmtTime(d).split(' ');
   return { t: s[0], ap: s[1] || '' };
 }
-
-function minsTo(d) {
-  return Math.round((d - Date.now()) / 60000);
+function minsTo(d)   { return Math.round((d - Date.now()) / 60000); }
+function elapsed(d)  {
+  const m = Math.round((Date.now() - d) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  return `${Math.floor(m/60)}h ago`;
 }
-
 function countdownInfo(d) {
   const m = minsTo(d);
   if (m < -5)  return { text: 'Departed', cls: 'gone' };
@@ -622,28 +436,24 @@ function countdownInfo(d) {
   const h = Math.floor(m / 60), rm = m % 60;
   return { text: h ? `${h}h ${rm}m` : `${m}m`, cls: '' };
 }
-
-function elapsedLabel(d) {
-  const m = Math.round((Date.now() - d) / 60000);
-  if (m < 1) return 'just now';
-  if (m < 60) return `${m}m ago`;
-  return `${Math.floor(m/60)}h ago`;
+function todayDateStr() {
+  const d = new Date();
+  return `${d.getMonth()+1}%2F${d.getDate()}%2F${d.getFullYear()}`;
 }
 
-// ── JSONP fallback ───────────────────────────────────────
+// ── API fetch with JSONP fallback ─────────────────────────
 function jsonpFetch(url) {
   return new Promise((res, rej) => {
-    const id = `_wsf_${Date.now()}`;
+    const id = `_wsf_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const s = document.createElement('script');
-    window[id] = data => { res(data); delete window[id]; s.remove(); };
-    s.onerror = () => { rej(new Error('JSONP failed')); delete window[id]; s.remove(); };
+    const cleanup = () => { delete window[id]; s.remove(); };
+    window[id] = data => { res(data); cleanup(); };
+    s.onerror = () => { rej(new Error('JSONP failed')); cleanup(); };
     s.src = `${url}&callback=${id}`;
     document.head.appendChild(s);
   });
 }
-
-async function apiFetch(path) {
-  const url = `${BASE}${path}?apiaccesscode=${API_KEY}`;
+async function apiFetch(url) {
   try {
     const r = await fetch(url, { headers: { Accept: 'application/json' } });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -652,29 +462,32 @@ async function apiFetch(path) {
     return jsonpFetch(url);
   }
 }
-
-// ── Data loading ─────────────────────────────────────────
-function todayDateStr() {
-  const d = new Date();
-  // WSDOT expects mm/dd/yyyy, URL-encoded
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${mm}%2F${dd}%2F${d.getFullYear()}`;
+function apiUrl(base, path) {
+  return `${base}/${path}?apiaccesscode=${API_KEY}`;
 }
 
+// ── API calls ─────────────────────────────────────────────
+
+// schedroutes: all scheduled routes + service disruptions
+// Used to: (1) dynamically resolve the SEA-BI RouteID, (2) surface any active alerts
+async function loadSchedRoutes() {
+  return apiFetch(apiUrl(SCHED_BASE, 'schedroutes'));
+}
+
+// Today's departures for the resolved route ID
 async function loadSchedule() {
-  // Primary: route-based today endpoint (no date required)
+  // Primary: route-based scheduletoday (no date required, always current)
   try {
-    const data = await apiFetch(`/schedule/rest/scheduletoday/${ROUTE_ID}/false`);
+    const data = await apiFetch(apiUrl(SCHED_BASE, `scheduletoday/${routeId}/false`));
     if (data && (Array.isArray(data) ? data.length : data.TerminalCombos?.length)) return data;
   } catch (e) {
-    console.warn('Route schedule failed, trying terminal endpoint:', e);
+    console.warn('scheduletoday failed, falling back to terminal endpoint:', e);
   }
-  // Fallback: fetch both directions by terminal ID
+  // Fallback: terminal-pair based schedule for today
   const td = todayDateStr();
   const [r1, r2] = await Promise.allSettled([
-    apiFetch(`/schedule/rest/schedule/${td}/${TERMINALS.SEA.id}/${TERMINALS.BI.id}`),
-    apiFetch(`/schedule/rest/schedule/${td}/${TERMINALS.BI.id}/${TERMINALS.SEA.id}`),
+    apiFetch(apiUrl(SCHED_BASE, `schedule/${td}/${TERMINALS.SEA.id}/${TERMINALS.BI.id}`)),
+    apiFetch(apiUrl(SCHED_BASE, `schedule/${td}/${TERMINALS.BI.id}/${TERMINALS.SEA.id}`)),
   ]);
   const combos = [];
   for (const r of [r1, r2]) {
@@ -685,11 +498,115 @@ async function loadSchedule() {
   return { TerminalCombos: combos };
 }
 
+// Live vessel positions for all WSF vessels
 async function loadVessels() {
-  return apiFetch('/vessels/rest/vessellocations');
+  return apiFetch(apiUrl(VESS_BASE, 'vessellocations'));
 }
 
-// ── Extract departures for current direction ─────────────
+// Terminal wait times: car queue depth at each terminal dock
+async function loadWaitTimes() {
+  return apiFetch(apiUrl(TERM_BASE, 'terminalwaittimes'));
+}
+
+// ── Process schedroutes response ──────────────────────────
+function processSchedRoutes(data) {
+  if (!data || !Array.isArray(data)) return;
+
+  // Find the SEA-BI route and extract its RouteID
+  const seaBiRoute = data.find(r => {
+    const abbr = (r.RouteAbbrev || '').toLowerCase();
+    const desc = (r.Description || '').toLowerCase();
+    return abbr === 'sea-bi' || (desc.includes('seattle') && desc.includes('bainbridge'));
+  });
+  if (seaBiRoute && seaBiRoute.RouteID) {
+    routeId = seaBiRoute.RouteID;
+  }
+
+  // Collect service disruptions for this route
+  disruptions = [];
+  const routesToCheck = seaBiRoute ? [seaBiRoute] : data;
+  routesToCheck.forEach(r => {
+    if (!r.ServiceDisruptions) return;
+    r.ServiceDisruptions.forEach(d => {
+      if (d.DisruptionDescription || d.BulletinFlag) {
+        disruptions.push({
+          title: d.DisruptionDescription || 'Service Disruption',
+          bulletin: d.BulletinFlag,
+        });
+      }
+    });
+  });
+}
+
+// ── Alert banner ─────────────────────────────────────────
+function renderAlerts() {
+  const banner = document.getElementById('alertBanner');
+  if (!disruptions.length) {
+    banner.classList.add('hidden');
+    return;
+  }
+  const isBulletin = disruptions.some(d => d.bulletin);
+  banner.className = `alert-banner${isBulletin ? '' : ' warn'}`;
+  banner.innerHTML =
+    `<div class="alert-title">${isBulletin ? '⚠ Service Alert' : '⚠ Advisory'}</div>` +
+    disruptions.map(d => `<div class="alert-item"><strong>${d.title}</strong></div>`).join('');
+}
+
+// ── Wait times ────────────────────────────────────────────
+function renderWaitTimes() {
+  const wrap = document.getElementById('waitContent');
+  const deptTermId = direction === 'SEA-BI' ? TERMINALS.SEA.id : TERMINALS.BI.id;
+  const deptName   = direction === 'SEA-BI' ? 'Seattle (Colman Dock)' : 'Bainbridge Island';
+
+  if (!waitData || !waitData.length) {
+    wrap.innerHTML = `
+      <div class="wait-row">
+        <div class="wait-cell">
+          <div class="wait-terminal">${deptName}<small>Departure terminal</small></div>
+          <span class="wait-na">No data</span>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const terminal = waitData.find(t => t.TerminalID === deptTermId);
+  if (!terminal || !terminal.WaitTimes || !terminal.WaitTimes.length) {
+    wrap.innerHTML = `
+      <div class="wait-row">
+        <div class="wait-cell">
+          <div class="wait-terminal">${deptName}<small>Departure terminal</small></div>
+          <span class="wait-na">No wait data</span>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const rows = terminal.WaitTimes.map(wt => {
+    const count = wt.VehicleSpaceCount;
+    const note  = wt.WaitTimeNotes || '';
+    // WaitTimeNotes typically: "0-30 min", "30-60 min", "Over 1 hour", or blank
+    let valueClass = '';
+    if (typeof count === 'number') {
+      if (count > 100) valueClass = 'full';
+      else if (count > 50) valueClass = 'busy';
+    }
+    const displayNote = note || (count != null ? `${count} vehicles` : '—');
+    return `
+      <div class="wait-cell">
+        <div class="wait-terminal">
+          ${wt.RouteName || deptName}
+          <small>Est. wait · ${wt.WaitTimeLastUpdated ? fmtTime(parseWSDot(wt.WaitTimeLastUpdated)) : 'live'}</small>
+        </div>
+        <div class="wait-value ${valueClass}">
+          ${displayNote}<small>at dock</small>
+        </div>
+      </div>`;
+  }).join('');
+
+  wrap.innerHTML = `<div class="wait-row">${rows}</div>`;
+}
+
+// ── Schedule parsing ──────────────────────────────────────
 function getAllCombos() {
   if (!schedData) return [];
   if (Array.isArray(schedData)) return schedData.flatMap(s => s.TerminalCombos || []);
@@ -699,13 +616,13 @@ function getAllCombos() {
 function findCombo() {
   const combos = getAllCombos();
   const isSeaBi = direction === 'SEA-BI';
-  // 1. Exact ID match
+  // Try exact ID match first
   let c = combos.find(c =>
     isSeaBi
       ? (c.DepartingTerminalID === TERMINALS.SEA.id && c.ArrivingTerminalID === TERMINALS.BI.id)
       : (c.DepartingTerminalID === TERMINALS.BI.id  && c.ArrivingTerminalID === TERMINALS.SEA.id)
   );
-  // 2. Name-based fallback (API may use different IDs than the VesselWatch pages)
+  // Fall back to name matching
   if (!c) {
     c = combos.find(c => {
       const dep = (c.DepartingTerminalName || '').toLowerCase();
@@ -727,7 +644,6 @@ function getDepartures() {
       arrive:     parseWSDot(t.ArrivingTime),
       vessel:     t.VesselName || '',
       accessible: t.VesselHandicapAccessible,
-      vesselId:   t.VesselID,
     }))
     .filter(t => t.depart)
     .sort((a, b) => a.depart - b.depart);
@@ -738,7 +654,7 @@ function getScheduleNotes() {
   return combo && combo.SailingNotes ? [combo.SailingNotes] : [];
 }
 
-// ── Find live vessel data by name ─────────────────────────
+// ── Live vessel helpers ───────────────────────────────────
 function getLiveVessel(name) {
   if (!name) return null;
   return vesselList.find(v => v.VesselName === name && v.InService) || null;
@@ -752,7 +668,7 @@ function routeVessels() {
   );
 }
 
-// ── Render schedule section ───────────────────────────────
+// ── Render schedule ───────────────────────────────────────
 function renderSchedule() {
   const wrap = document.getElementById('schedContent');
   const departures = getDepartures();
@@ -762,13 +678,10 @@ function renderSchedule() {
     return;
   }
 
-  const now = Date.now();
   const upcoming = departures.filter(d => minsTo(d.depart) > -5);
-  const hasPast = departures.some(d => minsTo(d.depart) <= -5);
-
   if (!upcoming.length) {
     wrap.innerHTML = `<div class="empty-state"><strong>No more sailings today</strong>Last ferry has departed</div>`;
-    renderFullSched(departures, wrap, true);
+    renderFullSched(wrap, departures, null);
     return;
   }
 
@@ -777,12 +690,11 @@ function renderSchedule() {
   const { t: dt, ap: dap } = splitTime(next.depart);
   const cd = countdownInfo(next.depart);
   const lv = getLiveVessel(next.vessel);
-  let statusBadge = '';
-  if (lv) {
-    statusBadge = lv.AtDock
-      ? `<span class="sail-badge badge-dock">At Dock</span>`
-      : `<span class="sail-badge badge-underway">Underway</span>`;
-  }
+  const statusBadge = lv
+    ? (lv.AtDock
+        ? `<span class="sail-badge badge-dock">At Dock</span>`
+        : `<span class="sail-badge badge-underway">Underway</span>`)
+    : '';
 
   let html = `
     <div class="next-card">
@@ -812,12 +724,11 @@ function renderSchedule() {
     rest.forEach(d => {
       const { t, ap } = splitTime(d.depart);
       const lv2 = getLiveVessel(d.vessel);
-      let badge = '';
-      if (lv2) {
-        badge = lv2.AtDock
-          ? `<span class="sail-badge badge-dock">Dock</span>`
-          : `<span class="sail-badge badge-underway">Away</span>`;
-      }
+      const badge = lv2
+        ? (lv2.AtDock
+            ? `<span class="sail-badge badge-dock">Dock</span>`
+            : `<span class="sail-badge badge-underway">Away</span>`)
+        : '';
       html += `
         <div class="sail-row">
           <div class="sail-dep">${t}<small> ${ap}</small></div>
@@ -834,21 +745,19 @@ function renderSchedule() {
   // Full schedule toggle
   const notes = getScheduleNotes();
   const total = departures.length;
+  const remaining = upcoming.length;
   html += `
     <div class="section-label" style="margin-top:6px">Full Schedule</div>
     <button class="sched-toggle" id="schedToggle">
-      <span>Today's ${total} sailings${hasPast ? ` · ${upcoming.length} remaining` : ''}</span>
+      <span>Today · ${total} sailings${remaining < total ? ` · ${remaining} remaining` : ''}</span>
       <span class="sched-chevron ${schedOpen ? 'open' : ''}" id="schedChevron">▼</span>
     </button>
     <div class="sched-list ${schedOpen ? 'open' : ''}" id="schedList">`;
 
-  if (notes.length) {
-    notes.forEach(n => { html += `<div class="sched-note">${n}</div>`; });
-  }
-
-  departures.forEach((d, i) => {
-    const isPast  = minsTo(d.depart) <= -5;
-    const isNext  = d === next;
+  notes.forEach(n => { html += `<div class="sched-note">${n}</div>`; });
+  departures.forEach(d => {
+    const isPast = minsTo(d.depart) <= -5;
+    const isNext = d === next;
     const { t, ap } = splitTime(d.depart);
     html += `
       <div class="sched-row ${isPast ? 'past' : ''} ${isNext ? 'next-sail' : ''}">
@@ -867,7 +776,6 @@ function renderSchedule() {
     document.getElementById('schedChevron').classList.toggle('open', schedOpen);
   });
 
-  // Live countdown
   if (cdTimer) clearInterval(cdTimer);
   cdTimer = setInterval(() => {
     const pill = document.getElementById('cdPill');
@@ -878,6 +786,7 @@ function renderSchedule() {
   }, 20000);
 }
 
+// ── Vessel strip ──────────────────────────────────────────
 function renderVesselStrip() {
   const strip = document.getElementById('vesselStrip');
   const rv = routeVessels();
@@ -889,22 +798,17 @@ function renderVesselStrip() {
       const sub = v.AtDock
         ? `Docked · ${v.DepartingTerminalAbbrev || ''}`
         : (eta ? `ETA ${fmtTime(eta)}` : `${Math.round(v.Speed || 0)} kts`);
-      return `
-        <div class="vessel-chip" data-vid="${v.VesselID}" title="Center on map">
-          <span class="chip-dot ${v.AtDock ? 'docked' : 'underway'}"></span>
-          <span class="chip-name">${v.VesselName}</span>
-          <span class="chip-sub">${sub}</span>
-        </div>`;
+      return `<div class="vessel-chip" data-vid="${v.VesselID}">
+        <span class="chip-dot ${v.AtDock ? 'docked' : 'underway'}"></span>
+        <span class="chip-name">${v.VesselName}</span>
+        <span class="chip-sub">${sub}</span>
+      </div>`;
     }).join('') + '</div>';
 
   strip.querySelectorAll('.vessel-chip').forEach(chip => {
     chip.addEventListener('click', () => {
-      const vid = parseInt(chip.dataset.vid);
-      const m = vMarkers[vid];
-      if (m && leafMap) {
-        leafMap.setView(m.getLatLng(), 13, { animate: true });
-        m.openPopup();
-      }
+      const m = vMarkers[parseInt(chip.dataset.vid)];
+      if (m && leafMap) { leafMap.setView(m.getLatLng(), 13, { animate: true }); m.openPopup(); }
     });
   });
 }
@@ -912,34 +816,23 @@ function renderVesselStrip() {
 // ── Map ───────────────────────────────────────────────────
 function initMap() {
   leafMap = L.map('ferry-map', { zoomControl: false, attributionControl: false });
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png', {
-    maxZoom: 18,
-  }).addTo(leafMap);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(leafMap);
   L.control.attribution({ position: 'bottomleft', prefix: false }).addTo(leafMap);
 
-  // Route dashed line
   L.polyline([
     [TERMINALS.SEA.lat, TERMINALS.SEA.lng],
     [TERMINALS.BI.lat,  TERMINALS.BI.lng],
   ], { color: 'rgba(0,201,167,0.25)', weight: 2, dashArray: '7 6' }).addTo(leafMap);
 
-  // Terminal pips
-  const mkTerm = (t) => L.marker([t.lat, t.lng], {
+  const termIcon = t => L.marker([t.lat, t.lng], {
     icon: L.divIcon({
-      html: `<div style="
-        background:#0b1a30;border:1.5px solid #00c9a7;
-        border-radius:4px;padding:2px 6px;
-        font-family:-apple-system,system-ui,sans-serif;
-        font-size:10px;font-weight:700;color:#00c9a7;
-        white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.5);
-      ">${t.abbrev}</div>`,
+      html: `<div style="background:#0b1a30;border:1.5px solid #00c9a7;border-radius:4px;padding:2px 6px;font-family:-apple-system,system-ui,sans-serif;font-size:10px;font-weight:700;color:#00c9a7;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.5)">${t.abbrev}</div>`,
       className: '', iconAnchor: [0, 0],
     }),
-    title: t.name,
-    interactive: false,
+    title: t.name, interactive: false,
   }).addTo(leafMap);
-  mkTerm(TERMINALS.SEA);
-  mkTerm(TERMINALS.BI);
+  termIcon(TERMINALS.SEA);
+  termIcon(TERMINALS.BI);
 
   leafMap.fitBounds([
     [TERMINALS.SEA.lat - 0.02, TERMINALS.SEA.lng + 0.01],
@@ -948,20 +841,16 @@ function initMap() {
 }
 
 function vesselMarkerIcon(heading, atDock) {
-  const color  = atDock ? '#ffc947' : '#00c9a7';
-  const glow   = atDock ? '0 0 8px rgba(255,201,71,.5)' : '0 0 8px rgba(0,201,167,.5)';
-  const rotate = heading != null ? heading : 0;
+  const color = atDock ? '#ffc947' : '#00c9a7';
+  const glow  = atDock ? '0 0 8px rgba(255,201,71,.5)' : '0 0 8px rgba(0,201,167,.5)';
   return L.divIcon({
     html: `<div style="width:34px;height:34px;display:flex;align-items:center;justify-content:center">
       <svg width="22" height="30" viewBox="0 0 22 30" fill="none"
-           style="transform:rotate(${rotate}deg);filter:drop-shadow(${glow})">
+           style="transform:rotate(${heading||0}deg);filter:drop-shadow(${glow})">
         <path d="M11 2 L20 26 Q11 22 2 26 Z" fill="${color}" opacity="0.95"/>
         <circle cx="11" cy="14" r="3.5" fill="${atDock ? '#0b1a30' : '#060f1f'}"/>
-      </svg>
-    </div>`,
-    className: '',
-    iconSize: [34, 34],
-    iconAnchor: [17, 17],
+      </svg></div>`,
+    className: '', iconSize: [34, 34], iconAnchor: [17, 17],
   });
 }
 
@@ -977,36 +866,25 @@ function popupHtml(v) {
     if (v.ArrivingTerminalName)  rows.push(`To: <b>${v.ArrivingTerminalName}</b>`);
     if (eta)  rows.push(`ETA: <b>${fmtTime(eta)}</b>`);
     if (left) rows.push(`Left dock: <b>${fmtTime(left)}</b>`);
-    rows.push(`Speed: <b>${Math.round(v.Speed || 0)} kts · ${Math.round(v.Heading || 0)}°</b>`);
+    rows.push(`Speed: <b>${Math.round(v.Speed||0)} kts · ${Math.round(v.Heading||0)}°</b>`);
   }
-  return `<div class="pop-name">⛴ ${v.VesselName}</div>
-    <div class="pop-row">${rows.join('<br>')}</div>`;
+  return `<div class="pop-name">⛴ ${v.VesselName}</div><div class="pop-row">${rows.join('<br>')}</div>`;
 }
 
 function updateMap() {
   if (!leafMap) return;
   const rv = routeVessels();
   const activeIds = new Set(rv.map(v => v.VesselID));
-
-  // Remove gone vessels
   Object.keys(vMarkers).forEach(id => {
-    if (!activeIds.has(+id)) {
-      leafMap.removeLayer(vMarkers[id]);
-      delete vMarkers[id];
-    }
+    if (!activeIds.has(+id)) { leafMap.removeLayer(vMarkers[id]); delete vMarkers[id]; }
   });
-
   rv.forEach(v => {
     if (!v.Latitude || !v.Longitude) return;
-    const icon = vesselMarkerIcon(v.Heading, v.AtDock);
-    const popup = popupHtml(v);
+    const icon   = vesselMarkerIcon(v.Heading, v.AtDock);
+    const popup  = popupHtml(v);
     if (vMarkers[v.VesselID]) {
-      vMarkers[v.VesselID]
-        .setLatLng([v.Latitude, v.Longitude])
-        .setIcon(icon);
-      if (vMarkers[v.VesselID].getPopup()) {
-        vMarkers[v.VesselID].getPopup().setContent(popup);
-      }
+      vMarkers[v.VesselID].setLatLng([v.Latitude, v.Longitude]).setIcon(icon);
+      vMarkers[v.VesselID].getPopup()?.setContent(popup);
     } else {
       vMarkers[v.VesselID] = L.marker([v.Latitude, v.Longitude], { icon })
         .bindPopup(popup, { maxWidth: 230, closeButton: false })
@@ -1015,26 +893,19 @@ function updateMap() {
   });
 }
 
-// ── Status bar ───────────────────────────────────────────
+// ── Status bar ────────────────────────────────────────────
 function setStatus(state) {
   const dot  = document.getElementById('liveDot');
   const text = document.getElementById('liveText');
-  if (state === 'loading') {
-    dot.className = 'live-dot off';
-    text.textContent = 'Refreshing…';
-  } else if (state === 'live') {
-    dot.className = 'live-dot live';
-    text.textContent = lastUpdate ? `Updated ${elapsedLabel(lastUpdate)}` : 'Live';
-  } else if (state === 'stale') {
-    dot.className = 'live-dot stale';
-    text.textContent = lastUpdate ? `Stale · ${elapsedLabel(lastUpdate)}` : 'Offline';
-  }
+  if (state === 'loading') { dot.className = 'live-dot off'; text.textContent = 'Refreshing…'; }
+  else if (state === 'live')  { dot.className = 'live-dot live';  text.textContent = lastUpdate ? `Updated ${elapsed(lastUpdate)}` : 'Live'; }
+  else if (state === 'stale') { dot.className = 'live-dot stale'; text.textContent = lastUpdate ? `Stale · ${elapsed(lastUpdate)}` : 'Offline'; }
 }
 
 function showError(msg) {
-  const wrap = document.getElementById('schedContent');
   if (!schedData) {
-    wrap.innerHTML = `<div class="err-card">⚠ ${msg}<small>Tap ↺ to retry</small></div>`;
+    document.getElementById('schedContent').innerHTML =
+      `<div class="err-card">⚠ ${msg}<small>Tap ↺ to retry</small></div>`;
   }
   setStatus('stale');
 }
@@ -1044,28 +915,40 @@ async function refresh(forceSchedReload) {
   if (isLoading) return;
   isLoading = true;
   setStatus('loading');
-  const btn = document.getElementById('refreshBtn');
-  btn.classList.add('spinning');
+  document.getElementById('refreshBtn').classList.add('spinning');
 
   try {
-    const promises = [loadVessels()];
-    if (forceSchedReload || !schedData) promises.push(loadSchedule());
-    const results = await Promise.allSettled(promises);
+    const needSched = forceSchedReload || !schedData;
 
-    const vesselResult = results[0];
-    const schedResult  = results.length > 1 ? results[1] : null;
+    // Fetch everything in parallel
+    const fetches = [loadVessels(), loadWaitTimes()];
+    if (needSched) fetches.push(loadSchedRoutes(), loadSchedule());
 
-    if (vesselResult.status === 'fulfilled') {
-      vesselList = Array.isArray(vesselResult.value) ? vesselResult.value : [];
+    const results = await Promise.allSettled(fetches);
+
+    // Vessels (always index 0)
+    if (results[0].status === 'fulfilled' && Array.isArray(results[0].value)) {
+      vesselList = results[0].value;
     }
-    if (schedResult && schedResult.status === 'fulfilled') {
-      schedData = schedResult.value;
+    // Wait times (always index 1)
+    if (results[1].status === 'fulfilled' && Array.isArray(results[1].value)) {
+      waitData = results[1].value;
+    }
+    // SchedRoutes (index 2 when reloading)
+    if (needSched && results[2]?.status === 'fulfilled') {
+      processSchedRoutes(results[2].value);
+    }
+    // Schedule (index 3 when reloading)
+    if (needSched && results[3]?.status === 'fulfilled') {
+      schedData = results[3].value;
     }
 
     if (!schedData) throw new Error('No schedule data');
 
     lastUpdate = new Date();
+    renderAlerts();
     renderSchedule();
+    renderWaitTimes();
     renderVesselStrip();
     updateMap();
     setStatus('live');
@@ -1075,19 +958,16 @@ async function refresh(forceSchedReload) {
     showError('Could not load ferry data. Check your connection.');
   } finally {
     isLoading = false;
-    btn.classList.remove('spinning');
+    document.getElementById('refreshBtn').classList.remove('spinning');
   }
 }
 
-// Update stale label periodically without fetching
-setInterval(() => {
-  if (lastUpdate) setStatus('live');
-}, 60000);
+// Refresh stale label without fetching
+setInterval(() => { if (lastUpdate) setStatus('live'); }, 60000);
 
-// ── Auto-refresh ──────────────────────────────────────────
-// Vessels every 60s; schedule every 10min
-setInterval(() => refresh(false),      60 * 1000);
-setInterval(() => refresh(true),  10 * 60 * 1000);
+// Auto-refresh: vessels + wait times every 60s; full schedule every 10min
+setInterval(() => refresh(false),       60 * 1000);
+setInterval(() => refresh(true),   10 * 60 * 1000);
 
 // ── Boot ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -1103,12 +983,12 @@ document.addEventListener('DOMContentLoaded', () => {
       tab.classList.add('active');
       direction = tab.dataset.dir;
       schedOpen = false;
+      renderWaitTimes();
       if (schedData) renderSchedule();
     });
   });
 
-  // Dismiss home screen tip if already added
-  const tipKey = 'ferry_tip_dismissed';
+  const tipKey = 'ferry_tip_v1';
   if (localStorage.getItem(tipKey) || window.navigator.standalone) {
     document.getElementById('homeTip').classList.add('hidden');
   }
@@ -1117,14 +997,10 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem(tipKey, '1');
   });
 
-  // Re-render countdown on page visibility restore
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && schedData) {
-      refresh(false);
-    }
+    if (!document.hidden) refresh(false);
   });
 });
 </script>
-
 </body>
 </html>
