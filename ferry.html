@@ -836,6 +836,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .arrive-label { font-size: 10px; color: var(--mid); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 2px; }
     .arrive-time { font-size: 24px; font-weight: 700; letter-spacing: -1px; color: var(--mid); }
     .next-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .next-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
     .vessel-tag { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--mid); min-width: 0; }
     .vessel-icon { font-size: 16px; flex-shrink: 0; }
     .vessel-tag-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -869,6 +870,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .sail-arr { font-size: 12px; color: var(--mid); }
     .sail-vessel { font-size: 11px; color: var(--dim); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .sail-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 8px; white-space: nowrap; flex-shrink: 0; }
+    .delay-tag { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; background: rgba(255,84,73,0.15); color: var(--red); }
+    .delay-tag.early { background: rgba(0,201,167,0.12); color: var(--teal); }
     .badge-dock     { background: rgba(255,201,71,0.15); color: var(--amber); }
     .badge-underway { background: var(--teal-glow); color: var(--teal); }
 
@@ -1036,11 +1039,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <div class="loading-wrap"><div class="ring"></div><span id="loadingMsg">Fetching today's schedule…</span></div>
     </div>
 
-    <div class="section-label">Terminal Wait Times</div>
-    <div id="waitContent">
-      <div style="padding:0 16px 8px"><div style="height:56px;border-radius:var(--radius);background:var(--navy-card);border:1px solid var(--border)"></div></div>
-    </div>
-
     <button id="vesselLabel" class="section-label" style="width:100%;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;-webkit-tap-highlight-color:transparent">
       Live Vessels <span id="vesselChevron" style="font-size:10px;color:var(--mid);font-weight:400">▼</span>
     </button>
@@ -1051,6 +1049,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <div id="ferry-map"></div>
         <div class="map-hint">Tap vessel for details</div>
       </div>
+    </div>
+
+    <div class="section-label">Terminal Wait Times</div>
+    <div id="waitContent">
+      <div style="padding:0 16px 8px"><div style="height:56px;border-radius:var(--radius);background:var(--navy-card);border:1px solid var(--border)"></div></div>
     </div>
 
     <div id="homeTip" class="home-tip" style="margin-top:16px">
@@ -1075,7 +1078,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 'use strict';
 
 // ── Build version — bump this string on every deploy ─────
-const BUILD = 'r32';
+const BUILD = 'r33';
 
 // ── Config ───────────────────────────────────────────────
 const API_KEY   = 'ff39cd9c-729e-40ac-b740-1cebec6226f9';
@@ -1465,20 +1468,18 @@ function closeMiniMap() {
 }
 
 function openMiniMap(vesselName) {
-  const wrap = document.getElementById('miniMapWrap');
-  const btn  = document.getElementById('trackBtn');
-  const el   = document.getElementById('miniMapEl');
-  if (!wrap || !el) return;
-
   if (miniMap) { miniMap.remove(); miniMap = null; }
 
-  wrap.classList.add('open');
-  btn && btn.classList.add('active');
+  // Use a short timeout so the browser has committed the container's full height
+  // before Leaflet measures it. rAF alone fires before paint on some mobile browsers.
+  setTimeout(() => {
+    const wrap = document.getElementById('miniMapWrap');
+    const el   = document.getElementById('miniMapEl');
+    if (!wrap || !el) return;
 
-  // Defer Leaflet init to the next frame so the browser paints the container at
-  // full height before Leaflet measures it (synchronous init at 0-height = blank map)
-  requestAnimationFrame(() => {
-    if (!document.getElementById('miniMapEl')) return; // guard if DOM was replaced
+    // Force explicit height so Leaflet always measures 190px regardless of CSS state
+    el.style.height = '190px';
+
     miniMap = L.map(el, {
       zoomControl: false, attributionControl: false,
       dragging: true, scrollWheelZoom: false, touchZoom: true,
@@ -1518,9 +1519,8 @@ function openMiniMap(vesselName) {
       miniMap.fitBounds([[TERMINALS.SEA.lat, TERMINALS.SEA.lng],[TERMINALS.BI.lat, TERMINALS.BI.lng]], { padding: [20,20] });
     }
 
-    // Second invalidateSize pass after container transition completes (~280ms)
-    setTimeout(() => miniMap && miniMap.invalidateSize({ reset: true }), 350);
-  });
+    setTimeout(() => miniMap && miniMap.invalidateSize({ reset: true }), 200);
+  }, 50);
 }
 
 // ── Live vessel helpers ───────────────────────────────────
@@ -1582,7 +1582,15 @@ function renderSchedule() {
 
   let html = `
     <div class="next-card" id="nextCard">
-      <div class="next-eyebrow">${isUnderway ? 'Current Sailing' : 'Next Sailing'}</div>
+      <div class="next-header">
+        <div class="vessel-tag">
+          <span class="vessel-icon">⛴</span>
+          <span class="vessel-tag-name" style="color:${getVesselColor(next.vessel)}">${next.vessel || 'Vessel TBD'}</span>
+          ${status ? `<span class="sail-badge ${status.cls}">${status.text}</span>` : ''}
+        </div>
+        <div class="countdown-pill ${cd.cls}" id="cdPill">${cd.text}</div>
+      </div>
+      <div class="next-eyebrow">${isUnderway ? 'Arrival Time' : 'Departs'}</div>
       <div class="next-body">
         <div class="next-depart">
           <span class="depart-big">${dt}</span><span class="depart-ampm">${dap}</span>
@@ -1592,14 +1600,6 @@ function renderSchedule() {
           <div class="arrive-label">${smallLabel}</div>
           <div class="arrive-time">${fmtTime(smallTime)}</div>
         </div>
-      </div>
-      <div class="next-footer">
-        <div class="vessel-tag">
-          <span class="vessel-icon">⛴</span>
-          <span class="vessel-tag-name" style="color:${getVesselColor(next.vessel)}">${next.vessel || 'Vessel TBD'}</span>
-          ${status ? `<span class="sail-badge ${status.cls}">${status.text}</span>` : ''}
-        </div>
-        <div class="countdown-pill ${cd.cls}" id="cdPill">${cd.text}</div>
       </div>
       ${lv && !lv.AtDock ? `<div class="mini-map-wrap open" id="miniMapWrap"><div id="miniMapEl"></div></div>` : ''}
     </div>`;
@@ -1611,10 +1611,12 @@ function renderSchedule() {
       const lv2 = getLiveVessel(d.vessel);
       const liveEta2 = (lv2 && !lv2.AtDock) ? parseWSDot(lv2.Eta) : null;
       const arriveTime = liveEta2 || d.arrive;
-      const badge = lv2
-        ? (lv2.AtDock
-            ? `<span class="sail-badge badge-dock">Dock</span>`
-            : `<span class="sail-badge badge-underway">Away</span>`)
+      // Show delay tag only when we have a live ETA that differs from schedule by ≥2 min
+      const delayMins = (liveEta2 && d.arrive) ? Math.round((liveEta2 - d.arrive) / 60000) : null;
+      const delayTag  = (delayMins !== null && Math.abs(delayMins) >= 2)
+        ? (delayMins > 0
+            ? `<span class="delay-tag">+${delayMins}m</span>`
+            : `<span class="delay-tag early">−${Math.abs(delayMins)}m</span>`)
         : '';
       html += `
         <div class="sail-row">
@@ -1622,7 +1624,7 @@ function renderSchedule() {
             <div class="sail-vessel">${d.vessel}</div>
           </div>
           <div class="sail-arr">→ ${fmtTime(arriveTime)}</div>
-          <div style="text-align:right">${badge}</div>
+          <div style="text-align:right">${delayTag}</div>
         </div>`;
     });
     html += `</div>`;
