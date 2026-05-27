@@ -1078,7 +1078,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 'use strict';
 
 // ── Build version — bump this string on every deploy ─────
-const BUILD = 'r33';
+const BUILD = 'r34';
 
 // ── Config ───────────────────────────────────────────────
 const API_KEY   = 'ff39cd9c-729e-40ac-b740-1cebec6226f9';
@@ -1548,7 +1548,6 @@ function vesselStatus(lv) {
 
 // ── Render schedule ───────────────────────────────────────
 function renderSchedule() {
-  closeMiniMap(); // clean up any existing mini-map before overwriting DOM
   const wrap = document.getElementById('schedContent');
   const departures = getDepartures();
 
@@ -1601,30 +1600,21 @@ function renderSchedule() {
           <div class="arrive-time">${fmtTime(smallTime)}</div>
         </div>
       </div>
-      ${lv && !lv.AtDock ? `<div class="mini-map-wrap open" id="miniMapWrap"><div id="miniMapEl"></div></div>` : ''}
     </div>`;
 
   if (rest.length) {
     html += `<div class="section-label">Upcoming</div><div class="upcoming-list">`;
     rest.forEach(d => {
       const { t, ap } = splitTime(d.depart);
-      const lv2 = getLiveVessel(d.vessel);
-      const liveEta2 = (lv2 && !lv2.AtDock) ? parseWSDot(lv2.Eta) : null;
-      const arriveTime = liveEta2 || d.arrive;
-      // Show delay tag only when we have a live ETA that differs from schedule by ≥2 min
-      const delayMins = (liveEta2 && d.arrive) ? Math.round((liveEta2 - d.arrive) / 60000) : null;
-      const delayTag  = (delayMins !== null && Math.abs(delayMins) >= 2)
-        ? (delayMins > 0
-            ? `<span class="delay-tag">+${delayMins}m</span>`
-            : `<span class="delay-tag early">−${Math.abs(delayMins)}m</span>`)
-        : '';
+      // Use only the scheduled arrival — live ETA reflects the vessel's current trip,
+      // not this future scheduled trip, so it must not override d.arrive here.
       html += `
         <div class="sail-row">
           <div class="sail-dep">${t}<small> ${ap}</small>
             <div class="sail-vessel">${d.vessel}</div>
           </div>
-          <div class="sail-arr">→ ${fmtTime(arriveTime)}</div>
-          <div style="text-align:right">${delayTag}</div>
+          <div class="sail-arr">→ ${fmtTime(d.arrive)}</div>
+          <div></div>
         </div>`;
     });
     html += `</div>`;
@@ -1663,9 +1653,6 @@ function renderSchedule() {
     document.getElementById('schedList').classList.toggle('open', schedOpen);
     document.getElementById('schedChevron').classList.toggle('open', schedOpen);
   });
-
-  // Auto-open mini-map when vessel is underway (no toggle needed)
-  if (lv && !lv.AtDock) openMiniMap(next.vessel);
 
   const nextCardEl = document.getElementById('nextCard');
   function updateProgress() {
