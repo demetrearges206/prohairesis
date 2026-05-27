@@ -725,8 +725,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .build-tag { font-size: 10px; color: var(--dim); background: rgba(255,255,255,0.04); border-radius: 4px; padding: 1px 5px; font-variant-numeric: tabular-nums; }
     .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
     .live-dot.live  { animation: livepulse 2s ease-in-out infinite; }
-    .live-dot.stale { background: var(--red); animation: none; }
-    .live-dot.off   { background: var(--dim); animation: none; }
+    .live-dot.stale   { background: var(--red);   animation: none; }
+    .live-dot.partial { background: var(--amber); animation: none; }
+    .live-dot.off     { background: var(--dim);   animation: none; }
     @keyframes livepulse { 0%,100%{opacity:1} 50%{opacity:.25} }
     .hdr-actions { display: flex; align-items: center; gap: 6px; }
     .icon-btn {
@@ -1074,7 +1075,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 'use strict';
 
 // ── Build version — bump this string on every deploy ─────
-const BUILD = 'r31';
+const BUILD = 'r32';
 
 // ── Config ───────────────────────────────────────────────
 const API_KEY   = 'ff39cd9c-729e-40ac-b740-1cebec6226f9';
@@ -1426,6 +1427,16 @@ function getDepartures() {
     .sort((a, b) => a.depart - b.depart);
 }
 
+// Return the first scheduled departure in the opposite direction after `afterTime`
+function getReturnDeparture(afterTime) {
+  if (!afterTime) return null;
+  const saved = direction;
+  direction = (direction === 'SEA-BI') ? 'BI-SEA' : 'SEA-BI';
+  const deps = getDepartures();
+  direction = saved;
+  return deps.find(d => d.depart > afterTime) || null;
+}
+
 function getScheduleNotes() {
   const combo = findCombo();
   return combo && combo.SailingNotes ? [combo.SailingNotes] : [];
@@ -1464,55 +1475,62 @@ function openMiniMap(vesselName) {
   wrap.classList.add('open');
   btn && btn.classList.add('active');
 
-  miniMap = L.map(el, {
-    zoomControl: false, attributionControl: false,
-    dragging: true, scrollWheelZoom: false, touchZoom: true,
-  });
-  L.geoJSON(PUGET_SOUND_LAND, { style: LAND_STYLE }).addTo(miniMap);
-
-  L.polyline([
-    [TERMINALS.SEA.lat, TERMINALS.SEA.lng],
-    [TERMINALS.BI.lat,  TERMINALS.BI.lng],
-  ], { color: 'rgba(0,201,167,0.6)', weight: 2.5, dashArray: '6 5' }).addTo(miniMap);
-
-  const mkLabel = (t) => L.marker([t.lat, t.lng], {
-    icon: L.divIcon({
-      html: `<div style="background:#0b1a30;border:1.5px solid #00c9a7;border-radius:3px;padding:1px 5px;font-family:-apple-system,system-ui,sans-serif;font-size:9px;font-weight:700;color:#00c9a7;white-space:nowrap">${t.abbrev}</div>`,
-      className: '', iconAnchor: [0, 0],
-    }), interactive: false,
-  }).addTo(miniMap);
-  mkLabel(TERMINALS.SEA);
-  mkLabel(TERMINALS.BI);
-
-  const vessel = vesselList.find(v => v.VesselName === vesselName && v.InService);
-  if (vessel && vessel.Latitude && vessel.Longitude) {
-    const color = getVesselColor(vesselName);
-    const icon  = L.divIcon({
-      html: `<div style="width:30px;height:30px;display:flex;align-items:center;justify-content:center">
-        <svg width="18" height="24" viewBox="0 0 18 24" fill="none"
-             style="transform:rotate(${vessel.Heading||0}deg);filter:drop-shadow(0 0 6px ${color}88)">
-          <path d="M9 2 L16 21 Q9 18 2 21 Z" fill="${color}"/>
-        </svg></div>`,
-      className: '', iconSize: [30, 30], iconAnchor: [15, 15],
+  // Defer Leaflet init to the next frame so the browser paints the container at
+  // full height before Leaflet measures it (synchronous init at 0-height = blank map)
+  requestAnimationFrame(() => {
+    if (!document.getElementById('miniMapEl')) return; // guard if DOM was replaced
+    miniMap = L.map(el, {
+      zoomControl: false, attributionControl: false,
+      dragging: true, scrollWheelZoom: false, touchZoom: true,
     });
-    L.marker([vessel.Latitude, vessel.Longitude], { icon })
-      .bindPopup(`<div style="font-weight:700;font-size:13px">⛴ ${vesselName}</div><div style="font-size:11px;color:#8099c0;margin-top:4px">${Math.round(vessel.Speed||0)} kts · ${Math.round(vessel.Heading||0)}°</div>`, { closeButton: false })
-      .addTo(miniMap);
-    miniMap.setView([vessel.Latitude, vessel.Longitude], 11);
-  } else {
-    miniMap.fitBounds([[TERMINALS.SEA.lat, TERMINALS.SEA.lng],[TERMINALS.BI.lat, TERMINALS.BI.lng]], { padding: [20,20] });
-  }
+    L.geoJSON(PUGET_SOUND_LAND, { style: LAND_STYLE }).addTo(miniMap);
 
-  setTimeout(() => miniMap && miniMap.invalidateSize(), 30);
+    L.polyline([
+      [TERMINALS.SEA.lat, TERMINALS.SEA.lng],
+      [TERMINALS.BI.lat,  TERMINALS.BI.lng],
+    ], { color: 'rgba(0,201,167,0.6)', weight: 2.5, dashArray: '6 5' }).addTo(miniMap);
+
+    const mkLabel = (t) => L.marker([t.lat, t.lng], {
+      icon: L.divIcon({
+        html: `<div style="background:#0b1a30;border:1.5px solid #00c9a7;border-radius:3px;padding:1px 5px;font-family:-apple-system,system-ui,sans-serif;font-size:9px;font-weight:700;color:#00c9a7;white-space:nowrap">${t.abbrev}</div>`,
+        className: '', iconAnchor: [0, 0],
+      }), interactive: false,
+    }).addTo(miniMap);
+    mkLabel(TERMINALS.SEA);
+    mkLabel(TERMINALS.BI);
+
+    const vessel = Array.isArray(vesselList) && vesselList.find(v => v.VesselName === vesselName && v.InService);
+    if (vessel && vessel.Latitude && vessel.Longitude) {
+      const color = getVesselColor(vesselName);
+      const icon  = L.divIcon({
+        html: `<div style="width:30px;height:30px;display:flex;align-items:center;justify-content:center">
+          <svg width="18" height="24" viewBox="0 0 18 24" fill="none"
+               style="transform:rotate(${vessel.Heading||0}deg);filter:drop-shadow(0 0 6px ${color}88)">
+            <path d="M9 2 L16 21 Q9 18 2 21 Z" fill="${color}"/>
+          </svg></div>`,
+        className: '', iconSize: [30, 30], iconAnchor: [15, 15],
+      });
+      L.marker([vessel.Latitude, vessel.Longitude], { icon })
+        .bindPopup(`<div style="font-weight:700;font-size:13px">⛴ ${vesselName}</div><div style="font-size:11px;color:#8099c0;margin-top:4px">${Math.round(vessel.Speed||0)} kts · ${Math.round(vessel.Heading||0)}°</div>`, { closeButton: false })
+        .addTo(miniMap);
+      miniMap.setView([vessel.Latitude, vessel.Longitude], 11);
+    } else {
+      miniMap.fitBounds([[TERMINALS.SEA.lat, TERMINALS.SEA.lng],[TERMINALS.BI.lat, TERMINALS.BI.lng]], { padding: [20,20] });
+    }
+
+    // Second invalidateSize pass after container transition completes (~280ms)
+    setTimeout(() => miniMap && miniMap.invalidateSize({ reset: true }), 350);
+  });
 }
 
 // ── Live vessel helpers ───────────────────────────────────
 function getLiveVessel(name) {
-  if (!name) return null;
+  if (!name || !Array.isArray(vesselList)) return null;
   return vesselList.find(v => v.VesselName === name && v.InService) || null;
 }
 
 function routeVessels() {
+  if (!Array.isArray(vesselList)) return [];
   return vesselList.filter(v =>
     v.InService &&
     ((v.DepartingTerminalID === TERMINALS.SEA.id || v.ArrivingTerminalID === TERMINALS.SEA.id) &&
@@ -1552,8 +1570,10 @@ function renderSchedule() {
   const isUnderway = !!(lv && !lv.AtDock);
   const liveEta = isUnderway ? parseWSDot(lv.Eta) : null;
   const bigTime   = isUnderway ? (liveEta || next.arrive) : next.depart;
-  const smallTime = isUnderway ? next.depart : next.arrive;
-  const smallLabel = isUnderway ? 'DEPARTED' : 'ARRIVES';
+  // When underway: right side shows next return departure from the arriving terminal
+  const returnDep   = isUnderway ? getReturnDeparture(bigTime) : null;
+  const smallTime   = isUnderway ? (returnDep ? returnDep.depart : next.depart)  : next.arrive;
+  const smallLabel  = isUnderway ? (returnDep ? 'RETURN DEP'    : 'DEPARTED')    : 'ARRIVES';
   const cdTarget  = isUnderway ? (liveEta || next.arrive) : next.depart;
   const { t: dt, ap: dap } = splitTime(bigTime);
   const { t: depT, ap: depAp } = splitTime(next.depart);
@@ -1807,9 +1827,10 @@ function setLoadingMsg(msg) {
 function setStatus(state) {
   const dot  = document.getElementById('liveDot');
   const text = document.getElementById('liveText');
-  if (state === 'loading') { dot.className = 'live-dot off'; text.textContent = 'Refreshing…'; }
-  else if (state === 'live')  { dot.className = 'live-dot live';  text.textContent = lastUpdate ? `Updated ${elapsed(lastUpdate)}` : 'Live'; }
-  else if (state === 'stale') { dot.className = 'live-dot stale'; text.textContent = lastUpdate ? `Stale · ${elapsed(lastUpdate)}` : 'Offline'; }
+  if (state === 'loading')  { dot.className = 'live-dot off';     text.textContent = 'Refreshing…'; }
+  else if (state === 'live')    { dot.className = 'live-dot live';    text.textContent = lastUpdate ? `Updated ${elapsed(lastUpdate)}` : 'Live'; }
+  else if (state === 'partial') { dot.className = 'live-dot partial'; text.textContent = 'Schedule · vessels offline'; }
+  else if (state === 'stale')   { dot.className = 'live-dot stale';   text.textContent = lastUpdate ? `Stale · ${elapsed(lastUpdate)}` : 'Offline'; }
 }
 
 function showError(msg) {
@@ -1845,8 +1866,9 @@ async function refresh(forceSchedReload) {
 
     const vesselsOk = results[0].status === 'fulfilled' && Array.isArray(results[0].value);
     const waitOk    = results[1].status === 'fulfilled' && Array.isArray(results[1].value);
-    if (vesselsOk) vesselList = results[0].value;
-    if (waitOk)    waitData   = results[1].value;
+    // Always assign — default to [] on failure so downstream finds/filters never throw
+    vesselList = vesselsOk ? results[0].value : [];
+    waitData   = waitOk   ? results[1].value : [];
     if (needSched) {
       if (results[2]?.status === 'fulfilled') processSchedRoutes(results[2].value);
       if (results[3]?.status === 'fulfilled') schedData = results[3].value;
@@ -1862,7 +1884,8 @@ async function refresh(forceSchedReload) {
     renderWaitTimes();
     renderVesselStrip();
     updateMap();
-    setStatus('live');
+    // Show amber "partial" state when vessel API failed but schedule is available
+    setStatus(vesselsOk ? 'live' : 'partial');
 
   } catch (e) {
     console.error('Refresh error:', e);
