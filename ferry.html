@@ -844,11 +844,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .countdown-pill {
       font-size: 14px; font-weight: 700; padding: 5px 14px; border-radius: 20px;
       background: var(--teal-dim); color: var(--teal); flex-shrink: 0;
-      white-space: nowrap; transition: background 0.3s, color 0.3s;
+      transition: background 0.3s, color 0.3s; text-align: center; line-height: 1.2;
     }
     .countdown-pill.soon { background: rgba(255,201,71,0.18); color: var(--amber); }
     .countdown-pill.now  { background: rgba(255,84,73,0.18);  color: var(--red); }
     .countdown-pill.gone { background: rgba(255,255,255,0.06); color: var(--mid); }
+    .cd-sublabel { display: block; font-size: 8px; font-weight: 600; opacity: 0.65;
+                   letter-spacing: 0.6px; text-transform: uppercase; margin-top: 2px; }
+    .return-dep-footer { font-size: 10px; color: var(--mid); margin-top: 10px;
+                         padding-top: 8px; border-top: 1px solid var(--border); letter-spacing: 0.3px; }
 
     /* ── Section label ───────────────────────────────────────── */
     .section-label {
@@ -1035,7 +1039,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
     <div id="alertBanner" class="alert-banner hidden"></div>
 
-    <div id="schedContent">
+    <div id="schedFeatured">
       <div class="loading-wrap"><div class="ring"></div><span id="loadingMsg">Fetching today's schedule…</span></div>
     </div>
 
@@ -1050,6 +1054,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <div class="map-hint">Tap vessel for details</div>
       </div>
     </div>
+
+    <div id="schedContent"></div>
 
     <div class="section-label">Terminal Wait Times</div>
     <div id="waitContent">
@@ -1078,7 +1084,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 'use strict';
 
 // ── Build version — bump this string on every deploy ─────
-const BUILD = 'r34';
+const BUILD = 'r35';
 
 // ── Config ───────────────────────────────────────────────
 const API_KEY   = 'ff39cd9c-729e-40ac-b740-1cebec6226f9';
@@ -1548,17 +1554,20 @@ function vesselStatus(lv) {
 
 // ── Render schedule ───────────────────────────────────────
 function renderSchedule() {
-  const wrap = document.getElementById('schedContent');
+  const featWrap = document.getElementById('schedFeatured');
+  const wrap     = document.getElementById('schedContent');
   const departures = getDepartures();
 
   if (!departures.length) {
-    wrap.innerHTML = `<div class="empty-state"><strong>No sailings found</strong>Check back tomorrow</div>`;
+    featWrap.innerHTML = `<div class="empty-state"><strong>No sailings found</strong>Check back tomorrow</div>`;
+    wrap.innerHTML = '';
     return;
   }
 
   const upcoming = departures.filter(d => minsTo(d.depart) > -5);
   if (!upcoming.length) {
-    wrap.innerHTML = `<div class="empty-state"><strong>No more sailings today</strong>Last ferry has departed</div>`;
+    featWrap.innerHTML = `<div class="empty-state"><strong>No more sailings today</strong>Last ferry has departed</div>`;
+    wrap.innerHTML = '';
     renderFullSched(wrap, departures, null);
     return;
   }
@@ -1568,18 +1577,20 @@ function renderSchedule() {
   const lv = getLiveVessel(next.vessel);
   const isUnderway = !!(lv && !lv.AtDock);
   const liveEta = isUnderway ? parseWSDot(lv.Eta) : null;
-  const bigTime   = isUnderway ? (liveEta || next.arrive) : next.depart;
-  // When underway: right side shows next return departure from the arriving terminal
-  const returnDep   = isUnderway ? getReturnDeparture(bigTime) : null;
-  const smallTime   = isUnderway ? (returnDep ? returnDep.depart : next.depart)  : next.arrive;
-  const smallLabel  = isUnderway ? (returnDep ? 'RETURN DEP'    : 'DEPARTED')    : 'ARRIVES';
-  const cdTarget  = isUnderway ? (liveEta || next.arrive) : next.depart;
+  const bigTime    = isUnderway ? (liveEta || next.arrive) : next.depart;
+  // When underway: find next return departure from arriving terminal
+  const returnDep  = isUnderway ? getReturnDeparture(bigTime) : null;
+  // Right-side block only shown when returnDep is absent
+  const smallTime  = isUnderway ? next.depart  : next.arrive;
+  const smallLabel = isUnderway ? 'DEPARTED'   : 'ARRIVES';
+  const cdTarget   = isUnderway ? (liveEta || next.arrive) : next.depart;
   const { t: dt, ap: dap } = splitTime(bigTime);
   const { t: depT, ap: depAp } = splitTime(next.depart);
   const cd = countdownInfo(cdTarget);
   const status = vesselStatus(lv);
 
-  let html = `
+  // ── Featured card (renders into #schedFeatured) ────────
+  featWrap.innerHTML = `
     <div class="next-card" id="nextCard">
       <div class="next-header">
         <div class="vessel-tag">
@@ -1587,7 +1598,7 @@ function renderSchedule() {
           <span class="vessel-tag-name" style="color:${getVesselColor(next.vessel)}">${next.vessel || 'Vessel TBD'}</span>
           ${status ? `<span class="sail-badge ${status.cls}">${status.text}</span>` : ''}
         </div>
-        <div class="countdown-pill ${cd.cls}" id="cdPill">${cd.text}</div>
+        <div class="countdown-pill ${cd.cls}" id="cdPill">${cd.text}${isUnderway ? '<span class="cd-sublabel">to arrival</span>' : ''}</div>
       </div>
       <div class="next-eyebrow">${isUnderway ? 'Arrival Time' : 'Departs'}</div>
       <div class="next-body">
@@ -1595,19 +1606,23 @@ function renderSchedule() {
           <span class="depart-big">${dt}</span><span class="depart-ampm">${dap}</span>
           ${isUnderway ? `<div style="font-size:11px;color:var(--mid);margin-top:4px">Dep ${depT}<small style="font-size:9px;margin-left:2px">${depAp}</small></div>` : ''}
         </div>
+        ${!returnDep ? `
         <div class="arrive-block">
           <div class="arrive-label">${smallLabel}</div>
           <div class="arrive-time">${fmtTime(smallTime)}</div>
-        </div>
+        </div>` : ''}
       </div>
+      ${returnDep ? `<div class="return-dep-footer">Return dep · ${fmtTime(returnDep.depart)}</div>` : ''}
     </div>`;
+
+  // ── Upcoming + full schedule (renders into #schedContent) ─
+  let html = '';
 
   if (rest.length) {
     html += `<div class="section-label">Upcoming</div><div class="upcoming-list">`;
     rest.forEach(d => {
       const { t, ap } = splitTime(d.depart);
-      // Use only the scheduled arrival — live ETA reflects the vessel's current trip,
-      // not this future scheduled trip, so it must not override d.arrive here.
+      // Always use scheduled arrival — live ETA is for the vessel's current trip only
       html += `
         <div class="sail-row">
           <div class="sail-dep">${t}<small> ${ap}</small>
@@ -1670,10 +1685,11 @@ function renderSchedule() {
     const pill = document.getElementById('cdPill');
     if (!pill) { clearInterval(cdTimer); return; }
     const { text, cls } = countdownInfo(cdTarget);
-    pill.textContent = text;
+    // Preserve the "to arrival" sublabel while updating the countdown text
+    pill.innerHTML = `${text}${isUnderway ? '<span class="cd-sublabel">to arrival</span>' : ''}`;
     pill.className = `countdown-pill ${cls}`;
     updateProgress();
-  }, 20000);
+  }, 10000);
 }
 
 // ── Vessel strip ──────────────────────────────────────────
